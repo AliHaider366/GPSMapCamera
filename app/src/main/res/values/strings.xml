@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">GPSMapCamera</string>
+    <string name="add_note">Add Note</string>
+    <string name="add_custom_name">Add Custom Name</string>
+    <string name="date_and_time">Date and time</string>
+    <string name="day">Day</string>
+    <string name="hour_minute_second">Hour minute second</string>
+    <string name="_24_hours">24 Hours</string>
+    <string name="decimal">Decimal</string>
+    <string name="dms">DMS</string>
+    <string name="line_1">Line 1</string>
+    <string name="line_2">Line 2</string>
+    <string name="line_3">Line 3</string>
+    <string name="line_4">Line 4</string>
+
+    <string-array name="aspect_ratios">
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+    <string-array name="grid_options">
+        <item>Off</item>
+        <item>2x2</item>
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
+
+</resources>
