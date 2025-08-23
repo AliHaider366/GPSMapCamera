@@ -38,7 +38,7 @@
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"/>
     </FrameLayout>
-    <com.example.gpsmapcamera.GridOverlayView
+    <com.example.gpsmapcamera.cameraHelper.GridOverlayView
         android:id="@+id/gridOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

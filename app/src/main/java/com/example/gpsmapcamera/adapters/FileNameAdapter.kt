@@ -13,7 +13,7 @@ import com.example.gpsmapcamera.activities.FieldItem
 import com.example.gpsmapcamera.databinding.FilenameRecyclerItem1Binding
 import com.example.gpsmapcamera.databinding.FilenameRecyclerItem2Binding
 import com.example.gpsmapcamera.utils.formatForFile
-import com.example.gpsmapcamera.utils.setDrawableEnd
+import com.example.gpsmapcamera.utils.setDrawable
 import java.util.Date
 
 class FileNameAdapter(
@@ -194,13 +194,13 @@ class FileNameAdapter(
                 if (item.isDropCheck==null)         /// hide dropdown icon and disable click
                 {
                     titleTv.isEnabled=false
-                    titleTv.setDrawableEnd(null)
+                    titleTv.setDrawable(end = null)
                     titleTv.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
                 }
                 else
                 {
                     titleTv.isEnabled=true
-                    titleTv.setDrawableEnd(R.drawable.dropdown_open_ic)
+                    titleTv.setDrawable(end = R.drawable.dropdown_open_ic)
                 }
 
 
@@ -211,12 +211,12 @@ class FileNameAdapter(
                         if(item.isDropDownVisible==true) {
                             dropdown.visibility = View.GONE
                             item.isDropDownVisible=false
-                            titleTv.setDrawableEnd(R.drawable.dropdown_open_ic)
+                            titleTv.setDrawable(end = R.drawable.dropdown_open_ic)
                         }
                         else {
                             dropdown.visibility = View.VISIBLE
                             item.isDropDownVisible=true
-                            titleTv.setDrawableEnd(R.drawable.dropdown_close_ic)
+                            titleTv.setDrawable(end =R.drawable.dropdown_close_ic)
                         }
                     }
                     else if (item.isDropCheck == false)
@@ -224,13 +224,13 @@ class FileNameAdapter(
                         if(item.isDropDownVisible==true) {
                             dropdownTv.visibility = View.GONE
                             item.isDropDownVisible=false
-                            titleTv.setDrawableEnd(R.drawable.dropdown_open_ic)
+                            titleTv.setDrawable(end =R.drawable.dropdown_open_ic)
 
                         }
                         else {
                             dropdownTv.visibility = View.VISIBLE
                             item.isDropDownVisible=true
-                            titleTv.setDrawableEnd(R.drawable.dropdown_close_ic)
+                            titleTv.setDrawable(end =R.drawable.dropdown_close_ic)
 
                         }
                     }

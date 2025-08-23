@@ -35,11 +35,57 @@
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
                 android:background="#000"
-                android:scaleType="fitCenter" />
-            <!--app:implementationMode="compatible"-->
+                app:implementationMode="performance"
+            app:scaleType="fillCenter" />
+            <!-- app:implementationMode="compatible"-->
         </FrameLayout>
-
+        <com.example.gpsmapcamera.cameraHelper.GridOverlayView
+            android:id="@+id/gridOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            />
+        <com.example.gpsmapcamera.cameraHelper.LevelView
+            android:id="@+id/cameraLevel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"/>
     </eightbitlab.com.blurview.BlurTarget>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/brightnessBarView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.example.gpsmapcamera.utils.VerticalSeekBar
+            android:id="@+id/brightnessBar"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:progressDrawable="@drawable/custom_progress"
+            android:thumb="@drawable/brightness_bar_thumb"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/progressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:text="0"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/brightnessBar" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <!--defaut top menu-->
@@ -85,7 +131,7 @@
                 android:padding="@dimen/_5sdp"
                 android:layout_weight="1"
                 android:src="@drawable/flash_ic"
-                />
+                 />
 
             <ImageView
                 android:id="@+id/pick_galley_btn"
@@ -146,12 +192,12 @@
                     android:id="@+id/ratio_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/ratio_ic"
+                    android:drawableTop="@drawable/ratio16_ic"
                     android:drawablePadding="@dimen/_5sdp"
                     android:text="Ratio"
                     android:gravity="center"
                     android:layout_weight="1"
-                    android:textColor="@color/white"
+                    android:textColor="@color/blue"
                     android:textSize="@dimen/_10sdp"
                     />
 
@@ -218,7 +264,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/brigghtness_btn"
+                    android:id="@+id/brightness_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/brightness_ic"

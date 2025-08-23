@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity() {
         flashToggle.setOnClickListener {
 //            flashEnabled = !flashEnabled
 //            imageCapture?.flashMode = if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
-            cameraManager.toggleFlash()
+            cameraManager.toggleFlash(true)
 
         }
 

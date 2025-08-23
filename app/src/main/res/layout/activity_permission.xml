@@ -125,6 +125,7 @@
                     android:layout_marginVertical="@dimen/_10sdp"
                     android:background="@drawable/bg_stroke_10"
                     android:gravity="center"
+
                     android:paddingHorizontal="@dimen/_30sdp"
                     android:paddingVertical="@dimen/_10sdp"
                     android:text="Allow"
@@ -284,7 +285,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_radius_10"
-        android:backgroundTint="@color/blue"
+        android:backgroundTint="@color/blue_b3"
+        android:enabled="false"
         android:layout_marginHorizontal="@dimen/_10sdp"
         android:layout_marginBottom="@dimen/_10sdp"
         android:gravity="center"

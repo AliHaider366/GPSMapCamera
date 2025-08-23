@@ -5,9 +5,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#3972FE</color>
     <color name="blue_b2">#E0E7FF</color>
+    <color name="blue_b3">#BBCFFF</color>
     <color name="green_g1">#D1FAE5</color>
     <color name="yellow_y1">#FEF3C7</color>
     <color name="grey_g1">#D1D5DB</color>
     <color name="grey_g2">#F3F4F6</color>
     <color name="transparent">#00FFFFFF</color>
+    <color name="rippleColor">#69D0D0D0</color>
 </resources>

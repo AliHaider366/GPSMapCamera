@@ -1,9 +1,12 @@
 package com.example.gpsmapcamera.cameraHelper
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.media.MediaActionSound
@@ -13,11 +16,17 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.ViewAnimationUtils
+import android.view.ViewTreeObserver
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -30,12 +39,29 @@ import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.FallbackStrategy
+import androidx.camera.video.FileOutputOptions
+import androidx.camera.video.MediaStoreOutputOptions
+import androidx.camera.video.OutputOptions
+import androidx.camera.video.Quality
+import androidx.camera.video.QualitySelector
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.enums.ImageFormat
 import com.example.gpsmapcamera.enums.ImageQuality
+import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
 import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.PrefManager.getCameraFlash
+import com.example.gpsmapcamera.utils.animateLightSweep
+import com.example.gpsmapcamera.utils.animateRippleReveal
+import com.example.gpsmapcamera.utils.playCurtainAnimation
+import com.example.gpsmapcamera.utils.tooBitmap
 import jp.co.cyberagent.android.gpuimage.GPUImage
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageGrayscaleFilter
 import java.io.File
@@ -44,6 +70,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.hypot
 
 class CameraManager(
     private val context: Context,
@@ -52,6 +79,7 @@ class CameraManager(
     )
 {
     private var imageCapture: ImageCapture? = null
+    private var videoCapture: VideoCapture<Recorder>? = null
     private var camera: Camera? = null
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
     private var flashEnabled = false
@@ -66,12 +94,23 @@ class CameraManager(
     private var qrCodeAnalyzer: QRCodeAnalyzer? = null
     private var qrImageAnalysis: ImageAnalysis? = null
     private var isQRCodeEnabled = false
+    private var isVideoRecordEnabled = false
 
     private val cameraProviderFuture by lazy {
         ProcessCameraProvider.getInstance(context)
     }
 
 
+    fun setVideoRecord(enabled: Boolean)
+    {
+        isVideoRecordEnabled = enabled
+        val container = previewView.parent as? FrameLayout
+//                container?.playCurtainAnimation(
+//                    duration = 1000,
+//                )
+//                container?.animateLightSweep()
+        startCamera()
+    }
     fun setQRCodeDetectionEnabled(enabled: Boolean, onResult: (String) -> Unit) {
         isQRCodeEnabled = enabled
         if (enabled) {
@@ -122,6 +161,7 @@ class CameraManager(
     {
         camera?.cameraControl?.setZoomRatio(zoom)
     }
+
     fun setBrightness(level: Int) {
         val range = camera?.cameraInfo?.exposureState?.exposureCompensationRange
         if (range != null && level in range) {
@@ -135,12 +175,294 @@ class CameraManager(
         startCamera()
     }
 
-    fun toggleFlash() {
-        flashEnabled = !flashEnabled
-        imageCapture?.flashMode = if (flashEnabled)
-            ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
+    fun toggleFlash(isFlashEnabled:Boolean) {
+        flashEnabled = isFlashEnabled
+        if (imageCapture != null)
+        {
+            imageCapture?.setFlashMode(if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
+        }
+        else startCamera()
     }
 
+    fun captureSound(soundEnabled:Boolean)
+    {
+        captureSoundEnabled=soundEnabled
+    }
+
+    private var activeRecording: Recording? = null
+
+    fun stopVideoRecording() {
+        activeRecording?.stop()
+        activeRecording = null
+    }
+
+    fun startVideoRecording(
+        onStarted: () -> Unit,
+        onSaved: (Uri) -> Unit,
+        onError: (String) -> Unit
+    ) {
+
+        val vc = videoCapture ?: return onError("VideoCapture not ready")
+
+        val saveFileName = generateImageFileName(prefix = "VID",extension = ".mp4")
+       /* val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "Movies/${BuildConfig.APPLICATION_ID}")
+        }
+
+        val mediaStoreOptions = MediaStoreOutputOptions.Builder(
+            context.contentResolver,
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        )
+            .setContentValues(contentValues)
+            .build()*/
+        // Choose output options based on Android version
+        val outputOptions: OutputOptions =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // ✅ Android 10 and above → MediaStore
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, saveFileName)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, SAVED_DEFAULT_FILE_PATH)
+                }
+
+                MediaStoreOutputOptions.Builder(
+                    context.contentResolver,
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                )
+                    .setContentValues(contentValues)
+                    .build()
+            } else {
+                // ✅ Android 9 and below → FileOutputOptions
+                val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+                val appDir = File(moviesDir, BuildConfig.APPLICATION_ID)
+                if (!appDir.exists()) appDir.mkdirs()
+
+                val file = File(appDir, saveFileName)
+                FileOutputOptions.Builder(file).build()
+            }
+
+        val pendingRecording = when (outputOptions) {
+            is MediaStoreOutputOptions -> vc.output.prepareRecording(context, outputOptions)
+            is FileOutputOptions -> vc.output.prepareRecording(context, outputOptions)
+            else -> {
+                onError("Unsupported OutputOptions type")
+                return
+            }
+        }
+
+        val recording = if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            pendingRecording.withAudioEnabled()
+        } else {
+            pendingRecording
+        }
+
+        activeRecording = recording.start(ContextCompat.getMainExecutor(context)) { event ->
+            when (event) {
+                is VideoRecordEvent.Start -> onStarted()
+                is VideoRecordEvent.Finalize -> {
+                    if (!event.hasError()) {
+                        onSaved(event.outputResults.outputUri)
+                    } else {
+                        onError("Recording error: ${event.error}")
+                    }
+                    activeRecording = null
+                }
+            }
+        }
+    }
+
+    // --- Capture frame from Preview while recording ---
+    fun capturePhotoFromPreviewView(onCaptured: (Uri) -> Unit) {
+        qrImageAnalysis?.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
+            // Convert ImageProxy to Bitmap with proper rotation
+            val bitmap = imageProxy.tooBitmap()
+            imageProxy.close()
+            qrImageAnalysis?.clearAnalyzer() // stop after single frame
+            bitmap?.let {
+                saveBitmap(context, it) { uri ->
+                    showShutterEffect()
+                    onCaptured(uri)
+                }
+            }
+        }
+
+    }
+    fun saveBitmap(context: Context, bitmap: Bitmap, onCaptured: (Uri) -> Unit) {
+        try {
+            val name = generateImageFileName() // e.g., IMG_123456789.jpg
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val selectedFormat = ImageFormat.JPG
+
+                // Android 10+ : save via MediaStore
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                    put(MediaStore.MediaColumns.MIME_TYPE, selectedFormat.mimeType)
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, SAVED_DEFAULT_FILE_PATH)
+                }
+
+                val resolver = context.contentResolver
+                val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    resolver.openOutputStream(uri)?.use { out ->
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    }
+                    onCaptured(uri)
+                }
+            } else {
+                // Android 9 and below : save to external files directory
+                val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                val appDir = File(picturesDir, BuildConfig.APPLICATION_ID)
+                if (!appDir.exists()) appDir.mkdirs()
+
+                val file = File(appDir, name)
+                FileOutputStream(file).use { out ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                }
+
+                val uri = Uri.fromFile(file)
+                onCaptured(uri)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Flash effect like camera shutter
+     */
+    fun showShutterEffect() {
+        val overlay = View(context).apply {
+            setBackgroundColor(Color.WHITE)
+            alpha = 0f
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+        }
+        (previewView.parent as? FrameLayout)?.addView(overlay)
+
+        // Animate flash
+        overlay.animate()
+            .alpha(0.5f)
+            .setDuration(50)
+            .withEndAction {
+                overlay.animate().alpha(0f).setDuration(100)
+                    .withEndAction { (previewView.parent as? FrameLayout)?.removeView(overlay) }
+                    .start()
+            }
+            .start()
+    }
+
+    fun startCamera() {
+
+        if (isQRCodeEnabled && qrCodeAnalyzer != null) {
+            qrImageAnalysis = ImageAnalysis.Builder()
+//                .setTargetAspectRatio(aspectRatio)
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+                .also {
+                    it.setAnalyzer(ContextCompat.getMainExecutor(context), qrCodeAnalyzer!!)
+                }
+        }
+        else if(isVideoRecordEnabled)
+        {
+            qrImageAnalysis = buildImageAnalysis(aspectRatio)
+
+        }
+
+        cameraProviderFuture.addListener({
+            val provider = cameraProviderFuture.get()
+
+
+            val preview = Preview.Builder()
+                .build().also {
+                    it.setSurfaceProvider(previewView.surfaceProvider)
+                }
+
+
+            /*   imageCapture = ImageCapture.Builder()
+                   .setTargetResolution(selectedQuality.resolution)
+                   .setFlashMode(if (flashEnabled)
+                       ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
+                   .setTargetAspectRatio(aspectRatio)
+                   .build()*/
+            imageCapture=buildImageCapture(flashEnabled,selectedQuality,aspectRatio)
+
+            // Recorder with quality
+            val qualitySelector = QualitySelector.from(
+                Quality.HD,
+                FallbackStrategy.higherQualityOrLowerThan(Quality.SD)
+            )
+            val recorder = Recorder.Builder()
+                .setAspectRatio(aspectRatio)
+                .setQualitySelector(qualitySelector)
+                .build()
+            videoCapture = VideoCapture.withOutput(recorder)
+
+
+            try {
+                provider.unbindAll()
+                camera= if (qrImageAnalysis != null && !isVideoRecordEnabled) provider.bindToLifecycle(     /// setup camera for QR
+                    context as LifecycleOwner,
+                    cameraSelector,
+                    preview,
+                    imageCapture,
+                    qrImageAnalysis,
+                ) // add conditionally
+                else if(qrImageAnalysis != null && isVideoRecordEnabled)       // setup camera for video
+                {
+                    provider.bindToLifecycle(
+                        context as LifecycleOwner,
+                        cameraSelector,
+                        preview,
+                        videoCapture,
+                        qrImageAnalysis
+                    )
+                }
+                else provider.bindToLifecycle(          // setup camera for images
+                    context as LifecycleOwner,
+                    cameraSelector,
+                    preview,
+                    imageCapture
+                    )
+
+                // --- COOL Curtain Animation ---
+                val container = previewView.parent as? FrameLayout
+//                container?.playCurtainAnimation(
+//                    duration = 1000,
+//                )
+//                container?.animateLightSweep()
+                container?.animateRippleReveal(previewView)
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }, ContextCompat.getMainExecutor(context))
+    }
+
+    private fun applyCircularReveal(container: FrameLayout) {
+        val cx = container.width / 2
+        val cy = container.height / 2
+        val finalRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
+
+        val anim = ViewAnimationUtils.createCircularReveal(
+            container,
+            cx,
+            cy,
+            0f,
+            finalRadius
+        )
+        container.alpha = 1f
+        anim.duration = 700
+        anim.interpolator = AccelerateDecelerateInterpolator()
+        anim.start()
+    }
     fun takePhotoWithDelay(seconds: Int, countdownText: TextView, onSaved: (Uri?) -> Unit) {
         /*Toast.makeText(context, "Capturing in $seconds sec...", Toast.LENGTH_SHORT).show()
         Handler(Looper.getMainLooper()).postDelayed({
@@ -186,17 +508,24 @@ class CameraManager(
     }
 
     fun takePhoto(onSaved: (Uri?) -> Unit) {
+        if (isVideoRecordEnabled)
+        {
+            capturePhotoFromPreviewView{
+
+            }
+            return
+        }
+
         val imageCapture = imageCapture ?: return
-//        val file = File(context.getExternalFilesDir(null), "${System.currentTimeMillis()}.jpg")
-//        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+        val file = File(context.getExternalFilesDir(null), "${System.currentTimeMillis()}.jpg")
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
 
         // ✅ Play sound if enabled
         if (captureSoundEnabled) {
             MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
         }
         val selectedFormat = ImageFormat.JPG
-
-        val (outputOptions, outputUri) = getImageOutputOptions(context, format = selectedFormat)
+//        val (outputOptions, outputUri) = getImageOutputOptions(context, format = selectedFormat)  /// use this to save image
 
         imageCapture.takePicture(
             outputOptions,
@@ -204,6 +533,7 @@ class CameraManager(
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(result: ImageCapture.OutputFileResults) {
 //                    onSaved(Uri.fromFile(file))
+                    val outputUri=Uri.fromFile(file)
                     if (isMirrorEnabled) {
                         if (outputUri != null) {
                             mirrorImageFromUri(outputUri) { mirroredUri ->
@@ -225,6 +555,7 @@ class CameraManager(
             })
     }
 
+    //// flip the captured image mirror feature
     fun mirrorImageFromUri(uri: Uri, callback: (Uri) -> Unit) {
         val bitmap = getCorrectlyOrientedBitmap(uri)
 
@@ -291,60 +622,11 @@ class CameraManager(
         callback(Uri.fromFile(filteredFile))
     }
 
-    fun startCamera() {
-
-        if (isQRCodeEnabled && qrCodeAnalyzer != null) {
-            qrImageAnalysis = ImageAnalysis.Builder()
-                .setTargetAspectRatio(aspectRatio)
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also {
-                    it.setAnalyzer(ContextCompat.getMainExecutor(context), qrCodeAnalyzer!!)
-                }
-        }
-
-        cameraProviderFuture.addListener({
-            val provider = cameraProviderFuture.get()
-
-            val preview = Preview.Builder()
-//                .setTargetAspectRatio(aspectRatio)
-                .build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
-
-         /*   imageCapture = ImageCapture.Builder()
-                .setTargetResolution(selectedQuality.resolution)
-                .setFlashMode(if (flashEnabled)
-                    ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
-                .setTargetAspectRatio(aspectRatio)
-                .build()*/
-            imageCapture=buildImageCapture(flashEnabled,selectedQuality,aspectRatio)
-
-            try {
-                provider.unbindAll()
-               camera= if (qrImageAnalysis != null) provider.bindToLifecycle(
-                        context as androidx.lifecycle.LifecycleOwner,
-                        cameraSelector,
-                        preview,
-                        imageCapture,
-                        qrImageAnalysis) // add conditionally
-
-                else provider.bindToLifecycle(
-                    context as androidx.lifecycle.LifecycleOwner,
-                    cameraSelector,
-                    preview,
-                    imageCapture,
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }, ContextCompat.getMainExecutor(context))
-    }
 
     fun buildImageCapture(
         flashEnabled: Boolean,
         quality: ImageQuality,
-        aspectRatio: Int // AspectRatio.RATIO_16_9, AspectRatio.RATIO_4_3, etc.
+        aspectRatio: Int
     ): ImageCapture {
 
         val resolutionSelector = ResolutionSelector.Builder()
@@ -362,6 +644,21 @@ class CameraManager(
         return ImageCapture.Builder()
             .setFlashMode(if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
             .setResolutionSelector(resolutionSelector)
+            .build()
+    }
+
+
+    fun buildImageAnalysis(aspectRatio: Int = AspectRatio.RATIO_16_9): ImageAnalysis {
+        // Create ResolutionSelector like ImageCapture
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setAspectRatioStrategy(
+                AspectRatioStrategy(aspectRatio, AspectRatioStrategy.FALLBACK_RULE_AUTO)
+            )
+            .build() // For ImageAnalysis, we usually don’t need a specific resolutionStrategy
+
+        return ImageAnalysis.Builder()
+            .setResolutionSelector(resolutionSelector)
+            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
     }
 
@@ -403,8 +700,9 @@ class CameraManager(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, fileName.removeSuffix(".jpg")) // No extension here
+//                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName) // No extension here
                 put(MediaStore.MediaColumns.MIME_TYPE, format.mimeType)
-                put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/${BuildConfig.APPLICATION_ID}")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, SAVED_DEFAULT_FILE_PATH)     ///saved to folder path
             }
 
             val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -423,7 +721,7 @@ class CameraManager(
 
         } else {
             val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val appDir = File(picturesDir, "MyCameraApp")
+            val appDir = File(picturesDir, BuildConfig.APPLICATION_ID)      ///saved to folder path
             if (!appDir.exists()) appDir.mkdirs()
 
             val file = File(appDir, fileName)
@@ -431,6 +729,7 @@ class CameraManager(
             Pair(outputOptions, Uri.fromFile(file))
         }
     }
+
 
     fun generateImageFileName(
         prefix: String = "IMG",
@@ -457,6 +756,7 @@ class CameraManager(
         }
 
         return "${prefix}_${countFormatted}_${timeStamp}_${suffix}_$extension"
+//        return "${prefix}_${countFormatted}_${timeStamp}_${suffix}"
     }
 
 
