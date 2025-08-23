@@ -534,6 +534,8 @@ class CameraManager(
                 override fun onImageSaved(result: ImageCapture.OutputFileResults) {
 //                    onSaved(Uri.fromFile(file))
                     val outputUri=Uri.fromFile(file)
+                    showShutterEffect()
+
                     if (isMirrorEnabled) {
                         if (outputUri != null) {
                             mirrorImageFromUri(outputUri) { mirroredUri ->

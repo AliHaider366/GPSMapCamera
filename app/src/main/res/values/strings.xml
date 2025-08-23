@@ -12,6 +12,12 @@
     <string name="line_2">Line 2</string>
     <string name="line_3">Line 3</string>
     <string name="line_4">Line 4</string>
+    <string name="file_name">File Name</string>
+    <string name="select_folder">Select Folder</string>
+    <string name="save_original_photos">Save original photos</string>
+    <string name="default_">Default</string>
+    <string name="site_1">Site 1</string>
+    <string name="site_2">Site 2</string>
 
     <string-array name="aspect_ratios">
         <item>4:3</item>

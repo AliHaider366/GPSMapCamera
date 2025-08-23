@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:text="File Name"
+            android:text="@string/file_name"
             android:gravity="center|start"
             android:textSize="@dimen/_18sdp"
             android:textStyle="bold"

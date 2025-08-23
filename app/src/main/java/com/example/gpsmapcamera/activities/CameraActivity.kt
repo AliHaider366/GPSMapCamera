@@ -162,7 +162,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 // Handle brightness
                 val mappedValue = progress - 40
                 progressText.text = mappedValue.toString()
-                cameraManager.setBrightness(progress - mappedValue)
+                cameraManager.setBrightness(mappedValue)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
