@@ -56,6 +56,7 @@ import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.enums.ImageFormat
 import com.example.gpsmapcamera.enums.ImageQuality
 import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
+import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.getCameraFlash
 import com.example.gpsmapcamera.utils.animateLightSweep
@@ -78,6 +79,7 @@ class CameraManager(
 
     )
 {
+    private val appViewModel=(context.applicationContext as MyApp).appViewModel
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     private var camera: Camera? = null
@@ -204,7 +206,8 @@ class CameraManager(
 
         val vc = videoCapture ?: return onError("VideoCapture not ready")
 
-        val saveFileName = generateImageFileName(prefix = "VID",extension = ".mp4")
+//        val saveFileName = generateImageFileName(prefix = "VID",extension = ".mp4")
+        val saveFileName = appViewModel.saveFileName.removeSuffix(".jpg") + ".mp4"
        /* val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
@@ -294,7 +297,7 @@ class CameraManager(
     }
     fun saveBitmap(context: Context, bitmap: Bitmap, onCaptured: (Uri) -> Unit) {
         try {
-            val name = generateImageFileName() // e.g., IMG_123456789.jpg
+            val name = appViewModel.saveFileName
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val selectedFormat = ImageFormat.JPG
@@ -463,7 +466,7 @@ class CameraManager(
         anim.interpolator = AccelerateDecelerateInterpolator()
         anim.start()
     }
-    fun takePhotoWithDelay(seconds: Int, countdownText: TextView, onSaved: (Uri?) -> Unit) {
+    fun takePhotoWithTimer(seconds: Int, countdownText: TextView, onSaved: (Uri?) -> Unit) {
         /*Toast.makeText(context, "Capturing in $seconds sec...", Toast.LENGTH_SHORT).show()
         Handler(Looper.getMainLooper()).postDelayed({
             takePhoto(onSaved)
@@ -518,14 +521,14 @@ class CameraManager(
 
         val imageCapture = imageCapture ?: return
         val file = File(context.getExternalFilesDir(null), "${System.currentTimeMillis()}.jpg")
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+//        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
 
         // ✅ Play sound if enabled
         if (captureSoundEnabled) {
             MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
         }
         val selectedFormat = ImageFormat.JPG
-//        val (outputOptions, outputUri) = getImageOutputOptions(context, format = selectedFormat)  /// use this to save image
+        val (outputOptions, outputUri) = getImageOutputOptions(context,appViewModel.saveFileName, format = selectedFormat)  /// use this to save image
 
         imageCapture.takePicture(
             outputOptions,
@@ -533,7 +536,7 @@ class CameraManager(
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(result: ImageCapture.OutputFileResults) {
 //                    onSaved(Uri.fromFile(file))
-                    val outputUri=Uri.fromFile(file)
+//                    val outputUri=Uri.fromFile(file)
                     showShutterEffect()
 
                     if (isMirrorEnabled) {
@@ -698,11 +701,11 @@ class CameraManager(
         }
     }
 
-    fun getImageOutputOptions(context: Context,   fileName: String = generateImageFileName(),format: ImageFormat): Pair<ImageCapture.OutputFileOptions, Uri?> {
+    fun getImageOutputOptions(context: Context,   fileName: String ,format: ImageFormat): Pair<ImageCapture.OutputFileOptions, Uri?> {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName.removeSuffix(".jpg")) // No extension here
-//                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName) // No extension here
+//                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName.removeSuffix(".jpg")) // No extension here
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
                 put(MediaStore.MediaColumns.MIME_TYPE, format.mimeType)
                 put(MediaStore.MediaColumns.RELATIVE_PATH, SAVED_DEFAULT_FILE_PATH)     ///saved to folder path
             }

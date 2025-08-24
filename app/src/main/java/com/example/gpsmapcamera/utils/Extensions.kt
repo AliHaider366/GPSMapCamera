@@ -6,8 +6,10 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Bitmap
@@ -24,8 +26,10 @@ import android.graphics.YuvImage
 import android.location.Location
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.Gravity
 import android.view.PixelCopy
@@ -44,6 +48,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
@@ -55,8 +60,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.TextViewCompat
 import com.example.gpsmapcamera.R
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.Priority
 import com.google.openlocationcode.OpenLocationCode
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
@@ -125,23 +138,66 @@ fun Pair<Double, Double>.toDMSPair(): Pair<String, String> {
     return Pair(latDMS, lonDMS)
 }
 @Suppress("MissingPermission")
-suspend fun Context.getCurrentLatLong(): Pair<Double, Double> =
+suspend fun Context.getCurrentLatLong(): Pair<Double, Double> {
+
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+    // First, try last known location
+    val lastKnown = suspendCancellableCoroutine { cont ->
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    cont.resume(location.latitude to location.longitude)
+                } else {
+                    cont.resume(null) // fallback
+                }
+            }
+            .addOnFailureListener {
+                cont.resume(null) // fallback
+            }
+    }
+
+    // If lastKnown was available, return it
+    if (lastKnown != null) return lastKnown
+
+    // Otherwise request fresh GPS location
+    return requestFreshLocation()
+}
+@Suppress("MissingPermission")
+suspend fun Context.requestFreshLocation(): Pair<Double, Double> =
     suspendCancellableCoroutine { cont ->
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-            if (location != null) {
-                cont.resume(Pair(location.latitude, location.longitude))
-            } else {
-                cont.resume(Pair(0.0, 0.0))
+        val request = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY, 1000
+        ).setMaxUpdates(1).build()
+
+        val callback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                fusedLocationClient.removeLocationUpdates(this)
+                val fresh = result.lastLocation
+                if (fresh != null) {
+                    cont.resume(fresh.latitude to fresh.longitude)
+                } else {
+                    cont.resume(0.0 to 0.0)
+                }
             }
-        }.addOnFailureListener {
-            cont.resume(Pair(0.0, 0.0))
+        }
+
+        fusedLocationClient.requestLocationUpdates(
+            request,
+            callback,
+            Looper.getMainLooper()
+        )
+
+        // Cancel listener if coroutine is cancelled
+        cont.invokeOnCancellation {
+            fusedLocationClient.removeLocationUpdates(callback)
         }
     }
 
 @Suppress("MissingPermission")
-suspend fun Context.getCurrentPlusCode(): String =
+/*suspend fun Context.getCurrentPlusCode(): String =
     suspendCancellableCoroutine { cont ->
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -154,10 +210,118 @@ suspend fun Context.getCurrentPlusCode(): String =
         }.addOnFailureListener {
             cont.resume("")
         }
+    }*/
+suspend fun Context.getCurrentPlusCode(): String {
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+    // First, try last known location
+    val lastKnown = suspendCancellableCoroutine<String?> { cont ->
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    cont.resume(getPlusCode(location.latitude, location.longitude))
+                } else {
+                    cont.resume(null) // fallback
+                }
+            }
+            .addOnFailureListener {
+                cont.resume(null) // fallback
+            }
     }
+
+    if (lastKnown != null) return lastKnown
+
+    // Otherwise request fresh location
+    val (lat, lng) = requestFreshLocation()
+    return if (lat != 0.0 && lng != 0.0) {
+        getPlusCode(lat, lng)
+    } else {
+        ""
+    }
+}
 
 fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, message, duration).show()
+}
+
+fun Context.openLatestImageFromFolder(folderPath: String) {
+    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    val projection = arrayOf(
+        MediaStore.Images.Media._ID,
+        MediaStore.Images.Media.DATA,          // For Android < 10
+        MediaStore.Images.Media.RELATIVE_PATH  // For Android 10+
+    )
+
+    val selection: String
+    val selectionArgs: Array<String>
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // Android 10+ → use RELATIVE_PATH
+        selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
+        selectionArgs = arrayOf(folderPath)
+    } else {
+        // Below Android 10 → use absolute DATA path
+        val cameraPath = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DCIM
+        ).toString() + "/" + folderPath.replace("DCIM/", "")
+        selection = "${MediaStore.Images.Media.DATA} LIKE ?"
+        selectionArgs = arrayOf("$cameraPath%")
+    }
+
+    val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+
+    contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+            val contentUri = ContentUris.withAppendedId(uri, id)
+
+            val baseIntent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(contentUri, "image/*")
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+//            startActivity(Intent.createChooser(baseIntent, "Complete action using Albums"))
+            startActivity(baseIntent)
+
+            /*  val pm = packageManager
+              val resolvedApps = pm.queryIntentActivities(baseIntent, 0)
+
+              val targetedIntents = mutableListOf<Intent>()
+              for (res in resolvedApps) {
+                  val packageName = res.activityInfo.packageName
+                  val label = res.loadLabel(pm).toString().lowercase()
+
+                  if (label.contains("gallery") ||  label.contains("photos")  || label.contains("album")) {
+                      val targetedIntent = Intent(baseIntent)
+                      targetedIntent.setPackage(packageName)
+                      targetedIntents.add(targetedIntent)
+                  }
+              }
+
+              if (targetedIntents.isNotEmpty()) {
+                  val chooserIntent = Intent.createChooser(targetedIntents.removeAt(0), "Open with")
+                  chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetedIntents.toTypedArray())
+                  startActivity(chooserIntent)
+              } else {
+                  Toast.makeText(this, "No supported gallery apps found", Toast.LENGTH_SHORT).show()
+              }*/
+            return
+        }
+    }
+
+    Toast.makeText(this, "No images found in $folderPath", Toast.LENGTH_SHORT).show()
+}
+
+fun Context.shareImage(imageUri: Uri, message: String = "Check out this photo I just captured! 📸") {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/*"
+        putExtra(Intent.EXTRA_STREAM, imageUri)
+        putExtra(Intent.EXTRA_TEXT, message)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    val chooser = Intent.createChooser(shareIntent, "Share Image")
+    startActivity(chooser)
 }
 
 fun getPlusCode(latitude: Double, longitude: Double): String {
@@ -296,6 +460,52 @@ fun ImageProxy.tooBitmap(): Bitmap? {
 }
 
 ///// permissions
+
+fun ComponentActivity.registerGpsResolutionLauncher(
+    onEnabled: () -> Unit,
+    onDenied: () -> Unit
+) = registerForActivityResult(
+    ActivityResultContracts.StartIntentSenderForResult()
+) { result ->
+    if (result.resultCode == Activity.RESULT_OK) {
+        onEnabled()
+    } else {
+        onDenied()
+    }
+}
+
+fun Context.checkAndRequestGps(
+    launcher: ActivityResultLauncher<IntentSenderRequest>
+) {
+    val locationRequest = LocationRequest.Builder(
+        Priority.PRIORITY_HIGH_ACCURACY, 2000
+    ).setWaitForAccurateLocation(true)
+        .setMinUpdateIntervalMillis(1000)
+        .build()
+
+    val builder = LocationSettingsRequest.Builder()
+        .addLocationRequest(locationRequest)
+        .setAlwaysShow(true)
+
+    val client = LocationServices.getSettingsClient(this)
+    val task = client.checkLocationSettings(builder.build())
+
+    task.addOnSuccessListener {
+        // Already enabled, do nothing
+    }
+
+    task.addOnFailureListener { exception ->
+        if (exception is ResolvableApiException) {
+            try {
+                val intentSenderRequest =
+                    IntentSenderRequest.Builder(exception.resolution).build()
+                launcher.launch(intentSenderRequest)
+            } catch (e: IntentSender.SendIntentException) {
+                e.printStackTrace()
+            }
+        }
+    }
+}
 
 fun Context.openAppSettings() {
     val intent = Intent(

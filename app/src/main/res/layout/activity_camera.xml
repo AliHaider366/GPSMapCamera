@@ -52,6 +52,19 @@
             android:background="@android:color/transparent"/>
     </eightbitlab.com.blurview.BlurTarget>
 
+    <!--timmer textview-->
+    <TextView
+        android:id="@+id/timmerTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/blue"
+        android:textSize="@dimen/_30sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/zoom_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBlurView" />
+    <!--brightness bar-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/brightnessBarView"
         android:layout_width="wrap_content"

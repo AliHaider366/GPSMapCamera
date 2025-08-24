@@ -55,7 +55,6 @@
         android:lines="4"
         android:paddingHorizontal="@dimen/_10sdp"
         android:paddingVertical="@dimen/_10sdp"
-        android:text="jasdjkasd"
         android:textColor="@color/black"
         android:textSize="@dimen/_16sdp"
         app:layout_constraintEnd_toEndOf="parent"

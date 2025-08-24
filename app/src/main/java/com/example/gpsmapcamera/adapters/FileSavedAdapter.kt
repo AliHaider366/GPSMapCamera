@@ -9,7 +9,7 @@ import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.visible
 
 class FileSavedAdapter(
-    private val items: List<String>
+    private val items: List<String>,val onClick:(Int,String)->Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -40,6 +40,7 @@ class FileSavedAdapter(
            binding.root.setOnClickListener{
                previousPre=currentPos
                currentPos=position
+               onClick(position,item)
                notifyDataSetChanged()
            }
        }

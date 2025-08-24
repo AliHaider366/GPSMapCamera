@@ -1,24 +1,34 @@
 package com.example.gpsmapcamera.activities
 
 import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.cameraHelper.CameraManager
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.ActivityCameraBinding
+import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager.getAutoFocus
 import com.example.gpsmapcamera.utils.PrefManager.getCameraFlash
 import com.example.gpsmapcamera.utils.PrefManager.getCameraGrid
@@ -26,7 +36,9 @@ import com.example.gpsmapcamera.utils.PrefManager.getCameraLevel
 import com.example.gpsmapcamera.utils.PrefManager.getCameraMirror
 import com.example.gpsmapcamera.utils.PrefManager.getCameraRatio
 import com.example.gpsmapcamera.utils.PrefManager.getCameraTimer
+import com.example.gpsmapcamera.utils.PrefManager.getCameraTimerValue
 import com.example.gpsmapcamera.utils.PrefManager.getCaptureSound
+import com.example.gpsmapcamera.utils.PrefManager.getShareImage
 import com.example.gpsmapcamera.utils.PrefManager.getWhiteBalance
 import com.example.gpsmapcamera.utils.PrefManager.saveAutoFocus
 import com.example.gpsmapcamera.utils.PrefManager.saveCameraFlash
@@ -36,12 +48,16 @@ import com.example.gpsmapcamera.utils.PrefManager.saveCameraMirror
 import com.example.gpsmapcamera.utils.PrefManager.saveCameraRatio
 import com.example.gpsmapcamera.utils.PrefManager.saveCameraTimer
 import com.example.gpsmapcamera.utils.PrefManager.saveCaptureSound
+import com.example.gpsmapcamera.utils.PrefManager.saveShareImage
 import com.example.gpsmapcamera.utils.PrefManager.saveWhiteBalance
+import com.example.gpsmapcamera.utils.checkAndRequestGps
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
 import com.example.gpsmapcamera.utils.isPermissionGranted
 import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.openAppSettings
+import com.example.gpsmapcamera.utils.openLatestImageFromFolder
+import com.example.gpsmapcamera.utils.registerGpsResolutionLauncher
 import com.example.gpsmapcamera.utils.registerPermissionLauncher
 import com.example.gpsmapcamera.utils.requestPermission
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
@@ -50,8 +66,15 @@ import com.example.gpsmapcamera.utils.setImage
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setTextColorRes
 import com.example.gpsmapcamera.utils.setTintColor
+import com.example.gpsmapcamera.utils.shareImage
 import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.visible
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.Priority
+import java.io.File
 import kotlin.concurrent.timer
 
 class CameraActivity : AppCompatActivity(),View.OnClickListener {
@@ -61,7 +84,9 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
 
 
     private lateinit var cameraManager: CameraManager
-
+    private val appViewModel by lazy {
+        (application as MyApp).appViewModel
+    }
     private var activeMode: Int = R.id.photo_btn
     private lateinit var micPermissionLauncher: ActivityResultLauncher<String>
 
@@ -104,12 +129,23 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
         }
     }
 
+    private val gpsResolutionLauncher by lazy {
+        registerGpsResolutionLauncher(
+            onEnabled = {
+                Toast.makeText(this, "GPS Enabled ", Toast.LENGTH_SHORT).show()
+            },
+            onDenied = {
+                Toast.makeText(this, "GPS Denied ", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         enableEdgeToEdge()
         hideSystemBars()
-
+        checkAndRequestGps(gpsResolutionLauncher)
         init()
 
 
@@ -156,13 +192,14 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
             .setBlurRadius(10f)*/
 
         brightnessBar.max = 80
-        brightnessBar.progress = 40
+        brightnessBar.progress = getWhiteBalance(this@CameraActivity)
         brightnessBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 // Handle brightness
                 val mappedValue = progress - 40
                 progressText.text = mappedValue.toString()
                 cameraManager.setBrightness(mappedValue)
+                saveWhiteBalance(this@CameraActivity,mappedValue)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -189,11 +226,16 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
         captureBtn.setOnClickListener(this@CameraActivity)
         videoRecordBtn.setOnClickListener(this@CameraActivity)
         videoStopBtn.setOnClickListener(this@CameraActivity)
+        galleyGotoBtn.setOnClickListener(this@CameraActivity)
 
     }
 
     private fun setInitialStates()=binding.apply {
 
+        if (getShareImage(this@CameraActivity))
+        {
+            switchMode(R.id.share_btn)
+        }
         if (getCameraLevel(this@CameraActivity))
         {
             camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
@@ -230,8 +272,22 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
 
         if (getCameraTimer(this@CameraActivity))
         {
-            timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+            when(getCameraTimerValue(this@CameraActivity))
+            {
+                0->{
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                    saveCameraTimer(this@CameraActivity,0,false)
 
+                }
+                3->{
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                    saveCameraTimer(this@CameraActivity,3,true)
+                }
+                5->{
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                    saveCameraTimer(this@CameraActivity,5,true)
+                }
+            }
         }
 
         if (getCameraMirror(this@CameraActivity))
@@ -262,6 +318,9 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
         binding.apply{
             when(p0.id)
             {
+                R.id.galley_goto_btn->{
+                    openLatestImageFromFolder("${appViewModel.fileSavePath}%")
+                }
                 R.id.switch_cam_btn->{
                     cameraManager.switchCamera()
                 }
@@ -315,16 +374,22 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                     }
                 }
                 R.id.timer_btn->{
-                    if (getCameraTimer(this@CameraActivity))
+                    when(getCameraTimerValue(this@CameraActivity))
                     {
-                        timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                        saveCameraTimer(this@CameraActivity,false)
+                        0->{
+                            timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                            saveCameraTimer(this@CameraActivity,3,true)
+                        }
+                        3->{
+                            timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                            saveCameraTimer(this@CameraActivity,5,true)
+                        }
+                        5->{
+                            timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                            saveCameraTimer(this@CameraActivity,0,false)
+                        }
                     }
-                    else
-                    {
-                        timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                        saveCameraTimer(this@CameraActivity,true)
-                    }
+
                 }
                 R.id.mirror_btn->{
                     if (getCameraMirror(this@CameraActivity))
@@ -396,12 +461,31 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
 //                    cameraManager.capturePhotoFromPreviewView{
 //
 //                    }
-                    cameraManager.takePhoto() {
-                        val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
-                        intent.putExtra("image_uri", it.toString())
-                        startActivity(intent)
-                        Toast.makeText(this@CameraActivity, "Saved: $it", Toast.LENGTH_SHORT).show()
+                    if (getCameraTimer(this@CameraActivity))
+                    {
+                        cameraManager.takePhotoWithTimer(getCameraTimerValue(this@CameraActivity),binding.timmerTV){
+                            val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                            intent.putExtra("image_uri", it.toString())
+//                            startActivity(intent)
+                            if (getShareImage(this@CameraActivity))
+                            {
+                                it?.let { shareImage(it) }
+                            }
+                        }
                     }
+                    else
+                    {
+                        cameraManager.takePhoto() {
+                            val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                            intent.putExtra("image_uri", it.toString())
+//                            startActivity(intent)
+                            if (getShareImage(this@CameraActivity))
+                            {
+                                it?.let { shareImage(it) }
+                            }
+                        }
+                    }
+
                 }
                 R.id.video_record_btn->{
                     videoStopBtn.visible()
@@ -474,7 +558,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 binding.videoRecordBtn.visibility=View.GONE
                 binding.templateBtn.visibility=View.VISIBLE
                 cameraManager.setVideoRecord(false)
-
+                saveShareImage(this,true)
             }
             R.id.photo_btn->{
                 binding.photoBtn.setTextColorRes(R.color.blue,R.color.white,binding.videoBtn,binding.shareBtn)
@@ -482,6 +566,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 binding.videoRecordBtn.visibility=View.GONE
                 binding.templateBtn.visibility=View.VISIBLE
                 cameraManager.setVideoRecord(false)
+                saveShareImage(this,false)
 
             }
             R.id.video_btn->{
@@ -490,7 +575,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 binding.videoRecordBtn.visibility=View.VISIBLE
                 binding.templateBtn.visibility=View.GONE
                 cameraManager.setVideoRecord(true)
-
+                saveShareImage(this,false)
             }
         }
     }

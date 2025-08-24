@@ -12,6 +12,11 @@ import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.FieldItem
 import com.example.gpsmapcamera.databinding.FilenameRecyclerItem1Binding
 import com.example.gpsmapcamera.databinding.FilenameRecyclerItem2Binding
+import com.example.gpsmapcamera.utils.PrefManager.getSequenceNumCheck
+import com.example.gpsmapcamera.utils.PrefManager.getSequenceNumValue
+import com.example.gpsmapcamera.utils.PrefManager.save24HourCheck
+import com.example.gpsmapcamera.utils.PrefManager.saveDayCheck
+import com.example.gpsmapcamera.utils.PrefManager.saveSequenceNumCheck
 import com.example.gpsmapcamera.utils.formatForFile
 import com.example.gpsmapcamera.utils.setDrawable
 import java.util.Date
@@ -74,7 +79,7 @@ class FileNameAdapter(
                 val context=binding.root.context
                 titleTv.text = item.name
                 checkbox.isChecked=item.isChecked
-                updateTopText()
+
 
                 if (item.isPremium)
                 {
@@ -104,6 +109,7 @@ class FileNameAdapter(
                         checkbox2.setOnCheckedChangeListener { _, isChecked ->
                             item.isCheckBox2Checked = isChecked
                             updateTopText()
+                            saveDayCheck(context,isChecked)
                         }
                         checkbox4.setOnCheckedChangeListener(null)
                         checkbox4.setOnCheckedChangeListener { _, isChecked ->
@@ -112,16 +118,20 @@ class FileNameAdapter(
                                 item.value=date24
 
                             updateTopText()
+                            save24HourCheck(context,isChecked)
                         }
                     }
                     1->{
                         checkbox.isEnabled=true
-//                        checkbox.isChecked=false
+                        checkbox.isChecked= getSequenceNumCheck(context)
+                        item.isChecked = getSequenceNumCheck(context)
+                        dropdownEdittext.setText(getSequenceNumValue(context))
+                        item.value=dropdownEdittext.text.toString()
+
                         dropdownEdittext.inputType=EditorInfo.TYPE_CLASS_NUMBER
                         dropdownEdittext.addTextChangedListener { text ->
                             item.value=text.toString()
                             updateTopText()
-
                         }
 
                     }
@@ -287,6 +297,17 @@ class FileNameAdapter(
                     item.isChecked = checkbox.isChecked
 //                    val date = Date().formatForFile()
                     updateTopText()
+                    when(position) {
+
+                        1 -> {
+                            saveSequenceNumCheck(
+                                context,
+                                dropdownEdittext.text.toString(),
+                                checkbox.isChecked
+                            )
+
+                        }
+                    }
                 }
 
                 reorderBtn.setOnTouchListener { _, event ->
@@ -295,6 +316,8 @@ class FileNameAdapter(
                     }
                     false
                 }
+
+                updateTopText()
             }
         }
     }

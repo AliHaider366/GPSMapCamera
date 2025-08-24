@@ -1,5 +1,6 @@
 package com.example.gpsmapcamera.activities
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.adapters.FileNameAdapter
 import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.databinding.ActivityFileNameBinding
+import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.formatForFile
 import com.example.gpsmapcamera.utils.getCurrentDay
 import com.example.gpsmapcamera.utils.getCurrentLatLong
@@ -87,6 +89,8 @@ class FileNameActivity : AppCompatActivity() {
                 list,
                 onSelectionChanged = { selected ->
                     filenameTv.text = selected
+
+                    (application as MyApp).appViewModel.setFileName(selected)
                 },
                 dragStartListener = { viewHolder ->
                     itemTouchHelper.startDrag(viewHolder)
