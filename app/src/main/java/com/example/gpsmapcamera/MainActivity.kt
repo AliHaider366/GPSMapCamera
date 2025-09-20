@@ -1,12 +1,21 @@
 package com.example.gpsmapcamera
 
 import android.content.ActivityNotFoundException
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
+import android.media.MediaActionSound
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.KeyEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -25,9 +34,13 @@ import androidx.core.content.ContextCompat
 import com.example.gpsmapcamera.activities.PreviewImageActivity
 import com.example.gpsmapcamera.cameraHelper.CameraManager
 import com.example.gpsmapcamera.databinding.ActivityMainBinding
+import com.example.gpsmapcamera.enums.ImageFormat
+import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
 import jp.co.cyberagent.android.gpuimage.GPUImage
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageGrayscaleFilter
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -362,3 +375,4 @@ class MainActivity : AppCompatActivity() {
     }*/
 
 }
+

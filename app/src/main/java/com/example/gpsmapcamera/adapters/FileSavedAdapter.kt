@@ -9,7 +9,7 @@ import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.visible
 
 class FileSavedAdapter(
-    private val items: List<String>,val onClick:(Int,String)->Unit
+    private val items: List<String>,val selectedPath:Int,val onClick:(Int,String)->Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -24,12 +24,14 @@ class FileSavedAdapter(
            binding.titleTv.text=item
         }
    }
-    var currentPos=-1
+    var currentPos=selectedPath
     var previousPre=-1
    inner class ImageViewHolder(val binding: FileSavedAdapterLayout2Binding) : RecyclerView.ViewHolder(binding.root){
 
        fun bind(item: String) {
+           val context=binding.root.context
            binding.titleTv.text=item
+//          val selectedPath= getSelectedFolderPath(context)
 
            if (position==currentPos)
            {

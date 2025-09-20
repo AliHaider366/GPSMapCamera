@@ -9,7 +9,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.ActivitySplashBinding
-import com.example.gpsmapcamera.utils.PrefManager.getIsFirstTime
+import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
+import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.launchActivity
 
 class SplashActivity : AppCompatActivity() {
@@ -21,7 +22,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (!getIsFirstTime(this))
+            if (!getBoolean(this,KEY_FIRST_TIME))
             {
                 launchActivity<PermissionActivity> {  }
             }

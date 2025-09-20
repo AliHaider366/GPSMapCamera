@@ -3,212 +3,146 @@ package com.example.gpsmapcamera.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
-import com.example.gpsmapcamera.utils.Constants.SAVED_FILE_NAME
+import com.example.gpsmapcamera.models.FieldItem
+import org.json.JSONArray
 
 object PrefManager {
 
-    private const val PREF_NAME = "app_prefs"
-    private const val KEY_IMAGE_COUNT  = "image_count"
-    private const val KEY_CAPTURE_SOUND  = "capture_sound"
-    private const val KEY_CAMERA_FLASH  = "camera_flash"
-    private const val KEY_WHITE_BALANCE  = "white_balance"
-    private const val KEY_CAMERA_MIRROR  = "camera_mirror"
-    private const val KEY_CAMERA_LEVEL  = "camera_level"
-    private const val KEY_AUTO_FOCUS  = "auto_focus"
-    private const val KEY_CAMERA_GRID  = "camera_grid"
-    private const val KEY_CAMERA_RATIO  = "camera_ratio"
-    private const val KEY_CAMERA_TIMER  = "camera_timer"
-    private const val KEY_CAMERA_TIMER_VALUE  = "camera_timer_value"
-    private const val KEY_FIRST_TIME  = "first_time"
-    private const val KEY_FILE_PATH  = "file_path"
-    private const val KEY_FILE_NAME  = "file_name"
-    private const val KEY_SHARE_IMAGE  = "share_image"
+        const val PREF_NAME = "app_prefs"
+        const val KEY_IMAGE_COUNT  = "image_count"
+        const val KEY_SELECTED_FOLDER_PATH  = "selected_folder_path"
+        const val KEY_FILE_PATH  = "file_path"
+        const val KEY_FOLDER_NAME  = "folder_name"
+        const val KEY_CAPTURE_SOUND  = "capture_sound"
+        const val KEY_CAMERA_FLASH  = "camera_flash"
+        const val KEY_WHITE_BALANCE  = "white_balance"
+        const val KEY_CAMERA_MIRROR  = "camera_mirror"
+        const val KEY_CAMERA_LEVEL  = "camera_level"
+        const val KEY_AUTO_FOCUS  = "auto_focus"
+        const val KEY_CAMERA_GRID  = "camera_grid"
+        const val KEY_CAMERA_RATIO  = "camera_ratio"
+        const val KEY_CAMERA_TIMER  = "camera_timer"
+        const val KEY_CAMERA_TIMER_VALUE  = "camera_timer_value"
+        const val KEY_FIRST_TIME  = "first_time"
+        const val KEY_FILE_NAME  = "file_name"
+        const val KEY_SHARE_IMAGE  = "share_image"
     /*file name activity*/
-    private const val KEY_DAY_CHECK  = "day_check"
-    private const val KEY_24HOURS_CHECK  = "24hours_check"
-    private const val KEY_SEQUENCE_NUMBER_CHECK  = "24hours_check"
-    private const val KEY_SEQUENCE_NUMBER_VALUE  = "24hours_value"
-    private const val KEY_CUSTOM_NAME_1_CHECK  = "custom_name_1_check"
-    private const val KEY_CUSTOM_NAME_1_VALUE  = "custom_name_1_value"
-    private const val KEY_CUSTOM_NAME_2_CHECK  = "custom_name_2_check"
-    private const val KEY_CUSTOM_NAME_2_VALUE  = "custom_name_2_value"
-    private const val KEY_CUSTOM_NAME_3_CHECK  = "custom_name_3_check"
-    private const val KEY_CUSTOM_NAME_3_VALUE  = "custom_name_3_value"
-    private const val KEY_NOTE_CHECK  = "note_check"
-    private const val KEY_NOTE_VALUE  = "note_value"
-    private const val KEY_LAT_LONG_CHECK  = "lat_long_check"
-    private const val KEY_DMS_CHECK  = "dms_value"
-    private const val KEY_PLUS_CODE_CHECK  = "plus_code_value"
-    private const val KEY_TIME_ZONE_CHECK  = "time_zone_value"
+     const val KEY_DAY_CHECK  = "day_check"
+     const val KEY_24HOURS_CHECK  = "24hours_check"
+     const val KEY_SEQUENCE_NUMBER_CHECK  = "sequence_num_check"
+     const val KEY_SEQUENCE_NUMBER_VALUE  = "sequence_num_value"
+     const val KEY_CUSTOM_NAME_1_CHECK  = "custom_name_1_check"
+     const val KEY_CUSTOM_NAME_1_VALUE  = "custom_name_1_value"
+     const val KEY_CUSTOM_NAME_2_CHECK  = "custom_name_2_check"
+     const val KEY_CUSTOM_NAME_2_VALUE  = "custom_name_2_value"
+     const val KEY_CUSTOM_NAME_3_CHECK  = "custom_name_3_check"
+     const val KEY_CUSTOM_NAME_3_VALUE  = "custom_name_3_value"
+     const val KEY_NOTE_CHECK  = "note_check"
+     const val KEY_NOTE_VALUE  = "note_value"
+     const val KEY_ADDRESS_CHECK  = "address_check"
+     const val KEY_ADDRESS_LINE1_CHECK  = "address_line1_check"
+     const val KEY_ADDRESS_LINE2_CHECK  = "address_line2_check"
+     const val KEY_ADDRESS_LINE3_CHECK  = "address_line3_check"
+     const val KEY_ADDRESS_LINE4_CHECK  = "address_line4_check"
+     const val KEY_LAT_LONG_CHECK  = "lat_long_check"
+     const val KEY_DMS_CHECK  = "dms_check"
+     const val KEY_PLUS_CODE_CHECK  = "plus_code_check"
+     const val KEY_TIME_ZONE_CHECK  = "time_zone_check"
+     const val KEY_FILENAME_PATTERN  = "filename_pattern"
+     const val KEY_LAT_LONG_VALUE_INDEX  = "lat_long_value_index"
+     const val KEY_PLUS_CODE_VALUE_INDEX  = "plus_code_value_index"
+     const val KEY_TIME_ZONE_VALUE_INDEX  = "time_zone_value_index"
+     const val KEY_DATE_VALUE_INDEX  = "date_value_index"
+     const val KEY_FIELD_ORDER  = "fields_order"
+     const val KEY_FOLDER_LIST = "key_folder_list"
 
-
-    fun saveDayCheck(context: Context, isDayChecked: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_DAY_CHECK, isDayChecked) }
-    }
-    fun getDayCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_DAY_CHECK, default)
-    }
-    fun save24HourCheck(context: Context, is24Checked: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_24HOURS_CHECK, is24Checked) }
-    }
-    fun get24HourCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_24HOURS_CHECK, default)
-    }
-    fun saveSequenceNumCheck(context: Context,seqNum:String, isSeqNumChecked: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_SEQUENCE_NUMBER_CHECK, isSeqNumChecked)
-            putString(KEY_SEQUENCE_NUMBER_VALUE, seqNum)}
-    }
-    fun getSequenceNumCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_SEQUENCE_NUMBER_CHECK, default)
-    }
-    fun getSequenceNumValue(context: Context, default:String ="0"): String {
-        return getPrefs(context).getString(KEY_SEQUENCE_NUMBER_VALUE, default)?:""
-    }
-    fun saveCustomName1Check(context: Context,name:String, isNameChecked: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CUSTOM_NAME_1_CHECK, isNameChecked)
-            putString(KEY_CUSTOM_NAME_1_VALUE, name)}
-    }
-    fun saveCustomName2Check(context: Context,name:String, isNameChecked: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CUSTOM_NAME_2_CHECK, isNameChecked)
-            putString(KEY_CUSTOM_NAME_2_VALUE, name)}
-    }
-    fun saveCustomName3Check(context: Context,name:String, isNameChecked: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CUSTOM_NAME_3_CHECK, isNameChecked)
-            putString(KEY_CUSTOM_NAME_3_VALUE, name)}
-    }
-    fun getCustomName1Value(context: Context, default:String =""): String {
-        return getPrefs(context).getString(KEY_CUSTOM_NAME_1_VALUE, default)?:""
-    }
-    fun getCustomName2Value(context: Context, default:String =""): String {
-        return getPrefs(context).getString(KEY_CUSTOM_NAME_2_VALUE, default)?:""
-    }
-    fun getCustomName3Value(context: Context, default:String =""): String {
-        return getPrefs(context).getString(KEY_CUSTOM_NAME_3_VALUE, default)?:""
-    }
-    fun getNoteCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_NOTE_CHECK, default)
-    }
-    fun getNoteValue(context: Context, default:String =""): String {
-        return getPrefs(context).getString(KEY_NOTE_VALUE, default)?:""
-    }
-    fun getLatLongCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_LAT_LONG_CHECK, default)
-    }
-    fun getDMSCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_DMS_CHECK, default)
-    }
-    fun getPlusCodeCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_PLUS_CODE_CHECK, default)
-    }
-    fun getTimeZoneCheck(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_TIME_ZONE_CHECK, default)
-    }
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     }
 
-    fun saveFilePath(context: Context, path: String) {
-        getPrefs(context).edit { putString(KEY_FILE_PATH, path) }
+    fun saveItemOrder(items: List<FieldItem>, context: Context) {
+        val order = items.map { it.name } // Save titles (or unique IDs)
+        val json = JSONArray(order).toString()
+        getPrefs(context).edit {putString(KEY_FIELD_ORDER, json) }
     }
-    fun getFilePath(context: Context, default: String = SAVED_DEFAULT_FILE_PATH): String {
-        return getPrefs(context).getString(KEY_FILE_PATH, default)?:""
-    }
-    fun saveFileName(context: Context, path: String) {
-        getPrefs(context).edit { putString(KEY_FILE_NAME, path) }
-    }
-    fun getFileName(context: Context, default: String = SAVED_FILE_NAME): String {
-        return getPrefs(context).getString(KEY_FILE_NAME, default)?:""
+    fun loadItemOrder(defaultItems: List<FieldItem>, context: Context): MutableList<FieldItem> {
+        val json = getPrefs(context).getString(KEY_FIELD_ORDER, null)
+
+        return if (json != null) {
+            val array = JSONArray(json)
+            val order = (0 until array.length()).map { array.getString(it) }
+
+            // Reorder default items based on saved order
+            val orderedList = mutableListOf<FieldItem>()
+            order.forEach { title ->
+                defaultItems.find { it.name == title }?.let { orderedList.add(it) }
+            }
+
+            // Add any missing items (new ones not yet saved)
+            defaultItems.forEach {
+                if (!orderedList.contains(it)) orderedList.add(it)
+            }
+
+            orderedList
+        } else {
+            defaultItems.toMutableList()
+        }
     }
 
-    fun saveImageCount(context: Context, volume: Int) {
-        getPrefs(context).edit { putInt(KEY_IMAGE_COUNT, volume) }
+    fun saveFolder(context: Context, folderName: String) {
+        // Get existing list
+        val currentList = getFolderList(context).toMutableList()
+
+        // Add only if not already present
+        if (!currentList.contains(folderName)) {
+            currentList.add(folderName)
+        }
+
+        // Save back as JSON
+        val json = JSONArray(currentList).toString()
+        getPrefs(context).edit {
+            putString(KEY_FOLDER_LIST, json)
+        }
     }
-    fun getImageCount(context: Context, default: Int = 0): Int {
-        return getPrefs(context).getInt(KEY_IMAGE_COUNT, default)
+    fun getFolderList(context: Context): List<String> {
+        val json = getPrefs(context).getString(KEY_FOLDER_LIST, null) ?: return emptyList()
+        return try {
+            val jsonArray = JSONArray(json)
+            List(jsonArray.length()) { i -> jsonArray.getString(i) }
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
-    fun saveWhiteBalance(context: Context, volume: Int) {
-        getPrefs(context).edit { putInt(KEY_WHITE_BALANCE, volume) }
-    }
-    fun getWhiteBalance(context: Context, default: Int = 40): Int {
-        return getPrefs(context).getInt(KEY_WHITE_BALANCE, default)
+    fun savePatternList(context: Context, key: String, pattern: List<String>) {
+        val joined = pattern.joinToString(",")   // "DATETIME,DAY,SEQ,ADDRESS_LINE1,LATLONG"
+        getPrefs(context).edit { putString(key, joined) }
     }
 
-    fun saveCameraRatio(context: Context, ratio: Int) {
-        getPrefs(context).edit { putInt(KEY_CAMERA_RATIO, ratio) }
+    /// Setter
+    fun saveBoolean(context: Context, key: String, value: Boolean) {
+        getPrefs(context).edit { putBoolean(key, value) }
     }
-    fun getCameraRatio(context: Context, default: Int = 16): Int {
-        return getPrefs(context).getInt(KEY_CAMERA_RATIO, default)
+    fun saveString(context: Context, key: String, value: String) {
+        getPrefs(context).edit { putString(key, value) }
     }
-
-    fun saveShareImage(context: Context, isShareOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_SHARE_IMAGE, isShareOn) }
+    fun saveInt(context: Context, key: String, value: Int) {
+        getPrefs(context).edit { putInt(key, value) }
     }
-    fun getShareImage(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_SHARE_IMAGE, default)
-    }
-
-    fun saveCameraTimer(context: Context,value:Int, isTimerOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CAMERA_TIMER, isTimerOn)
-            putInt(KEY_CAMERA_TIMER_VALUE, value)}
-    }
-    fun getCameraTimer(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_CAMERA_TIMER, default)
-    }
-    fun getCameraTimerValue(context: Context, default: Int = 0): Int {
-        return getPrefs(context).getInt(KEY_CAMERA_TIMER_VALUE, default)
+    // Getters
+    fun getBoolean(context: Context, key: String, defaultValue: Boolean = false): Boolean {
+        return getPrefs(context).getBoolean(key, defaultValue)
     }
 
-    fun saveIsFirstTime(context: Context, isFirst: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_FIRST_TIME, isFirst) }
-    }
-    fun getIsFirstTime(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_FIRST_TIME, default)
+    fun getString(context: Context, key: String, defaultValue: String=""): String {
+        return getPrefs(context).getString(key, defaultValue)?:""
     }
 
-    fun saveAutoFocus(context: Context, isFocusOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_AUTO_FOCUS, isFocusOn) }
-    }
-    fun getAutoFocus(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_AUTO_FOCUS, default)
+    fun getInt(context: Context, key: String, defaultValue: Int = 0): Int {
+        return getPrefs(context).getInt(key, defaultValue)
     }
 
 
-    fun saveCameraGrid(context: Context, isGridOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CAMERA_GRID, isGridOn) }
-    }
-    fun getCameraGrid(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_CAMERA_GRID, default)
-    }
-
-    fun saveCameraLevel(context: Context, isLevelOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CAMERA_LEVEL, isLevelOn) }
-    }
-    fun getCameraLevel(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_CAMERA_LEVEL, default)
-    }
-
-    fun saveCameraMirror(context: Context, isMirrorOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CAMERA_MIRROR, isMirrorOn) }
-    }
-    fun getCameraMirror(context: Context, default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_CAMERA_MIRROR, default)
-    }
-
-    fun saveCaptureSound(context: Context, isSoundOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CAPTURE_SOUND, isSoundOn) }
-    }
-    fun getCaptureSound(context: Context,default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_CAPTURE_SOUND,default)
-    }
-
-    fun saveCameraFlash(context: Context, isFlashOn: Boolean) {
-        getPrefs(context).edit { putBoolean(KEY_CAMERA_FLASH, isFlashOn) }
-    }
-    fun getCameraFlash(context: Context,default: Boolean=false): Boolean {
-        return getPrefs(context).getBoolean(KEY_CAMERA_FLASH,default)
-    }
 
 }

@@ -1,55 +1,40 @@
 package com.example.gpsmapcamera.activities
 
 import android.Manifest
-import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
-import com.example.gpsmapcamera.cameraHelper.CameraManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.cameraHelper.CameraManager
 import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.utils.MyApp
-import com.example.gpsmapcamera.utils.PrefManager.getAutoFocus
-import com.example.gpsmapcamera.utils.PrefManager.getCameraFlash
-import com.example.gpsmapcamera.utils.PrefManager.getCameraGrid
-import com.example.gpsmapcamera.utils.PrefManager.getCameraLevel
-import com.example.gpsmapcamera.utils.PrefManager.getCameraMirror
-import com.example.gpsmapcamera.utils.PrefManager.getCameraRatio
-import com.example.gpsmapcamera.utils.PrefManager.getCameraTimer
-import com.example.gpsmapcamera.utils.PrefManager.getCameraTimerValue
-import com.example.gpsmapcamera.utils.PrefManager.getCaptureSound
-import com.example.gpsmapcamera.utils.PrefManager.getShareImage
-import com.example.gpsmapcamera.utils.PrefManager.getWhiteBalance
-import com.example.gpsmapcamera.utils.PrefManager.saveAutoFocus
-import com.example.gpsmapcamera.utils.PrefManager.saveCameraFlash
-import com.example.gpsmapcamera.utils.PrefManager.saveCameraGrid
-import com.example.gpsmapcamera.utils.PrefManager.saveCameraLevel
-import com.example.gpsmapcamera.utils.PrefManager.saveCameraMirror
-import com.example.gpsmapcamera.utils.PrefManager.saveCameraRatio
-import com.example.gpsmapcamera.utils.PrefManager.saveCameraTimer
-import com.example.gpsmapcamera.utils.PrefManager.saveCaptureSound
-import com.example.gpsmapcamera.utils.PrefManager.saveShareImage
-import com.example.gpsmapcamera.utils.PrefManager.saveWhiteBalance
+import com.example.gpsmapcamera.utils.PrefManager.KEY_AUTO_FOCUS
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_FLASH
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_GRID
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_LEVEL
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_MIRROR
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_RATIO
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_TIMER
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_TIMER_VALUE
+import com.example.gpsmapcamera.utils.PrefManager.KEY_CAPTURE_SOUND
+import com.example.gpsmapcamera.utils.PrefManager.KEY_SHARE_IMAGE
+import com.example.gpsmapcamera.utils.PrefManager.KEY_WHITE_BALANCE
+import com.example.gpsmapcamera.utils.PrefManager.getBoolean
+import com.example.gpsmapcamera.utils.PrefManager.getInt
+import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
+import com.example.gpsmapcamera.utils.PrefManager.saveInt
 import com.example.gpsmapcamera.utils.checkAndRequestGps
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
@@ -58,6 +43,7 @@ import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.openAppSettings
 import com.example.gpsmapcamera.utils.openLatestImageFromFolder
 import com.example.gpsmapcamera.utils.registerGpsResolutionLauncher
+import com.example.gpsmapcamera.utils.registerMultiplePermissionsLauncher
 import com.example.gpsmapcamera.utils.registerPermissionLauncher
 import com.example.gpsmapcamera.utils.requestPermission
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
@@ -69,15 +55,8 @@ import com.example.gpsmapcamera.utils.setTintColor
 import com.example.gpsmapcamera.utils.shareImage
 import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.visible
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.Priority
-import java.io.File
-import kotlin.concurrent.timer
 
-class CameraActivity : AppCompatActivity(),View.OnClickListener {
+class CameraActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityCameraBinding.inflate(layoutInflater)
     }
@@ -89,18 +68,19 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
     }
     private var activeMode: Int = R.id.photo_btn
     private lateinit var micPermissionLauncher: ActivityResultLauncher<String>
+    var brightnessValue=0
 
     val requestCode=1001
     private val PERMISSIONS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
-            android.Manifest.permission.CAMERA,
-            android.Manifest.permission.READ_MEDIA_IMAGES
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_MEDIA_IMAGES
         )
     } else {
         arrayOf(
-            android.Manifest.permission.CAMERA,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
     }
 
@@ -110,32 +90,14 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
         }
     }
 
-    fun requestPermissionsIfNeeded() {
-        if (!allPermissionsGranted()) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, requestCode)
-        }
-        else
-        {
-            cameraManager.startCamera()
-            cameraManager.setupTouchControls{
-                if ( binding.topDetailBlurView.isVisible) {
-                    binding.topDetailBlurView.visibility = View.GONE
-                    binding.topBlurView.visibility = View.VISIBLE
-                }
-            }
-
-            setInitialStates()
-
-        }
-    }
-
     private val gpsResolutionLauncher by lazy {
         registerGpsResolutionLauncher(
             onEnabled = {
-                Toast.makeText(this, "GPS Enabled ", Toast.LENGTH_SHORT).show()
+                appViewModel.getLocation()
+//                Toast.makeText(this, "GPS Enabled ", Toast.LENGTH_SHORT).show()
             },
             onDenied = {
-                Toast.makeText(this, "GPS Denied ", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, "GPS Denied ", Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -152,6 +114,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
     }
 
     private fun init()=binding.apply {
+        cameraManager = CameraManager(this@CameraActivity, previewView)
 
         micPermissionLauncher = registerPermissionLauncher(
             Manifest.permission.RECORD_AUDIO,
@@ -166,77 +129,85 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 }
             }
         )
-        cameraManager = CameraManager(this@CameraActivity, previewView)
+        if (!allPermissionsGranted()) {
+            registerMultiplePermissionsLauncher(
+                permissions = PERMISSIONS,
+                onGranted = {
+                    cameraManager.startCamera{
+                        //set camera values after start
+                        cameraManager.setBrightness(getInt(this@CameraActivity,KEY_WHITE_BALANCE,40))
+                    }
+                    cameraManager.setupTouchControls{
+                        if ( binding.detailTopMenuView.isVisible) {
+                            binding.detailTopMenuView.visibility = View.GONE
+                            binding.defaultTopMenuView.visibility = View.VISIBLE
 
-        requestPermissionsIfNeeded()
-
-     /*   linearLayout.setRenderEffect(
-            RenderEffect.createBlurEffect(
-                20f,
-                20f,
-                Shader.TileMode.CLAMP
+                            // hide brightness bar if shown
+                            brightnessBarView.gone()
+                            brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                        }
+                    }
+                    setInitialStates()
+                },
+                onDenied = { permanentlyDenied ->
+                    if (permanentlyDenied) {
+                        openAppSettings()
+                    } else {
+                        showToast(getString(R.string.permission_denied))
+                    }
+                }
             )
-        )*/
-        val windowBackground = window.decorView.background
+        }
+        else
+        {
+            cameraManager.startCamera{
+                //set camera values after start
+                    cameraManager.setBrightness(getInt(this@CameraActivity,KEY_WHITE_BALANCE,40))
 
-/*        topBlurView.setupWith(blurTarget)
-            .setFrameClearDrawable(windowBackground)
-            .setBlurRadius(10f)
+            }
+            cameraManager.setupTouchControls{
+                if ( binding.detailTopMenuView.isVisible) {
+                    binding.detailTopMenuView.visibility = View.GONE
+                    binding.defaultTopMenuView.visibility = View.VISIBLE
+                    // hide brightness bar if shown
+                    brightnessBarView.gone()
+                    brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                }
+            }
+            setInitialStates()
+            appViewModel.getLocation()
+        }
 
-        topDetailBlurView.setupWith(blurTarget)
-            .setFrameClearDrawable(windowBackground)
-            .setBlurRadius(10f)
+        setClickListeners()
 
-        bottomBlurView.setupWith(blurTarget)
-            .setFrameClearDrawable(windowBackground)
-            .setBlurRadius(10f)*/
-
+        brightnessValue=getInt(this@CameraActivity,KEY_WHITE_BALANCE,40)        // set initial brightness
         brightnessBar.max = 80
-        brightnessBar.progress = getWhiteBalance(this@CameraActivity)
+        brightnessBar.progress = brightnessValue+40
+        progressText.text = brightnessValue.toString()
         brightnessBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 // Handle brightness
                 val mappedValue = progress - 40
                 progressText.text = mappedValue.toString()
                 cameraManager.setBrightness(mappedValue)
-                saveWhiteBalance(this@CameraActivity,mappedValue)
+                saveInt(this@CameraActivity,KEY_WHITE_BALANCE,mappedValue)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        switchCamBtn.setOnClickListener(this@CameraActivity)
-        moreBtn.setOnClickListener(this@CameraActivity)
-        x1ZoomTv.setOnClickListener(this@CameraActivity)
-        x2ZoomTv.setOnClickListener(this@CameraActivity)
-        shareBtn.setOnClickListener(this@CameraActivity)
-        videoBtn.setOnClickListener(this@CameraActivity)
-        photoBtn.setOnClickListener(this@CameraActivity)
-        fileNameBtn.setOnClickListener(this@CameraActivity)
-        flashBtn.setOnClickListener(this@CameraActivity)
-        ratioBtn.setOnClickListener(this@CameraActivity)
-        gridBtn.setOnClickListener(this@CameraActivity)
-        timerBtn.setOnClickListener(this@CameraActivity)
-        mirrorBtn.setOnClickListener(this@CameraActivity)
-        volumeBtn.setOnClickListener(this@CameraActivity)
-        focusBtn.setOnClickListener(this@CameraActivity)
-        camLevelBtn.setOnClickListener(this@CameraActivity)
-        brightnessBtn.setOnClickListener(this@CameraActivity)
-        captureBtn.setOnClickListener(this@CameraActivity)
-        videoRecordBtn.setOnClickListener(this@CameraActivity)
-        videoStopBtn.setOnClickListener(this@CameraActivity)
-        galleyGotoBtn.setOnClickListener(this@CameraActivity)
-
     }
 
     private fun setInitialStates()=binding.apply {
 
-        if (getShareImage(this@CameraActivity))
+
+
+        if (getBoolean(this@CameraActivity,KEY_SHARE_IMAGE))
         {
             switchMode(R.id.share_btn)
         }
-        if (getCameraLevel(this@CameraActivity))
+        if (getBoolean(this@CameraActivity,KEY_CAMERA_LEVEL))
         {
             camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
             cameraLevel.setLevelEnabled(true)
@@ -244,7 +215,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
         else cameraLevel.setLevelEnabled(false)
 
 
-        if (getCameraGrid(this@CameraActivity))
+        if (getBoolean(this@CameraActivity,KEY_CAMERA_GRID))
         {
             gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
             gridOverlay.updateGrid(true, 4)
@@ -252,7 +223,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
         else
             gridOverlay.updateGrid(false, 0)
 
-        when(getCameraRatio(this@CameraActivity))
+        when(getInt(this@CameraActivity,KEY_CAMERA_RATIO,16))
         {
             16->{
                 ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
@@ -264,287 +235,310 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
             }
         }
 
-        if (getCameraFlash(this@CameraActivity))
+        if (getBoolean(this@CameraActivity,KEY_CAMERA_FLASH))
         {
             flashBtn.setTintColor(R.color.blue)
             cameraManager.toggleFlash(true)
         }
 
-        if (getCameraTimer(this@CameraActivity))
+        if (getBoolean(this@CameraActivity,KEY_CAMERA_TIMER))
         {
-            when(getCameraTimerValue(this@CameraActivity))
+            when(getInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE))
             {
                 0->{
                     timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                    saveCameraTimer(this@CameraActivity,0,false)
-
+//                    saveCameraTimer(this@CameraActivity,0,false)
+//                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,false)
+//                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,0)
                 }
                 3->{
                     timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                    saveCameraTimer(this@CameraActivity,3,true)
+//                    saveCameraTimer(this@CameraActivity,3,true)
                 }
                 5->{
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                    saveCameraTimer(this@CameraActivity,5,true)
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red,R.color.red)
+//                    saveCameraTimer(this@CameraActivity,5,true)
                 }
             }
         }
 
-        if (getCameraMirror(this@CameraActivity))
+        if (getBoolean(this@CameraActivity,KEY_CAMERA_MIRROR))
         {
             mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
             cameraManager.setMirror(true)
         }
 
-        if (getCaptureSound(this@CameraActivity))
+        if (getBoolean(this@CameraActivity,KEY_CAPTURE_SOUND))
         {
             volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
             cameraManager.captureSound(true)
         }
 
-        if (getCameraLevel(this@CameraActivity))
-        {
-            camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-        }
+//        if (getCameraLevel(this@CameraActivity))
+//        {
+//            camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+//        }
 
-        if (getAutoFocus(this@CameraActivity))
+        if (getBoolean(this@CameraActivity,KEY_AUTO_FOCUS))
             focusBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
         previewView.implementationMode = PreviewView.ImplementationMode.COMPATIBLE
 
     }
 
-    override fun onClick(p0: View) {
+    private fun setClickListeners()=binding.apply {
 
-        binding.apply{
-            when(p0.id)
+        galleyGotoBtn.setOnClickListener {
+            openLatestImageFromFolder("${appViewModel.fileSavePath}%")
+
+        }
+
+        switchCamBtn.setOnClickListener {
+            cameraManager.switchCamera()
+        }
+
+        pickGalleyBtn.setOnClickListener {
+            launchActivity<SavedPathActivity> {  }
+        }
+
+        fileNameBtn.setOnClickListener {
+            launchActivity<FileNameActivity> {  }
+        }
+
+        flashBtn.setOnClickListener {
+            if (getBoolean(this@CameraActivity,KEY_CAMERA_FLASH))
             {
-                R.id.galley_goto_btn->{
-                    openLatestImageFromFolder("${appViewModel.fileSavePath}%")
-                }
-                R.id.switch_cam_btn->{
-                    cameraManager.switchCamera()
-                }
-                R.id.file_name_btn->{
-                    launchActivity<FileNameActivity> {  }
-                }
-                R.id.flash_btn->{
-                    if (getCameraFlash(this@CameraActivity))
-                    {
-                        flashBtn.setTintColor(R.color.white)
-                        saveCameraFlash(this@CameraActivity,false)
-                        cameraManager.toggleFlash(false)
-                    }
-                    else
-                    {
-                        flashBtn.setTintColor(R.color.blue)
-                        saveCameraFlash(this@CameraActivity,true)
-                        cameraManager.toggleFlash(true)
-                    }
+                flashBtn.setTintColor(R.color.white)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_FLASH,false)
+                cameraManager.toggleFlash(false)
+            }
+            else
+            {
+                flashBtn.setTintColor(R.color.blue)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_FLASH,true)
+                cameraManager.toggleFlash(true)
+            }
+        }
+
+        ratioBtn.setOnClickListener {
+            when(getInt(this@CameraActivity,KEY_CAMERA_RATIO,16))
+            {
+                4->{
+                    saveInt(this@CameraActivity,KEY_CAMERA_RATIO,16)
+                    ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
+                    cameraManager.setAspectRatio(AspectRatio.RATIO_16_9)
 
                 }
-                R.id.ratio_btn->{
-                    when(getCameraRatio(this@CameraActivity))
-                    {
-                        4->{
-                            saveCameraRatio(this@CameraActivity,16)
-                            ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
-                            cameraManager.setAspectRatio(AspectRatio.RATIO_16_9)
-
-                        }
-                        16->{
-                            saveCameraRatio(this@CameraActivity,4)
-                            ratioBtn.setDrawable(top = R.drawable.ratio4_ic)
-                            cameraManager.setAspectRatio(AspectRatio.RATIO_4_3)
-                        }
-                    }
-
-                }
-                R.id.grid_btn->{
-                    if (getCameraGrid(this@CameraActivity))
-                    {
-                        gridBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                        saveCameraGrid(this@CameraActivity,false)
-                        gridOverlay.updateGrid(false, 0)
-                    }
-                    else
-                    {
-                        gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                        saveCameraGrid(this@CameraActivity,true)
-                        gridOverlay.updateGrid(true, 4)
-                    }
-                }
-                R.id.timer_btn->{
-                    when(getCameraTimerValue(this@CameraActivity))
-                    {
-                        0->{
-                            timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                            saveCameraTimer(this@CameraActivity,3,true)
-                        }
-                        3->{
-                            timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                            saveCameraTimer(this@CameraActivity,5,true)
-                        }
-                        5->{
-                            timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                            saveCameraTimer(this@CameraActivity,0,false)
-                        }
-                    }
-
-                }
-                R.id.mirror_btn->{
-                    if (getCameraMirror(this@CameraActivity))
-                    {
-                        mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                        saveCameraMirror(this@CameraActivity,false)
-                        cameraManager.setMirror(false)
-                    }
-                    else
-                    {
-                        mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                        saveCameraMirror(this@CameraActivity,true)
-                        cameraManager.setMirror(true)
-                    }
-                }
-                R.id.volume_btn->{
-                    if (getCaptureSound(this@CameraActivity))
-                    {
-                        volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                        saveCaptureSound(this@CameraActivity,false)
-                        cameraManager.captureSound(false)
-                    }
-                    else
-                    {
-                        volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                        saveCaptureSound(this@CameraActivity,true)
-                        cameraManager.captureSound(true)
-                    }
-                }
-                R.id.focus_btn->{
-                    if (getAutoFocus(this@CameraActivity))
-                    {
-                        focusBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                        saveAutoFocus(this@CameraActivity,false)
-                    }
-                    else
-                    {
-                        focusBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                        saveAutoFocus(this@CameraActivity,true)
-                    }
-                }
-                R.id.cam_level_btn->{
-                    if (getCameraLevel(this@CameraActivity))
-                    {
-                        camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                        saveCameraLevel(this@CameraActivity,false)
-                        cameraLevel.setLevelEnabled(false)
-                    }
-                    else
-                    {
-                        camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                        saveCameraLevel(this@CameraActivity,true)
-                        cameraLevel.setLevelEnabled(true)
-                    }
-                }
-                R.id.brightness_btn->{
-                    if (brightnessBarView.isVisible)
-                    {
-                        brightnessBarView.gone()
-                        brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                    }
-                    else {
-                        brightnessBarView.visible()
-                        brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                    }
-
-                }
-                R.id.capture_btn->{
-//                    cameraManager.capturePhotoFromPreviewView{
-//
-//                    }
-                    if (getCameraTimer(this@CameraActivity))
-                    {
-                        cameraManager.takePhotoWithTimer(getCameraTimerValue(this@CameraActivity),binding.timmerTV){
-                            val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
-                            intent.putExtra("image_uri", it.toString())
-//                            startActivity(intent)
-                            if (getShareImage(this@CameraActivity))
-                            {
-                                it?.let { shareImage(it) }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        cameraManager.takePhoto() {
-                            val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
-                            intent.putExtra("image_uri", it.toString())
-//                            startActivity(intent)
-                            if (getShareImage(this@CameraActivity))
-                            {
-                                it?.let { shareImage(it) }
-                            }
-                        }
-                    }
-
-                }
-                R.id.video_record_btn->{
-                    videoStopBtn.visible()
-                    videoRecordBtn.gone()
-                    cameraManager.startVideoRecording(
-                        onStarted = {
-
-                        },
-                        onSaved = { uri ->
-                            showToast("video saved:$uri")
-                        },
-                        onError = { msg ->
-                            videoStopBtn.gone()
-                            videoRecordBtn.visible()
-                        }
-                    )
-                }
-                R.id.video_stop_btn->{
-                    cameraManager.stopVideoRecording()
-                    videoStopBtn.gone()
-                    videoRecordBtn.visible()
-                }
-                R.id.x1_zoom_tv->{
-                    binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
-                    binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
-                    cameraManager.zoom1x2x(1f)
-
-                }
-                R.id.x2_zoom_tv->{
-                    binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
-                    binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
-                    cameraManager.zoom1x2x(2f)
-                }
-                R.id.share_btn->{
-                    switchMode(R.id.share_btn)
-                }
-                R.id.photo_btn->{
-                    switchMode(R.id.photo_btn)
-                }
-                R.id.video_btn->{
-                    if (isPermissionGranted(Manifest.permission.RECORD_AUDIO)) {
-                        switchMode(R.id.video_btn)
-                    } else {
-                        micPermissionLauncher.requestPermission(Manifest.permission.RECORD_AUDIO)
-                    }
-                }
-                R.id.more_btn->{
-                    if ( binding.topDetailBlurView.isVisible) {
-                        binding.topDetailBlurView.visibility = View.GONE
-                        binding.topBlurView.visibility = View.VISIBLE
-                    }
-                    else {
-                        binding.topDetailBlurView.visibility = View.VISIBLE
-                        binding.topBlurView.visibility = View.GONE
-                    }
+                16->{
+                    saveInt(this@CameraActivity,KEY_CAMERA_RATIO,4)
+                    ratioBtn.setDrawable(top = R.drawable.ratio4_ic)
+                    cameraManager.setAspectRatio(AspectRatio.RATIO_4_3)
                 }
             }
         }
 
+        gridBtn.setOnClickListener {
+            if (getBoolean(this@CameraActivity,KEY_CAMERA_GRID))
+            {
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_GRID,false)
+                gridOverlay.updateGrid(false, 0)
+            }
+            else
+            {
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_GRID,true)
+                gridOverlay.updateGrid(true, 4)
+            }
+        }
+
+        timerBtn.setOnClickListener {
+            when(getInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE))
+            {
+                0->{
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+//                    saveCameraTimer(this@CameraActivity,3,true)
+                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,true)
+                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,3)
+                }
+                3->{
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red,R.color.red)
+//                    saveCameraTimer(this@CameraActivity,5,true)
+                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,true)
+                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,5)
+                }
+                5->{
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+//                    saveCameraTimer(this@CameraActivity,0,false)
+                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,false)
+                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,0)
+                }
+            }
+        }
+
+        mirrorBtn.setOnClickListener {
+            if (getBoolean(this@CameraActivity,KEY_CAMERA_MIRROR))
+            {
+                mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_MIRROR,false)
+                cameraManager.setMirror(false)
+            }
+            else
+            {
+                mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_MIRROR,true)
+                cameraManager.setMirror(true)
+            }
+        }
+
+        volumeBtn.setOnClickListener {
+            if (getBoolean(this@CameraActivity,KEY_CAPTURE_SOUND))
+            {
+                volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                saveBoolean(this@CameraActivity,KEY_CAPTURE_SOUND,false)
+                cameraManager.captureSound(false)
+            }
+            else
+            {
+                volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                saveBoolean(this@CameraActivity,KEY_CAPTURE_SOUND,true)
+                cameraManager.captureSound(true)
+            }
+        }
+
+        focusBtn.setOnClickListener {
+            if (getBoolean(this@CameraActivity,KEY_AUTO_FOCUS))
+            {
+                focusBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                saveBoolean(this@CameraActivity,KEY_AUTO_FOCUS,false)
+            }
+            else
+            {
+                focusBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                saveBoolean(this@CameraActivity,KEY_AUTO_FOCUS,true)
+            }
+        }
+
+        camLevelBtn.setOnClickListener {
+            if (getBoolean(this@CameraActivity,KEY_CAMERA_LEVEL))
+            {
+                camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_LEVEL,false)
+                cameraLevel.setLevelEnabled(false)
+            }
+            else
+            {
+                camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                saveBoolean(this@CameraActivity,KEY_CAMERA_LEVEL,true)
+                cameraLevel.setLevelEnabled(true)
+            }
+        }
+
+        brightnessBtn.setOnClickListener {
+            if (brightnessBarView.isVisible)
+            {
+                brightnessBarView.gone()
+                brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+            }
+            else {
+                brightnessBarView.visible()
+                brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+            }
+        }
+
+        captureBtn.setOnClickListener {
+            if (getBoolean(this@CameraActivity,KEY_CAMERA_TIMER))
+            {
+                cameraManager.takePhotoWithTimer(getInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE),binding.timmerTV){
+                    val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                    intent.putExtra("image_uri", it.toString())
+//                            startActivity(intent)
+                    if (getBoolean(this@CameraActivity,KEY_SHARE_IMAGE))
+                    {
+                        it?.let { shareImage(it) }
+                    }
+                }
+            }
+            else
+            {
+                cameraManager.takePhoto() {uri->
+                    if (uri != null)
+                    {
+                        val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                        intent.putExtra("image_uri", uri.toString())
+//                            startActivity(intent)
+                        if (getBoolean(this@CameraActivity,KEY_SHARE_IMAGE))
+                        {
+                            it?.let { shareImage(uri) }
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+        videoRecordBtn.setOnClickListener {
+            videoStopBtn.visible()
+            videoRecordBtn.gone()
+            cameraManager.startVideoRecording(
+                onStarted = {
+
+                },
+                onSaved = { uri ->
+//                    showToast("video saved:$uri")
+                },
+                onError = { msg ->
+                    videoStopBtn.gone()
+                    videoRecordBtn.visible()
+                }
+            )
+        }
+
+        videoStopBtn.setOnClickListener {
+            cameraManager.stopVideoRecording()
+            videoStopBtn.gone()
+            videoRecordBtn.visible()
+        }
+
+        x1ZoomTv.setOnClickListener {
+            binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
+            binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
+            cameraManager.zoom1x2x(1f)
+        }
+
+        x2ZoomTv.setOnClickListener {
+            binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
+            binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
+            cameraManager.zoom1x2x(2f)
+        }
+
+        shareBtn.setOnClickListener {
+            switchMode(R.id.share_btn)
+
+        }
+
+        photoBtn.setOnClickListener {
+            switchMode(R.id.photo_btn)
+        }
+
+        videoBtn.setOnClickListener {
+            if (isPermissionGranted(Manifest.permission.RECORD_AUDIO)) {
+                switchMode(R.id.video_btn)
+            } else {
+                micPermissionLauncher.requestPermission(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+
+        moreBtn.setOnClickListener {
+            if ( binding.detailTopMenuView.isVisible) {
+                binding.detailTopMenuView.visibility = View.GONE
+                binding.defaultTopMenuView.visibility = View.VISIBLE
+            }
+            else {
+                binding.detailTopMenuView.visibility = View.VISIBLE
+                binding.defaultTopMenuView.visibility = View.GONE
+            }
+        }
     }
 
     private fun switchMode(newMode: Int) {
@@ -558,7 +552,10 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 binding.videoRecordBtn.visibility=View.GONE
                 binding.templateBtn.visibility=View.VISIBLE
                 cameraManager.setVideoRecord(false)
-                saveShareImage(this,true)
+                saveBoolean(this,KEY_SHARE_IMAGE,true)
+
+                cameraManager.stopVideoRecording()/// stop recording if started
+                binding.videoStopBtn.gone()
             }
             R.id.photo_btn->{
                 binding.photoBtn.setTextColorRes(R.color.blue,R.color.white,binding.videoBtn,binding.shareBtn)
@@ -566,7 +563,10 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 binding.videoRecordBtn.visibility=View.GONE
                 binding.templateBtn.visibility=View.VISIBLE
                 cameraManager.setVideoRecord(false)
-                saveShareImage(this,false)
+                saveBoolean(this,KEY_SHARE_IMAGE,false)
+
+                cameraManager.stopVideoRecording()///stop recording if started
+                binding.videoStopBtn.gone()
 
             }
             R.id.video_btn->{
@@ -575,7 +575,7 @@ class CameraActivity : AppCompatActivity(),View.OnClickListener {
                 binding.videoRecordBtn.visibility=View.VISIBLE
                 binding.templateBtn.visibility=View.GONE
                 cameraManager.setVideoRecord(true)
-                saveShareImage(this,false)
+                saveBoolean(this,KEY_SHARE_IMAGE,false)
             }
         }
     }

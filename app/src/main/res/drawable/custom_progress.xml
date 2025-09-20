@@ -7,8 +7,8 @@
         android:height="@dimen/_2sdp"
         android:gravity="center_vertical">
         <shape android:shape="rectangle">
-            <corners android:radius="10dp"/>
-            <solid android:color="#DDDDDD"/>
+            <corners android:radius="@dimen/_10sdp"/>
+            <solid android:color="@color/grey_g1"/>
         </shape>
     </item>
 
@@ -19,8 +19,8 @@
         android:gravity="center_vertical">
         <clip>
             <shape android:shape="rectangle">
-                <corners android:radius="10dp"/>
-                <solid android:color="#2196F3"/>
+                <corners android:radius="@dimen/_10sdp"/>
+                <solid android:color="@color/blue"/>
             </shape>
         </clip>
     </item>

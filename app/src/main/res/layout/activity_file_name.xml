@@ -53,6 +53,7 @@
         android:background="@drawable/bg_radius_10"
         android:backgroundTint="@color/white"
         android:lines="4"
+        android:scrollbars="vertical"
         android:paddingHorizontal="@dimen/_10sdp"
         android:paddingVertical="@dimen/_10sdp"
         android:textColor="@color/black"

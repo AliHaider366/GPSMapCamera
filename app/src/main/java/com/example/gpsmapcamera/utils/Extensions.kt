@@ -6,6 +6,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.app.Dialog
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
@@ -23,7 +24,10 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Shader
 import android.graphics.YuvImage
+import android.graphics.drawable.ColorDrawable
+import android.location.Geocoder
 import android.location.Location
+import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -31,7 +35,10 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.PixelCopy
 import android.view.SurfaceView
 import android.view.TextureView
@@ -39,8 +46,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -59,7 +68,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.TextViewCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.viewbinding.ViewBinding
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.models.AddressModel
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -70,7 +82,10 @@ import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.openlocationcode.OpenLocationCode
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -78,6 +93,20 @@ import java.util.Locale
 import java.util.TimeZone
 import kotlin.coroutines.resume
 
+
+fun EditText.addTextChanged(onTextChanged: ((String) -> Unit)? = null) {
+    this.addTextChangedListener { editable ->
+        val text = editable.toString()
+        if (text.contains("_")) {
+            val clean = text.replace("_", "")
+            if (clean != text) {
+                this.setText(clean)
+                this.setSelection(clean.length) // keep cursor at end
+            }
+        }
+        onTextChanged?.invoke(this.text.toString())
+    }
+}
 
 fun View.visible() {
     this.visibility = View.VISIBLE
@@ -115,6 +144,7 @@ fun Date.getGmtOffset(): String {
     val minutes = Math.abs((offsetMillis / (1000 * 60)) % 60)
     return String.format(Locale.getDefault(), "GMT%+03d:%02d", hours, minutes)
 }
+
 fun Double.toDMS(): String {
     val degrees = this.toInt()
     val minutesDecimal = (this - degrees) * 60
@@ -123,6 +153,7 @@ fun Double.toDMS(): String {
     return String.format("%d°%d'%s\"",
         degrees, minutes, String.format("%.2f", seconds))
 }
+
 fun Pair<Double, Double>.toDMSPair(): Pair<String, String> {
     fun Double.toDMS(): String {
         val degrees = this.toInt()
@@ -137,9 +168,13 @@ fun Pair<Double, Double>.toDMSPair(): Pair<String, String> {
     val lonDMS = second.toDMS()
     return Pair(latDMS, lonDMS)
 }
+
 @Suppress("MissingPermission")
 suspend fun Context.getCurrentLatLong(): Pair<Double, Double> {
 
+    if (!isLocationEnabled()) {
+        return 0.0 to 0.0 // instantly return if location is OFF
+    }
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
     // First, try last known location
@@ -158,43 +193,84 @@ suspend fun Context.getCurrentLatLong(): Pair<Double, Double> {
     }
 
     // If lastKnown was available, return it
-    if (lastKnown != null) return lastKnown
+    if (lastKnown != null)
+        return lastKnown
 
     // Otherwise request fresh GPS location
     return requestFreshLocation()
 }
+
 @Suppress("MissingPermission")
-suspend fun Context.requestFreshLocation(): Pair<Double, Double> =
-    suspendCancellableCoroutine { cont ->
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+suspend fun Context.getCurrentAddress(): AddressModel {
+    val (lat, lon) = getCurrentLatLong()
 
-        val request = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY, 1000
-        ).setMaxUpdates(1).build()
+    if (lat == 0.0 && lon == 0.0) {
+        return AddressModel("Unknown", "Unknown", "Unknown", "Unknown")
+    }
 
-        val callback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                fusedLocationClient.removeLocationUpdates(this)
-                val fresh = result.lastLocation
-                if (fresh != null) {
-                    cont.resume(fresh.latitude to fresh.longitude)
-                } else {
-                    cont.resume(0.0 to 0.0)
+    return try {
+        val geocoder = Geocoder(this, Locale.getDefault())
+        val addresses = withContext(Dispatchers.IO) {
+            geocoder.getFromLocation(lat, lon, 1) // Get single address
+        }
+
+        if (!addresses.isNullOrEmpty()) {
+            val addr = addresses[0]
+
+            val street = addr.getAddressLine(0) ?: "Unknown"
+            val city = addr.locality ?: addr.subAdminArea ?: "Unknown"
+            val province = addr.adminArea ?: "Unknown"
+            val country = addr.countryName ?: "Unknown"
+
+            AddressModel(street, city, province, country)
+        } else {
+            AddressModel("Unknown", "Unknown", "Unknown", "Unknown")
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        AddressModel("Unknown", "Unknown", "Unknown", "Unknown")
+    }
+}
+
+
+@Suppress("MissingPermission")
+suspend fun Context.requestFreshLocation(): Pair<Double, Double> {
+    if (!isLocationEnabled()) {
+        return 0.0 to 0.0 // instantly return if location is OFF
+    }
+
+    return withTimeoutOrNull(5000) { // wait max 5s
+        suspendCancellableCoroutine { cont ->
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@requestFreshLocation)
+
+            val request = LocationRequest.Builder(
+                Priority.PRIORITY_HIGH_ACCURACY, 1000
+            ).setMaxUpdates(1).build()
+
+            val callback = object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    fusedLocationClient.removeLocationUpdates(this)
+                    val fresh = result.lastLocation
+                    if (fresh != null) {
+                        cont.resume(fresh.latitude to fresh.longitude)
+                    } else {
+                        cont.resume(0.0 to 0.0)
+                    }
                 }
             }
-        }
 
-        fusedLocationClient.requestLocationUpdates(
-            request,
-            callback,
-            Looper.getMainLooper()
-        )
+            fusedLocationClient.requestLocationUpdates(
+                request,
+                callback,
+                Looper.getMainLooper()
+            )
 
-        // Cancel listener if coroutine is cancelled
-        cont.invokeOnCancellation {
-            fusedLocationClient.removeLocationUpdates(callback)
+            cont.invokeOnCancellation {
+                fusedLocationClient.removeLocationUpdates(callback)
+            }
         }
-    }
+    } ?: (0.0 to 0.0) // fallback if timeout
+}
 
 @Suppress("MissingPermission")
 /*suspend fun Context.getCurrentPlusCode(): String =
@@ -212,6 +288,9 @@ suspend fun Context.requestFreshLocation(): Pair<Double, Double> =
         }
     }*/
 suspend fun Context.getCurrentPlusCode(): String {
+    if (!isLocationEnabled()) {
+        return ""// instantly return if location is OFF
+    }
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
     // First, try last known location
@@ -231,13 +310,45 @@ suspend fun Context.getCurrentPlusCode(): String {
 
     if (lastKnown != null) return lastKnown
 
-    // Otherwise request fresh location
+ /*   // Otherwise request fresh location
     val (lat, lng) = requestFreshLocation()
     return if (lat != 0.0 && lng != 0.0) {
         getPlusCode(lat, lng)
     } else {
         ""
+    }*/
+    // Try fresh location
+    return try {
+        val (lat, lng) = requestFreshLocation()
+        if (lat != 0.0 && lng != 0.0) {
+            getPlusCode(lat, lng)
+        } else {
+            "" // fallback when GPS off
+        }
+    } catch (e: Exception) {
+        "" // ensure return
     }
+}
+
+inline fun <reified T : ViewBinding> Context.showCustomDialog(
+    noinline bindingInflater: (LayoutInflater) -> T,
+    isCancelable: Boolean = true,
+    crossinline onBind: (binding: T, dialog: Dialog) -> Unit
+) {
+    val binding = bindingInflater(LayoutInflater.from(this))
+
+    val dialog = Dialog(this).apply {
+        setContentView(binding.root)
+        setCancelable(isCancelable)
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+    }
+
+    onBind(binding, dialog)
+    dialog.show()
 }
 
 fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
@@ -245,9 +356,12 @@ fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 }
 
 fun Context.openLatestImageFromFolder(folderPath: String) {
-    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+//    val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    val uri = MediaStore.Files.getContentUri("external")
+
     val projection = arrayOf(
         MediaStore.Images.Media._ID,
+        MediaStore.Files.FileColumns.MEDIA_TYPE,
         MediaStore.Images.Media.DATA,          // For Android < 10
         MediaStore.Images.Media.RELATIVE_PATH  // For Android 10+
     )
@@ -257,25 +371,54 @@ fun Context.openLatestImageFromFolder(folderPath: String) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         // Android 10+ → use RELATIVE_PATH
-        selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
-        selectionArgs = arrayOf(folderPath)
-    } else {
+//        selection = "${MediaStore.Images.Media.RELATIVE_PATH} LIKE ?"
+//        selectionArgs = arrayOf(folderPath)
+        selection =
+            "${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ? AND " +
+                    "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
+        selectionArgs = arrayOf(
+            folderPath,
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
+        )
+    }
+    else {
         // Below Android 10 → use absolute DATA path
         val cameraPath = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DCIM
         ).toString() + "/" + folderPath.replace("DCIM/", "")
-        selection = "${MediaStore.Images.Media.DATA} LIKE ?"
-        selectionArgs = arrayOf("$cameraPath%")
+//        selection = "${MediaStore.Images.Media.DATA} LIKE ?"
+//        selectionArgs = arrayOf("$cameraPath%")
+        selection =
+            "${MediaStore.Files.FileColumns.DATA} LIKE ? AND " +
+                    "(${MediaStore.Files.FileColumns.MEDIA_TYPE}=? OR ${MediaStore.Files.FileColumns.MEDIA_TYPE}=?)"
+        selectionArgs = arrayOf(
+            "$cameraPath%",
+            MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
+            MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
+        )
     }
 
     val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
     contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
         if (cursor.moveToFirst()) {
-            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
-            val contentUri = ContentUris.withAppendedId(uri, id)
+//            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID))
+            val type = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE))
 
+//            val contentUri = ContentUris.withAppendedId(uri, id)
+            val contentUri = when (type) {
+                MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE ->
+                    ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO ->
+                    ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+                else -> null
+            }
+
+            val mimeType = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) "video/*" else "image/*"
             val baseIntent = Intent(Intent.ACTION_VIEW).apply {
+//                setDataAndType(contentUri, "image/*")
                 setDataAndType(contentUri, "image/*")
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
@@ -355,6 +498,40 @@ fun TextView.setDrawable(
     )
 }
 
+fun String.updateFileNameWithCurrentValues(
+    newDateTime: String,
+    newDay: String,
+    newTimeZone: String?=null,
+    newLatLong: String?=null
+): String {
+    val parts = this.removeSuffix(".jpg").split("_").toMutableList()
+
+    // Regex patterns
+    val date= Regex("\\d{8}")              // 20250831_154957
+    val Time24h = Regex("\\d{6}")              // 20250831_154957
+    val Time12h = Regex("\\d{6}(AM|PM)")       // 20250831_035521PM
+    val dayRegex = Regex("(?i)(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)")
+    val tzRegex = Regex("GMT[+-]\\d{2}:\\d{2}")
+
+    // Decimal lat/long e.g. 33.6771516,72.6720808
+    val latLongDecimal = Regex("-?\\d+\\.\\d+,-?\\d+\\.\\d+")
+    // DMS format e.g. 33*40'37.75'',72*40'19.4''
+    val latLongDMS = Regex("\\d+°\\d+'\\d+(\\.\\d+)?''[, ]\\d+°\\d+'\\d+(\\.\\d+)?''")
+
+    for (i in parts.indices) {
+        when {
+            Time24h.matches(parts[i]) || Time12h.matches(parts[i]) -> parts[i] = newDateTime.split("_")[1]
+            date.matches(parts[i]) -> parts[i] = newDateTime.split("_")[0]
+            dayRegex.matches(parts[i]) -> parts[i] = newDay
+//            tzRegex.matches(parts[i]) -> parts[i] = newTimeZone
+//            latLongDecimal.matches(parts[i]) || latLongDMS.matches(parts[i]) -> parts[i] = newLatLong
+        }
+    }
+
+    return parts.joinToString("_") + ".jpg"
+}
+
+
 fun TextView.setTextColorRes(colorResId: Int) {
     this.setTextColor(ContextCompat.getColor(context, colorResId))
 }
@@ -390,6 +567,18 @@ fun TextView.setTextColorAndBackgroundTint( textColorRes: Int, backgroundTintRes
         ColorStateList.valueOf(ContextCompat.getColor(context, backgroundTintRes))
     )
 }
+fun EditText.addAfterTextChanged(onChanged: (String) -> Unit): TextWatcher {
+    val watcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(editable: Editable?) {
+            onChanged(editable?.toString().orEmpty())
+        }
+    }
+    this.addTextChangedListener(watcher)
+    return watcher
+}
+
 fun TextView.setCompoundDrawableTintAndTextColor(
     drawableTintRes: Int? = null,
     textColorRes: Int? = null
@@ -472,6 +661,12 @@ fun ComponentActivity.registerGpsResolutionLauncher(
     } else {
         onDenied()
     }
+}
+
+fun Context.isLocationEnabled(): Boolean {
+    val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    return lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+            lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 }
 
 fun Context.checkAndRequestGps(

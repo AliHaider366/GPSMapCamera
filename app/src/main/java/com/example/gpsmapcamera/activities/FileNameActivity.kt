@@ -1,43 +1,32 @@
 package com.example.gpsmapcamera.activities
 
-import android.app.Application
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import android.text.method.ScrollingMovementMethod
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.adapters.FileNameAdapter
-import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.databinding.ActivityFileNameBinding
+import com.example.gpsmapcamera.models.AddressModel
+import com.example.gpsmapcamera.models.FieldItem
 import com.example.gpsmapcamera.utils.MyApp
+import com.example.gpsmapcamera.utils.PrefManager.loadItemOrder
 import com.example.gpsmapcamera.utils.formatForFile
+import com.example.gpsmapcamera.utils.getCurrentAddress
 import com.example.gpsmapcamera.utils.getCurrentDay
 import com.example.gpsmapcamera.utils.getCurrentLatLong
 import com.example.gpsmapcamera.utils.getCurrentPlusCode
 import com.example.gpsmapcamera.utils.getGmtOffset
+import com.example.gpsmapcamera.utils.registerGpsResolutionLauncher
 import com.example.gpsmapcamera.utils.toDMSPair
 import kotlinx.coroutines.launch
 import java.util.Date
 
-data class FieldItem(
-    val name: String,
-    var value: String,
-    val day: String="",
-    val latLongDMS: String="",
-    var isChecked: Boolean = false,
-    var isCheckBox1Checked: Boolean = false,
-    var isCheckBox2Checked: Boolean = false,
-    var isCheckBox3Checked: Boolean = false,
-    var isCheckBox4Checked: Boolean = false,
-    var isDropCheck: Boolean?=null,
-    var isDropDownVisible: Boolean?=null,
-    var isPremium: Boolean=false
-)
 
 
 class FileNameActivity : AppCompatActivity() {
@@ -45,22 +34,39 @@ class FileNameActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityFileNameBinding.inflate(layoutInflater)
     }
+    private val appViewModel by lazy {
+        (application as MyApp).appViewModel
+    }
 
     private val list by lazy {
-        mutableListOf(
-            FieldItem("Date and Time",Date().formatForFile(), day = Date().getCurrentDay(), isDropCheck = true, isChecked = true),
-            FieldItem("Sequence number","",isDropCheck = false),
-            FieldItem("Custom name 1","",isDropCheck = false),
-            FieldItem("Custom name 2","",isDropCheck = false),
-            FieldItem("Custom name 3","",isDropCheck = false),
-            FieldItem("Full Address","", isDropCheck = true),
-            FieldItem("Latitude/longitude","", isDropCheck = true),
-            FieldItem("Plus code",""),
-            FieldItem("Time zone",Date().getGmtOffset()),
-            FieldItem("Note","",isDropCheck = false)
+        val defaultItems = mutableListOf(
+            FieldItem(0, getString(R.string.date_and_time), Date().formatForFile(), day = Date().getCurrentDay(), isDropCheck = true, isChecked = true),
+            FieldItem(1, getString(R.string.sequence_number), "", isDropCheck = false),
+            FieldItem(2, getString(R.string.custom_name_1), "", isDropCheck = false),
+            FieldItem(3, getString(R.string.custom_name_2), "", isDropCheck = false),
+            FieldItem(4, getString(R.string.custom_name_3), "", isDropCheck = false),
+            FieldItem(5, getString(R.string.full_address), "", address = appViewModel.address, isDropCheck = true),
+            FieldItem(6, getString(R.string.latitude_longitude), "${appViewModel.latLong.first},${appViewModel.latLong.second}",
+                latLongDMS = "${appViewModel.latLongDMS.first},${appViewModel.latLongDMS.second}", isDropCheck = true),
+            FieldItem(7, getString(R.string.plus_code), appViewModel.plusCode),
+            FieldItem(8, getString(R.string.time_zone), Date().getGmtOffset()),
+            FieldItem(9, getString(R.string.note), "", isDropCheck = false)
         )
 
+        loadItemOrder(defaultItems, this@FileNameActivity)
     }
+
+    private val gpsResolutionLauncher by lazy {
+        registerGpsResolutionLauncher(
+            onEnabled = {
+                Toast.makeText(this, "GPS Enabled ", Toast.LENGTH_SHORT).show()
+            },
+            onDenied = {
+                Toast.makeText(this, "GPS Denied ", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -72,17 +78,16 @@ class FileNameActivity : AppCompatActivity() {
     private lateinit var itemTouchHelper: ItemTouchHelper
 
     private fun init()=binding.apply {
+//        checkAndRequestGps(gpsResolutionLauncher)
 
+        filenameTv.movementMethod = ScrollingMovementMethod()
+
+        backBtn.setOnClickListener {
+            finish()
+        }
         recyclerView.layoutManager = LinearLayoutManager(this@FileNameActivity)
 
         lifecycleScope.launch {
-            val pluscode=getCurrentPlusCode()
-            list.set(7,FieldItem("Plus code",pluscode))
-            val latLong=getCurrentLatLong()
-            val latLongDMS=latLong.toDMSPair()
-            list.set(6,FieldItem("Latitude/Longitude","${latLong.first},${latLong.second}",
-                latLongDMS = "${latLongDMS.first},${latLongDMS.second}",isDropCheck = true))
-
 
             // Adapter setup
             adapter = FileNameAdapter(
@@ -114,7 +119,7 @@ class FileNameActivity : AppCompatActivity() {
             ): Boolean {
                 val fromPos = viewHolder.adapterPosition
                 val toPos = target.adapterPosition
-                adapter.onItemMove(fromPos, toPos)
+                adapter.onItemMove(fromPos, toPos,this@FileNameActivity)
                 return true
             }
 

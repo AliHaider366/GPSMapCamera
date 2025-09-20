@@ -14,7 +14,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.ActivityPermissionBinding
-import com.example.gpsmapcamera.utils.PrefManager.saveIsFirstTime
+import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
+import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.arePermissionsGranted
 import com.example.gpsmapcamera.utils.isPermissionGranted
 import com.example.gpsmapcamera.utils.launchActivity
@@ -30,83 +31,6 @@ class PermissionActivity : AppCompatActivity() {
         ActivityPermissionBinding.inflate(layoutInflater)
     }
 
-/*
-    private val galleryPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val granted = permissions.entries.any { it.value }
-            if (granted) {
-                binding.btmGalleryAllow.setTextColorAndBackgroundTint(R.color.white,R.color.blue)
-                enableContinueButtonState()
-                showToast("Permission Granted ✅")
-                // Now you can access photos & videos
-            } else {
-                // Check if user permanently denied (Don't ask again)
-                val showRationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES) ||
-                            shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_VIDEO)
-                } else {
-                    shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
-                }
-
-                if (!showRationale) {
-                    // User checked "Don't ask again"
-                    Toast.makeText(this, "Permission permanently denied ❌", Toast.LENGTH_LONG).show()
-                    openAppSettings()
-                } else {
-                    Toast.makeText(this, "Permission Denied ❌", Toast.LENGTH_SHORT).show()
-                }
-
-            }
-        }
-*/
-
-/*
-    private val locationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val granted = permissions.entries.any { it.value }
-
-            if (granted) {
-                binding.btmLocationAllow.setTextColorAndBackgroundTint(R.color.white,R.color.blue)
-                Toast.makeText(this, "Location Permission Granted ✅", Toast.LENGTH_SHORT).show()
-                enableContinueButtonState()
-
-                // You can now access location
-            } else {
-                // Check if user permanently denied (Don't ask again)
-                val showRationale = shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ||
-                        shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
-
-                if (!showRationale) {
-                    // User chose "Don't ask again"
-                    Toast.makeText(this, "Permission permanently denied ❌", Toast.LENGTH_LONG).show()
-                    openAppSettings()
-                } else {
-                    Toast.makeText(this, "Permission Denied ❌", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-*/
-
-/*    private val cameraPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (granted) {
-                binding.btmCameraAllow.setTextColorAndBackgroundTint(R.color.white,R.color.blue)
-                enableContinueButtonState()
-
-                Toast.makeText(this, "Camera Permission Granted ✅", Toast.LENGTH_SHORT).show()
-                // Now you can open camera or start preview
-            } else {
-                val showRationale = shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)
-
-                if (!showRationale) {
-                    // User chose "Don't ask again"
-                    Toast.makeText(this, "Permission permanently denied ❌", Toast.LENGTH_LONG).show()
-                    openAppSettings()
-                } else {
-                    Toast.makeText(this, "Permission Denied ❌", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }*/
     private lateinit var cameraPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var locationPermissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var galleryPermissionLauncher: ActivityResultLauncher<Array<String>>
@@ -141,16 +65,19 @@ class PermissionActivity : AppCompatActivity() {
         if (arePermissionsGranted(galleryPermissions))
         {
             binding.btmGalleryAllow.setTextColorAndBackgroundTint(R.color.white,R.color.blue)
+            binding.btmGalleryAllow.text= getString(R.string.allowed)
 
         }
         if (isPermissionGranted(Manifest.permission.CAMERA))
         {
             binding.btmCameraAllow.setTextColorAndBackgroundTint(R.color.white,R.color.blue)
+            binding.btmCameraAllow.text= getString(R.string.allowed)
 
         }
         if (arePermissionsGranted(locationPermissions))
         {
             binding.btmLocationAllow.setTextColorAndBackgroundTint(R.color.white,R.color.blue)
+            binding.btmLocationAllow.text= getString(R.string.allowed)
 
         }
     }
@@ -165,14 +92,15 @@ class PermissionActivity : AppCompatActivity() {
                 Manifest.permission.CAMERA,
                 onGranted = {
                     btmCameraAllow.setTextColorAndBackgroundTint(R.color.white, R.color.blue)
+                    btmCameraAllow.text= getString(R.string.allowed)
                     enableContinueButtonState()
-                    showToast("Camera Permission Granted")
+                    showToast(getString(R.string.permission_granted))
                 },
                 onDenied = { permanentlyDenied ->
                     if (permanentlyDenied) {
                         openAppSettings()
                     } else {
-                        showToast("Camera Permission Denied ")
+                        showToast(getString(R.string.permission_denied))
 
                     }
                 }
@@ -180,31 +108,33 @@ class PermissionActivity : AppCompatActivity() {
             locationPermissionLauncher = registerMultiplePermissionsLauncher(
                 permissions = locationPermissions,
                 onGranted = {
-                    binding.btmLocationAllow.setTextColorAndBackgroundTint(R.color.white, R.color.blue)
+                    btmLocationAllow.setTextColorAndBackgroundTint(R.color.white, R.color.blue)
                     enableContinueButtonState()
-                    showToast("Location Permission Granted")
+                    btmLocationAllow.text= getString(R.string.allowed)
+                    showToast(getString(R.string.permission_granted))
                 },
                 onDenied = { permanentlyDenied ->
                     if (permanentlyDenied) {
                         openAppSettings()
                     } else {
-                        showToast("Location Permission Denied")
+                        showToast(getString(R.string.permission_denied))
                     }
                 }
             )
             galleryPermissionLauncher = registerMultiplePermissionsLauncher(
                 permissions = galleryPermissions,
                 onGranted = {
-                    binding.btmGalleryAllow.setTextColorAndBackgroundTint(R.color.white, R.color.blue)
+                    btmGalleryAllow.setTextColorAndBackgroundTint(R.color.white, R.color.blue)
                     enableContinueButtonState()
-                    showToast("Permission Granted ✅")
+                    btmGalleryAllow.text= getString(R.string.allowed)
+                    showToast(getString(R.string.permission_granted))
                 },
                 onDenied = { permanentlyDenied ->
                     if (permanentlyDenied) {
-                        showToast("Permission permanently denied")
+//                        showToast("Permission permanently denied")
                         openAppSettings()
                     } else {
-                        showToast("Permission Denied ")
+                        showToast(getString(R.string.permission_denied))
                     }
                 }
             )
@@ -223,7 +153,7 @@ class PermissionActivity : AppCompatActivity() {
                 locationPermissionLauncher.launch(locationPermissions)
             }
             btnContinue.setOnClickListener {
-                saveIsFirstTime(this@PermissionActivity,true)
+                saveBoolean(this@PermissionActivity,KEY_FIRST_TIME,true)
                 launchActivity<CameraActivity> {  }
             }
         }
@@ -244,7 +174,7 @@ class PermissionActivity : AppCompatActivity() {
 
     }
 
-    private fun isLocationPermissionGranted(): Boolean {
+  /*  private fun isLocationPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -262,7 +192,6 @@ class PermissionActivity : AppCompatActivity() {
             )
         )
     }
-
     private fun isCameraPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             this,
@@ -298,6 +227,6 @@ class PermissionActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
             )
         }
-    }
+    }*/
 
 }

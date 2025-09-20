@@ -16,17 +16,12 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
-import android.view.ViewAnimationUtils
-import android.view.ViewTreeObserver
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.annotation.RequiresPermission
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -34,6 +29,7 @@ import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
@@ -55,23 +51,25 @@ import androidx.lifecycle.LifecycleOwner
 import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.enums.ImageFormat
 import com.example.gpsmapcamera.enums.ImageQuality
-import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
-import com.example.gpsmapcamera.utils.PrefManager.getCameraFlash
-import com.example.gpsmapcamera.utils.animateLightSweep
+import com.example.gpsmapcamera.utils.PrefManager.KEY_FOLDER_NAME
+import com.example.gpsmapcamera.utils.PrefManager.KEY_WHITE_BALANCE
+import com.example.gpsmapcamera.utils.PrefManager.getInt
+import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.animateRippleReveal
-import com.example.gpsmapcamera.utils.playCurtainAnimation
+import com.example.gpsmapcamera.utils.formatForFile
+import com.example.gpsmapcamera.utils.getCurrentDay
+import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.tooBitmap
+import com.example.gpsmapcamera.utils.updateFileNameWithCurrentValues
 import jp.co.cyberagent.android.gpuimage.GPUImage
 import jp.co.cyberagent.android.gpuimage.filter.GPUImageGrayscaleFilter
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.hypot
 
 class CameraManager(
     private val context: Context,
@@ -90,7 +88,7 @@ class CameraManager(
     private var isMirrorEnabled = false
     private val tapCapture=false
     var selectedQuality: ImageQuality = ImageQuality.HIGH // default
-
+    private var activeRecording: Recording? = null
     private var currentZoom=0.0f
     /// QR code
     private var qrCodeAnalyzer: QRCodeAnalyzer? = null
@@ -191,8 +189,6 @@ class CameraManager(
         captureSoundEnabled=soundEnabled
     }
 
-    private var activeRecording: Recording? = null
-
     fun stopVideoRecording() {
         activeRecording?.stop()
         activeRecording = null
@@ -206,28 +202,16 @@ class CameraManager(
 
         val vc = videoCapture ?: return onError("VideoCapture not ready")
 
-//        val saveFileName = generateImageFileName(prefix = "VID",extension = ".mp4")
-        val saveFileName = appViewModel.saveFileName.removeSuffix(".jpg") + ".mp4"
-       /* val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "Movies/${BuildConfig.APPLICATION_ID}")
-        }
-
-        val mediaStoreOptions = MediaStoreOutputOptions.Builder(
-            context.contentResolver,
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        )
-            .setContentValues(contentValues)
-            .build()*/
+//        val saveFileName = appViewModel.saveFileName.removeSuffix(".jpg") + ".mp4"          //// replace
+        val filename= appViewModel.fileNameFromPattern().removeSuffix(".jpg") + ".mp4"
         // Choose output options based on Android version
         val outputOptions: OutputOptions =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // ✅ Android 10 and above → MediaStore
+                //  Android 10 and above → MediaStore
                 val contentValues = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, saveFileName)
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, filename)
                     put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, SAVED_DEFAULT_FILE_PATH)
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, appViewModel.fileSavePath)
                 }
 
                 MediaStoreOutputOptions.Builder(
@@ -237,12 +221,18 @@ class CameraManager(
                     .setContentValues(contentValues)
                     .build()
             } else {
-                // ✅ Android 9 and below → FileOutputOptions
-                val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-                val appDir = File(moviesDir, BuildConfig.APPLICATION_ID)
+                //  Android 9 and below → FileOutputOptions
+//                val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+//                val appDir = File(moviesDir, BuildConfig.APPLICATION_ID)
+//                if (!appDir.exists()) appDir.mkdirs()
+                val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                val subFolderName= getString(context,KEY_FOLDER_NAME)
+                val appDir= if (subFolderName.isNotEmpty()) File(picturesDir,  "${BuildConfig.APPLICATION_ID}/$subFolderName")     ///saved to folder path
+                else  File(picturesDir,  BuildConfig.APPLICATION_ID)
+
                 if (!appDir.exists()) appDir.mkdirs()
 
-                val file = File(appDir, saveFileName)
+                val file = File(appDir, filename)
                 FileOutputOptions.Builder(file).build()
             }
 
@@ -284,58 +274,19 @@ class CameraManager(
         qrImageAnalysis?.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
             // Convert ImageProxy to Bitmap with proper rotation
             val bitmap = imageProxy.tooBitmap()
+            val filename= appViewModel.fileNameFromPattern()
             imageProxy.close()
             qrImageAnalysis?.clearAnalyzer() // stop after single frame
             bitmap?.let {
-                saveBitmap(context, it) { uri ->
+                saveCapturedBitmap(it, filename, format = ImageFormat.JPG){uri->           ////replace file name
                     showShutterEffect()
                     onCaptured(uri)
                 }
+
             }
         }
 
     }
-    fun saveBitmap(context: Context, bitmap: Bitmap, onCaptured: (Uri) -> Unit) {
-        try {
-            val name = appViewModel.saveFileName
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val selectedFormat = ImageFormat.JPG
-
-                // Android 10+ : save via MediaStore
-                val contentValues = ContentValues().apply {
-                    put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-                    put(MediaStore.MediaColumns.MIME_TYPE, selectedFormat.mimeType)
-                    put(MediaStore.MediaColumns.RELATIVE_PATH, SAVED_DEFAULT_FILE_PATH)
-                }
-
-                val resolver = context.contentResolver
-                val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
-                if (uri != null) {
-                    resolver.openOutputStream(uri)?.use { out ->
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                    }
-                    onCaptured(uri)
-                }
-            } else {
-                // Android 9 and below : save to external files directory
-                val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-                val appDir = File(picturesDir, BuildConfig.APPLICATION_ID)
-                if (!appDir.exists()) appDir.mkdirs()
-
-                val file = File(appDir, name)
-                FileOutputStream(file).use { out ->
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
-                }
-
-                val uri = Uri.fromFile(file)
-                onCaptured(uri)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     /**
      * Flash effect like camera shutter
      */
@@ -362,7 +313,7 @@ class CameraManager(
             .start()
     }
 
-    fun startCamera() {
+    fun startCamera(onStarted: (() -> Unit)?=null) {
 
         if (isQRCodeEnabled && qrCodeAnalyzer != null) {
             qrImageAnalysis = ImageAnalysis.Builder()
@@ -388,13 +339,6 @@ class CameraManager(
                     it.setSurfaceProvider(previewView.surfaceProvider)
                 }
 
-
-            /*   imageCapture = ImageCapture.Builder()
-                   .setTargetResolution(selectedQuality.resolution)
-                   .setFlashMode(if (flashEnabled)
-                       ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
-                   .setTargetAspectRatio(aspectRatio)
-                   .build()*/
             imageCapture=buildImageCapture(flashEnabled,selectedQuality,aspectRatio)
 
             // Recorder with quality
@@ -435,13 +379,16 @@ class CameraManager(
                     imageCapture
                     )
 
-                // --- COOL Curtain Animation ---
+                // --- Curtain Animation ---
                 val container = previewView.parent as? FrameLayout
-//                container?.playCurtainAnimation(
-//                    duration = 1000,
-//                )
-//                container?.animateLightSweep()
                 container?.animateRippleReveal(previewView)
+
+                if (onStarted != null) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        onStarted()
+                    }, 500)
+                }
+
             }
             catch (e: Exception) {
                 e.printStackTrace()
@@ -449,46 +396,8 @@ class CameraManager(
         }, ContextCompat.getMainExecutor(context))
     }
 
-    private fun applyCircularReveal(container: FrameLayout) {
-        val cx = container.width / 2
-        val cy = container.height / 2
-        val finalRadius = hypot(cx.toDouble(), cy.toDouble()).toFloat()
-
-        val anim = ViewAnimationUtils.createCircularReveal(
-            container,
-            cx,
-            cy,
-            0f,
-            finalRadius
-        )
-        container.alpha = 1f
-        anim.duration = 700
-        anim.interpolator = AccelerateDecelerateInterpolator()
-        anim.start()
-    }
     fun takePhotoWithTimer(seconds: Int, countdownText: TextView, onSaved: (Uri?) -> Unit) {
-        /*Toast.makeText(context, "Capturing in $seconds sec...", Toast.LENGTH_SHORT).show()
-        Handler(Looper.getMainLooper()).postDelayed({
-            takePhoto(onSaved)
-        }, seconds * 1000L)*/
-
         countdownText.visibility = View.VISIBLE
-
-    /*    val duration = (seconds * 1000L) - 1000L // subtract 1 second to stop at 1
-        val timer = object : CountDownTimer(duration, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val secondsLeft = (millisUntilFinished / 1000) + 1
-                countdownText.text = secondsLeft.toString()
-            }
-
-            override fun onFinish() {
-                countdownText.text = ""
-                countdownText.visibility = View.GONE
-                takePhoto(onSaved)
-            }
-        }
-
-        timer.start()*/
 
         var currentSecond = seconds
         val handler = Handler(Looper.getMainLooper())
@@ -502,7 +411,7 @@ class CameraManager(
                 } else {
                     countdownText.visibility = View.GONE
                     countdownText.text = ""
-                    takePhoto(onSaved) // run immediately after 1, don't show 0
+                    takePhoto(onSaved) // run immediately
                 }
             }
         }
@@ -520,81 +429,116 @@ class CameraManager(
         }
 
         val imageCapture = imageCapture ?: return
-        val file = File(context.getExternalFilesDir(null), "${System.currentTimeMillis()}.jpg")
+//        val file = File(context.getExternalFilesDir(null), "${System.currentTimeMillis()}.jpg")
 //        val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
 
-        // ✅ Play sound if enabled
+        //  Play sound if enabled
         if (captureSoundEnabled) {
             MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
         }
-        val selectedFormat = ImageFormat.JPG
-        val (outputOptions, outputUri) = getImageOutputOptions(context,appViewModel.saveFileName, format = selectedFormat)  /// use this to save image
 
         imageCapture.takePicture(
-            outputOptions,
             ContextCompat.getMainExecutor(context),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(result: ImageCapture.OutputFileResults) {
-//                    onSaved(Uri.fromFile(file))
-//                    val outputUri=Uri.fromFile(file)
-                    showShutterEffect()
+            object : ImageCapture.OnImageCapturedCallback() {
+                override fun onCaptureSuccess(image: ImageProxy) {
+                    val bitmap = imageProxyToBitmap(image)
+                    val rotationDegrees = image.imageInfo.rotationDegrees
 
-                    if (isMirrorEnabled) {
-                        if (outputUri != null) {
-                            mirrorImageFromUri(outputUri) { mirroredUri ->
-                                onSaved(mirroredUri) // Use mirrored image
+                    image.close()
+                    showShutterEffect()
+                    if (bitmap != null) {
+                        val matrix = Matrix().apply {
+                            // rotate correctly
+                            postRotate(rotationDegrees.toFloat())
+
+                            //  apply mirror (after rotation)
+                            if (isMirrorEnabled) {
+                                postScale(-1f, 1f, bitmap.width / 2f, bitmap.height / 2f)
                             }
                         }
+
+                        val finalBitmap = Bitmap.createBitmap(
+                            bitmap, 0, 0,
+                            bitmap.width, bitmap.height,
+                            matrix, true
+                        )
+
+//                        val filename= appViewModel.saveFileName.updateFileNameWithCurrentValues(Date().formatForFile(),Date().getCurrentDay())
+                        val filename= appViewModel.fileNameFromPattern()
+                         saveCapturedBitmap(finalBitmap, filename, format = ImageFormat.JPG){uri->
+                             onSaved(uri)
+                        }
+
                     } else {
-                        onSaved(outputUri) // Use original image
+                        onSaved(null)
                     }
-//                    val uri = Uri.fromFile(file)
-//                    applyFilterToImage(uri) { filteredUri ->
-//                        onSaved(filteredUri)
-//                    }
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Toast.makeText(context, "Capture failed: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    context.showToast("Capture failed: ${exception.message}")
+                    onSaved(null)
                 }
-            })
+            }
+        )
     }
 
-    //// flip the captured image mirror feature
-    fun mirrorImageFromUri(uri: Uri, callback: (Uri) -> Unit) {
-        val bitmap = getCorrectlyOrientedBitmap(uri)
-
-        // Flip horizontally (mirror)
-        val matrix = Matrix().apply {
-            preScale(-1f, 1f)  // Horizontal mirror
-        }
-
-        val mirroredBitmap = Bitmap.createBitmap(
-            bitmap, 0, 0,
-            bitmap.width, bitmap.height,
-            matrix, true
-        )
-
-        // Save mirrored bitmap to new file
-        val mirroredFile = File(
-            context.getExternalFilesDir(null),
-            "mirrored_${System.currentTimeMillis()}.jpg"
-        )
-
-        FileOutputStream(mirroredFile).use {
-            mirroredBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        }
-
-        callback(Uri.fromFile(mirroredFile))
+    // Convert ImageProxy → Bitmap
+    private fun imageProxyToBitmap(image: ImageProxy): Bitmap? {
+        val buffer = image.planes[0].buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
+    private fun saveCapturedBitmap(bitmap: Bitmap,fileName: String ,format: ImageFormat,onCaptured: (Uri) -> Unit) {
+         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                put(MediaStore.MediaColumns.MIME_TYPE, format.mimeType)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, appViewModel.fileSavePath)     ///saved to folder path
+            }
+
+            val resolver = context.contentResolver
+            val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            if (uri != null) {
+                resolver.openOutputStream(uri)?.use {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+                }
+                onCaptured(uri)
+            }
+        } else {
+            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            val subFolderName= getString(context,KEY_FOLDER_NAME)
+//            val file = if (subFolderName.isNotEmpty()) File(picturesDir,  "${BuildConfig.APPLICATION_ID}/$subFolderName")     ///saved to folder path
+//            else  File(picturesDir,  BuildConfig.APPLICATION_ID)
+            val folderDir = if (subFolderName.isNotEmpty()) File(picturesDir,  "${BuildConfig.APPLICATION_ID}/$subFolderName")     ///saved to folder path
+            else  File(picturesDir,  BuildConfig.APPLICATION_ID)
+
+            if (!folderDir.exists()) {
+                folderDir.mkdirs()
+            }
+
+            val imageFile = File(folderDir, fileName)
+            FileOutputStream(imageFile).use {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            }
+             val uri = Uri.fromFile(imageFile)
+             onCaptured(uri)
+        }
+    }
+
+    /// for image filter
     fun getCorrectlyOrientedBitmap(uri: Uri): Bitmap {
         val inputStream = context.contentResolver.openInputStream(uri)
         val bitmap = BitmapFactory.decodeStream(inputStream)
         inputStream?.close()
 
-        val file = File(uri.path ?: return bitmap)
-        val exif = ExifInterface(file.absolutePath)
+//        val file = File(uri.path ?: return bitmap)
+//        val exif = ExifInterface(file.absolutePath)
+        // Read Exif metadata
+        val exifInputStream = context.contentResolver.openInputStream(uri)
+        val exif = ExifInterface(exifInputStream!!)
+        exifInputStream.close()
         val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
 
         val rotation = when (orientation) {
@@ -608,7 +552,6 @@ class CameraManager(
         matrix.postRotate(rotation.toFloat())
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
-
     fun applyFilterToImage(uri: Uri, callback: (Uri) -> Unit) {
         // Load and correct orientation
         val rotatedBitmap = getCorrectlyOrientedBitmap(uri)        // Initialize GPUImage
@@ -626,7 +569,6 @@ class CameraManager(
 
         callback(Uri.fromFile(filteredFile))
     }
-
 
     fun buildImageCapture(
         flashEnabled: Boolean,
@@ -699,69 +641,6 @@ class CameraManager(
             }
             true
         }
-    }
-
-    fun getImageOutputOptions(context: Context,   fileName: String ,format: ImageFormat): Pair<ImageCapture.OutputFileOptions, Uri?> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val contentValues = ContentValues().apply {
-//                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName.removeSuffix(".jpg")) // No extension here
-                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                put(MediaStore.MediaColumns.MIME_TYPE, format.mimeType)
-                put(MediaStore.MediaColumns.RELATIVE_PATH, SAVED_DEFAULT_FILE_PATH)     ///saved to folder path
-            }
-
-            val contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val resolver = context.contentResolver
-            val uri = resolver.insert(contentUri, contentValues)
-
-            if (uri == null) {
-                throw IOException("Failed to create MediaStore entry")
-            }
-
-            val outputStream = resolver.openOutputStream(uri)
-                ?: throw IOException("Failed to open output stream for URI")
-
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(outputStream).build()
-            Pair(outputOptions, uri)
-
-        } else {
-            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val appDir = File(picturesDir, BuildConfig.APPLICATION_ID)      ///saved to folder path
-            if (!appDir.exists()) appDir.mkdirs()
-
-            val file = File(appDir, fileName)
-            val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
-            Pair(outputOptions, Uri.fromFile(file))
-        }
-    }
-
-
-    fun generateImageFileName(
-        prefix: String = "IMG",
-        suffix: String = "",
-        includeTimestamp: Boolean = true,
-        extension: String = ".jpg"
-    ): String {
-
-        val count = PrefManager.getImageCount(context,0) + 1
-        PrefManager.saveImageCount(context,count)
-
-        // Format the count with leading zeros: 001, 002, ...
-        val countFormatted = String.format("%03d", count)
-
-
-        val timeStamp = if (includeTimestamp) {
-//            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-            SimpleDateFormat(
-                "yyyy-MM-dd_EEEE_HH-mm-ss",  // Full date + day + 24-hour time
-                Locale.getDefault()
-            ).format(Date())
-        } else {
-            ""
-        }
-
-        return "${prefix}_${countFormatted}_${timeStamp}_${suffix}_$extension"
-//        return "${prefix}_${countFormatted}_${timeStamp}_${suffix}"
     }
 
 

@@ -3,27 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="@color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
   >
 
-    <!-- This holds the camera preview to be blurred -->
-    <!-- Blur top controls -->
-
-    <eightbitlab.com.blurview.BlurTarget
-        android:id="@+id/blurTarget"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#000"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
+    <!-- This holds the camera preview  -->
         <FrameLayout
             android:id="@+id/previewContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="#000"
+            android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +41,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"/>
-    </eightbitlab.com.blurview.BlurTarget>
 
     <!--timmer textview-->
     <TextView
@@ -63,7 +53,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/zoom_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topBlurView" />
+        app:layout_constraintTop_toBottomOf="@+id/defaultTopMenuView" />
     <!--brightness bar-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/brightnessBarView"
@@ -102,19 +92,13 @@
 
 
     <!--defaut top menu-->
-    <eightbitlab.com.blurview.BlurView
-        android:id="@+id/topBlurView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:elevation="16dp"
-        app:blurOverlayColor="#87494949">
-
         <LinearLayout
+            android:id="@+id/defaultTopMenuView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="6"
+            app:layout_constraintTop_toTopOf="parent"
             android:background="@color/black"
             android:paddingVertical="@dimen/_8sdp"
            >
@@ -174,23 +158,16 @@
                />
 
         </LinearLayout>
-    </eightbitlab.com.blurview.BlurView>
 
 <!--detail top menu-->
-    <eightbitlab.com.blurview.BlurView
-        android:id="@+id/topDetailBlurView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="@color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        android:elevation="16dp"
-        app:blurOverlayColor="#87494949">
-
         <LinearLayout
+            android:id="@+id/detailTopMenuView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/black"
             android:paddingVertical="@dimen/_5sdp"
             >
             <LinearLayout
@@ -207,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/ratio16_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Ratio"
+                    android:text="@string/ratio"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/blue"
@@ -220,7 +197,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/grid_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Grid"
+                    android:text="@string/grid"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/white"
@@ -233,7 +210,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/timer_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Timer Off"
+                    android:text="@string/timer_off"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/white"
@@ -245,7 +222,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/mirror_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Mirror"
+                    android:text="@string/mirror"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/white"
@@ -269,7 +246,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/volume_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Volume"
+                    android:text="@string/volume"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/white"
@@ -282,7 +259,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/brightness_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="White"
+                    android:text="@string/white"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/white"
@@ -295,7 +272,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/level_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Camera level"
+                    android:text="@string/camera_level"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/white"
@@ -307,7 +284,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/focus_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Focus"
+                    android:text="@string/focus"
                     android:gravity="center"
                     android:layout_weight="1"
                     android:textColor="@color/white"
@@ -318,7 +295,6 @@
             </LinearLayout>
         </LinearLayout>
 
-    </eightbitlab.com.blurview.BlurView>
 
     <!--bottom controls-->
     <LinearLayout
@@ -328,7 +304,7 @@
         android:orientation="horizontal"
         android:weightSum="2"
         android:layout_marginBottom="@dimen/_10sdp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomBlurView"
+        app:layout_constraintBottom_toTopOf="@+id/bottomControlsView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -338,7 +314,7 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="@dimen/_5sdp"
             android:paddingVertical="@dimen/_3sdp"
-            android:text="1x"
+            android:text="@string/_1x"
             android:layout_marginEnd="@dimen/_5sdp"
             android:background="@drawable/bg_radius_20"
             android:backgroundTint="@color/white"
@@ -353,21 +329,14 @@
             android:paddingVertical="@dimen/_3sdp"
             android:background="@drawable/bg_radius_20"
             android:backgroundTint="@color/transparent"
-            android:text="2x"
+            android:text="@string/_2x"
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp" />
 
     </LinearLayout>
 
-    <eightbitlab.com.blurview.BlurView
-        android:id="@+id/bottomBlurView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:elevation="16dp"
-        app:blurOverlayColor="#87494949"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottomControlsView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent">
@@ -417,7 +386,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/_5sdp"
-                    android:text="Quick Share"
+                    android:text="@string/quick_share"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_12sdp" />
 
@@ -426,7 +395,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/_5sdp"
-                    android:text="Photo"
+                    android:text="@string/photo"
                     android:textColor="@color/blue"
                     android:textSize="@dimen/_12sdp" />
 
@@ -435,7 +404,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/_5sdp"
-                    android:text="Video"
+                    android:text="@string/video"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_12sdp" />
             </LinearLayout>
@@ -465,7 +434,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/gallery_fill_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Gallery"
+                    android:text="@string/gallery"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_10sdp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -479,7 +448,7 @@
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/tempate_ic"
                     android:drawablePadding="@dimen/_5sdp"
-                    android:text="Templates"
+                    android:text="@string/templates"
                     android:textColor="@color/white"
                     android:textSize="@dimen/_10sdp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -511,6 +480,5 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </eightbitlab.com.blurview.BlurView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

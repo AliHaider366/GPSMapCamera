@@ -54,7 +54,7 @@ dependencies {
     implementation ("com.intuit.sdp:sdp-android:1.1.1")
 
     implementation ("jp.co.cyberagent.android:gpuimage:2.1.0")
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation ("com.github.bumptech.glide:glide:5.0.5")
 
     implementation ("com.google.mlkit:barcode-scanning:17.3.0")
 
@@ -68,6 +68,6 @@ dependencies {
     implementation("com.github.Dimezis:BlurView:version-3.1.0")
 
     implementation("com.google.openlocationcode:openlocationcode:1.0.4") //get plus code
-
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.3")
 }
 
