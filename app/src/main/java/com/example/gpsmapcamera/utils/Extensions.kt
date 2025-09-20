@@ -1,8 +1,8 @@
 package com.example.gpsmapcamera.utils
 
+import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
@@ -31,7 +31,6 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
-import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
@@ -55,7 +54,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.result.ActivityResultCaller
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,17 +61,21 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.PreviewView
-import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.TextViewCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.viewbinding.ViewBinding
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.models.AddressLineModel
 import com.example.gpsmapcamera.models.AddressModel
+import com.example.gpsmapcamera.models.FullAddress
+import com.example.gpsmapcamera.models.StampItemName
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -150,8 +152,10 @@ fun Double.toDMS(): String {
     val minutesDecimal = (this - degrees) * 60
     val minutes = minutesDecimal.toInt()
     val seconds = ((minutesDecimal - minutes) * 60)
-    return String.format("%d°%d'%s\"",
-        degrees, minutes, String.format("%.2f", seconds))
+    return String.format(
+        "%d°%d'%s\"",
+        degrees, minutes, String.format("%.2f", seconds)
+    )
 }
 
 fun Pair<Double, Double>.toDMSPair(): Pair<String, String> {
@@ -160,8 +164,10 @@ fun Pair<Double, Double>.toDMSPair(): Pair<String, String> {
         val minutesDecimal = (this - degrees) * 60
         val minutes = minutesDecimal.toInt()
         val seconds = (minutesDecimal - minutes) * 60
-        return String.format("%d°%d'%.2f\"",
-            degrees, minutes, seconds)
+        return String.format(
+            "%d°%d'%.2f\"",
+            degrees, minutes, seconds
+        )
     }
 
     val latDMS = first.toDMS()
@@ -201,11 +207,11 @@ suspend fun Context.getCurrentLatLong(): Pair<Double, Double> {
 }
 
 @Suppress("MissingPermission")
-suspend fun Context.getCurrentAddress(): AddressModel {
+suspend fun Context.getCurrentAddress(): AddressLineModel {
     val (lat, lon) = getCurrentLatLong()
 
     if (lat == 0.0 && lon == 0.0) {
-        return AddressModel("Unknown", "Unknown", "Unknown", "Unknown")
+        return AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
     }
 
     return try {
@@ -222,15 +228,16 @@ suspend fun Context.getCurrentAddress(): AddressModel {
             val province = addr.adminArea ?: "Unknown"
             val country = addr.countryName ?: "Unknown"
 
-            AddressModel(street, city, province, country)
+            AddressLineModel(street, city, province, country)
         } else {
-            AddressModel("Unknown", "Unknown", "Unknown", "Unknown")
+            AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        AddressModel("Unknown", "Unknown", "Unknown", "Unknown")
+        AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
     }
 }
+
 
 
 @Suppress("MissingPermission")
@@ -535,6 +542,7 @@ fun String.updateFileNameWithCurrentValues(
 fun TextView.setTextColorRes(colorResId: Int) {
     this.setTextColor(ContextCompat.getColor(context, colorResId))
 }
+
 fun TextView.setTextColorRes(
     @ColorRes activeColor: Int,
     @ColorRes inactiveColor: Int? = null,
@@ -550,15 +558,19 @@ fun TextView.setTextColorRes(
         }
     }
 }
+
 fun TextView.setTextColorAndDrawableTint(colorResId: Int) {
     val color = ContextCompat.getColor(context, colorResId)
     // Change text color
     this.setTextColor(color)
     // Change compound drawable tint
-    TextViewCompat.setCompoundDrawableTintList(this, ContextCompat.getColorStateList(context, colorResId))
+    TextViewCompat.setCompoundDrawableTintList(
+        this,
+        ContextCompat.getColorStateList(context, colorResId)
+    )
 }
 
-fun TextView.setTextColorAndBackgroundTint( textColorRes: Int, backgroundTintRes: Int) {
+fun TextView.setTextColorAndBackgroundTint(textColorRes: Int, backgroundTintRes: Int) {
     // Change text color
     setTextColor(ContextCompat.getColor(context, textColorRes))
     // Change background tint
@@ -598,6 +610,7 @@ fun TextView.setCompoundDrawableTintAndTextColor(
 fun ImageView.setImage(@DrawableRes drawableRes: Int) {
     setImageResource(drawableRes)
 }
+
 fun ImageView.setTintColor(@ColorRes colorRes: Int) {
     val color = ContextCompat.getColor(context, colorRes)
     ImageViewCompat.setImageTintList(this, ColorStateList.valueOf(color))
@@ -720,6 +733,7 @@ fun Context.isPermissionGranted(permission: String): Boolean {
 fun ActivityResultLauncher<String>.requestPermission(permission: String) {
     this.launch(permission)
 }
+
 // ✅ Extension to check multiple permissions
 fun ComponentActivity.arePermissionsGranted(permissions: Array<String>): Boolean {
     return permissions.all {
@@ -836,7 +850,8 @@ fun FrameLayout.animateLightSweep() {
     this.addView(sweepView)
 
     // Animate sweep vertically (top → bottom)
-    val anim = ObjectAnimator.ofFloat(sweepView, "translationY", -height.toFloat(), height.toFloat())
+    val anim =
+        ObjectAnimator.ofFloat(sweepView, "translationY", -height.toFloat(), height.toFloat())
     anim.duration = 900
     anim.start()
 
@@ -849,7 +864,7 @@ fun FrameLayout.animateLightSweep() {
 
 fun FrameLayout.animateRippleReveal(previewView: PreviewView) {
     val context = previewView.context
-    val overlay = RippleOverlay(context,previewView.width)
+    val overlay = RippleOverlay(context, previewView.width)
 
     overlay.layoutParams = ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -860,13 +875,13 @@ fun FrameLayout.animateRippleReveal(previewView: PreviewView) {
     overlay.startRipple { removeView(overlay) }
 }
 
-private class RippleOverlay(context: Context,widthP:Int) : View(context) {
+private class RippleOverlay(context: Context, widthP: Int) : View(context) {
     private var radius = 0f
     private var maxRadius = 0f
     private val paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
-        strokeWidth = widthP*0.3f // ripple thickness
+        strokeWidth = widthP * 0.3f // ripple thickness
         color = ContextCompat.getColor(context, R.color.rippleColor) // ripple color
     }
 
@@ -896,3 +911,142 @@ private class RippleOverlay(context: Context,widthP:Int) : View(context) {
         canvas.drawCircle(width / 2f, height / 2f, radius, paint)
     }
 }
+
+
+fun StampItemName.getIcon(): Int {
+    return when (this) {
+        StampItemName.CONTACT_NO -> R.drawable.ic_template_phone
+        StampItemName.SOUND_LEVEL -> R.drawable.ic_template_sound_level
+        StampItemName.ALTITUDE -> R.drawable.ic_template_altitude
+        StampItemName.ACCURACY -> R.drawable.ic_template_accuracy
+        StampItemName.WEATHER -> R.drawable.ic_template_temperature
+        StampItemName.COMPASS -> R.drawable.ic_template_compass
+        StampItemName.MAGNETIC_FIELD -> R.drawable.ic_template_magnetic_field
+        StampItemName.PRESSURE -> R.drawable.ic_template_pressure
+        StampItemName.WIND -> R.drawable.ic_template_wind_speed
+        StampItemName.HUMIDITY -> R.drawable.ic_template_humidity
+        else -> R.drawable.capture_btn_ic
+    }
+}
+
+
+fun Date.formatToString(format: String, locale: Locale = Locale.getDefault()): String {
+    return SimpleDateFormat(format, locale).format(this)
+}
+
+fun Context.isMicrophonePermissionGranted(): Boolean {
+    return ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.RECORD_AUDIO
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+
+fun Context.updateAddressPref(model: AddressModel, passedTemplate: String) {
+    when (model.title) {
+        getString(R.string.city) -> {
+            PrefManager.setBoolean(
+                this, Constants.FULL_ADDRESS_CITY + passedTemplate, model.isChecked
+            )
+        }
+
+        getString(R.string.state) -> {
+            PrefManager.setBoolean(
+                this, Constants.FULL_ADDRESS_STATE + passedTemplate, model.isChecked
+            )
+        }
+
+        getString(R.string.country) -> {
+            PrefManager.setBoolean(
+                this, Constants.FULL_ADDRESS_COUNTRY + passedTemplate, model.isChecked
+            )
+        }
+
+        getString(R.string.pincode) -> {
+            PrefManager.setBoolean(
+                this, Constants.FULL_ADDRESS_PIN_CODE + passedTemplate, model.isChecked
+            )
+        }
+    }
+}
+
+fun FullAddress.updateAddressWithVisibility(context: Context, template: String): String {
+    val pinCodeVisibility =
+        PrefManager.getBoolean(context, Constants.FULL_ADDRESS_PIN_CODE + template, true)
+    val stateVisibility =
+        PrefManager.getBoolean(context, Constants.FULL_ADDRESS_STATE + template, true)
+    val cityVisibility =
+        PrefManager.getBoolean(context, Constants.FULL_ADDRESS_CITY + template, true)
+    val countryVisibility =
+        PrefManager.getBoolean(context, Constants.FULL_ADDRESS_COUNTRY + template, true)
+
+    return buildString {
+        if (pinCodeVisibility) {
+            append(pinCode)
+            append(" ")
+        }
+        if (cityVisibility) {
+            if (city.isNotEmpty()) {
+                append(locality)
+                append(" ")
+                append(city)
+            } else {
+                append(locality)
+                append(city)
+            }
+            append(", ")
+        }
+        if (stateVisibility) {
+            append(state)
+            append(", ")
+        }
+        if (countryVisibility) {
+            append(country)
+        }
+    }
+
+}
+
+
+fun Int.saveSelectedMapType(): String {
+    return when(this){
+        0-> Constants.MAP_TYPE_NORMAL
+        1-> Constants.MAP_TYPE_SATELLITE
+        2-> Constants.MAP_TYPE_TERRAIN
+        3-> Constants.MAP_TYPE_HYBRID
+        else-> Constants.MAP_TYPE_NORMAL
+    }
+}
+
+fun Context.getSelectedMapDrawable(passedTemplate: String): Int {
+    return when(PrefManager.getString(this, Constants.SELECTED_MAP_TYPE + passedTemplate,
+        Constants.MAP_TYPE_NORMAL)){
+        Constants.MAP_TYPE_NORMAL -> R.drawable.map_type_normal
+        Constants.MAP_TYPE_SATELLITE -> R.drawable.map_type_satellite
+        Constants.MAP_TYPE_TERRAIN -> R.drawable.map_type_terrain
+        Constants.MAP_TYPE_HYBRID -> R.drawable.map_type_hybrid
+        else -> R.drawable.map_type_normal
+    }
+}
+
+fun String.selectedMapToInt(): Int {
+    return  when(this){
+        Constants.MAP_TYPE_NORMAL -> 0
+        Constants.MAP_TYPE_SATELLITE -> 1
+        Constants.MAP_TYPE_TERRAIN -> 2
+        Constants.MAP_TYPE_HYBRID -> 3
+        else -> 0
+    }
+}
+
+fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+    observe(lifecycleOwner, object : Observer<T> {
+        override fun onChanged(value: T) {
+            observer.onChanged(value)
+            removeObserver(this) // remove after first trigger
+        }
+    })
+}
+
+
+

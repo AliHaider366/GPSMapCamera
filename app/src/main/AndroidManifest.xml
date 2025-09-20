@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera.any" />
@@ -28,6 +29,52 @@
         android:theme="@style/Theme.GPSMapCamera"
         tools:targetApi="31">
         <activity
+            android:name=".activities.template.stampsetting.StampFontActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.stampsetting.MapPositionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.stampsetting.MapTypeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.stampsetting.MapScaleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.technical.NumberingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.technical.AltitudeAccuracyActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.weather.WeatherModuleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.basic.AddNoteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.basic.ContactNumberActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.basic.CoordinateLatLongActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.basic.FullAddressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.basic.ReportingTagActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name=".activities.template.basic.DateFormatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.AllTemplateActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.template.EditTemplateActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.SavedPathActivity"
             android:exported="false" />
         <activity
@@ -44,7 +91,7 @@
             android:exported="true" />
         <activity
             android:name=".activities.CameraActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".activities.PermissionActivity"
             android:exported="false" />
@@ -64,6 +111,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyASUvMbZYf7KFR-mrM7vRFDWUBc6OQPd-M" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

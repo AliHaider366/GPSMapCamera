@@ -17,9 +17,20 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.template.AllTemplateActivity
+import com.example.gpsmapcamera.adapters.StampAdapter
+import com.example.gpsmapcamera.adapters.StampCenterAdapter
 import com.example.gpsmapcamera.cameraHelper.CameraManager
 import com.example.gpsmapcamera.databinding.ActivityCameraBinding
+import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
+import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
+import com.example.gpsmapcamera.databinding.StampReportingTemplateLayoutBinding
+import com.example.gpsmapcamera.models.StampConfig
+import com.example.gpsmapcamera.models.StampItemName
+import com.example.gpsmapcamera.models.StampPosition
+import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
+import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.KEY_AUTO_FOCUS
 import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_FLASH
 import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_GRID
@@ -35,6 +46,7 @@ import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.PrefManager.getInt
 import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.PrefManager.saveInt
+import com.example.gpsmapcamera.utils.StampPreferences
 import com.example.gpsmapcamera.utils.checkAndRequestGps
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
@@ -45,6 +57,7 @@ import com.example.gpsmapcamera.utils.openLatestImageFromFolder
 import com.example.gpsmapcamera.utils.registerGpsResolutionLauncher
 import com.example.gpsmapcamera.utils.registerMultiplePermissionsLauncher
 import com.example.gpsmapcamera.utils.registerPermissionLauncher
+import com.example.gpsmapcamera.utils.reportingTagsDefault
 import com.example.gpsmapcamera.utils.requestPermission
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
 import com.example.gpsmapcamera.utils.setDrawable
@@ -61,6 +74,27 @@ class CameraActivity : AppCompatActivity() {
         ActivityCameraBinding.inflate(layoutInflater)
     }
 
+    private val templateAdapterBottom = StampAdapter()
+    private val templateAdapterCenter = StampCenterAdapter()
+    private val templateAdapterRight = StampAdapter()
+
+    // Keep references for your template bindings
+    private val classicTemplateBinding by lazy {
+        StampClassicTemplateLayoutBinding.inflate(
+            layoutInflater, binding.layoutContainer, true
+        )
+    }
+    private val advanceTemplateBinding by lazy {
+        StampAdvanceTemplateLayoutBinding.inflate(
+            layoutInflater, binding.layoutContainer, true
+        )
+    }
+    private val reportingTemplateBinding by lazy {
+        StampReportingTemplateLayoutBinding.inflate(
+            layoutInflater, binding.layoutContainer, true
+        )
+    }
+
 
     private lateinit var cameraManager: CameraManager
     private val appViewModel by lazy {
@@ -68,9 +102,9 @@ class CameraActivity : AppCompatActivity() {
     }
     private var activeMode: Int = R.id.photo_btn
     private lateinit var micPermissionLauncher: ActivityResultLauncher<String>
-    var brightnessValue=0
+    var brightnessValue = 0
 
-    val requestCode=1001
+    val requestCode = 1001
     private val PERMISSIONS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
             Manifest.permission.CAMERA,
@@ -113,7 +147,8 @@ class CameraActivity : AppCompatActivity() {
 
     }
 
-    private fun init()=binding.apply {
+    private fun init() = binding.apply {
+        setUpTemplate()
         cameraManager = CameraManager(this@CameraActivity, previewView)
 
         micPermissionLauncher = registerPermissionLauncher(
@@ -133,18 +168,27 @@ class CameraActivity : AppCompatActivity() {
             registerMultiplePermissionsLauncher(
                 permissions = PERMISSIONS,
                 onGranted = {
-                    cameraManager.startCamera{
+                    cameraManager.startCamera {
                         //set camera values after start
-                        cameraManager.setBrightness(getInt(this@CameraActivity,KEY_WHITE_BALANCE,40))
+                        cameraManager.setBrightness(
+                            getInt(
+                                this@CameraActivity,
+                                KEY_WHITE_BALANCE,
+                                40
+                            )
+                        )
                     }
-                    cameraManager.setupTouchControls{
-                        if ( binding.detailTopMenuView.isVisible) {
+                    cameraManager.setupTouchControls {
+                        if (binding.detailTopMenuView.isVisible) {
                             binding.detailTopMenuView.visibility = View.GONE
                             binding.defaultTopMenuView.visibility = View.VISIBLE
 
                             // hide brightness bar if shown
                             brightnessBarView.gone()
-                            brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                            brightnessBtn.setCompoundDrawableTintAndTextColor(
+                                R.color.white,
+                                R.color.white
+                            )
                         }
                     }
                     setInitialStates()
@@ -157,21 +201,19 @@ class CameraActivity : AppCompatActivity() {
                     }
                 }
             )
-        }
-        else
-        {
-            cameraManager.startCamera{
+        } else {
+            cameraManager.startCamera {
                 //set camera values after start
-                    cameraManager.setBrightness(getInt(this@CameraActivity,KEY_WHITE_BALANCE,40))
+                cameraManager.setBrightness(getInt(this@CameraActivity, KEY_WHITE_BALANCE, 40))
 
             }
-            cameraManager.setupTouchControls{
-                if ( binding.detailTopMenuView.isVisible) {
+            cameraManager.setupTouchControls {
+                if (binding.detailTopMenuView.isVisible) {
                     binding.detailTopMenuView.visibility = View.GONE
                     binding.defaultTopMenuView.visibility = View.VISIBLE
                     // hide brightness bar if shown
                     brightnessBarView.gone()
-                    brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                    brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
                 }
             }
             setInitialStates()
@@ -180,9 +222,10 @@ class CameraActivity : AppCompatActivity() {
 
         setClickListeners()
 
-        brightnessValue=getInt(this@CameraActivity,KEY_WHITE_BALANCE,40)        // set initial brightness
+        brightnessValue =
+            getInt(this@CameraActivity, KEY_WHITE_BALANCE, 40)        // set initial brightness
         brightnessBar.max = 80
-        brightnessBar.progress = brightnessValue+40
+        brightnessBar.progress = brightnessValue + 40
         progressText.text = brightnessValue.toString()
         brightnessBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -190,7 +233,7 @@ class CameraActivity : AppCompatActivity() {
                 val mappedValue = progress - 40
                 progressText.text = mappedValue.toString()
                 cameraManager.setBrightness(mappedValue)
-                saveInt(this@CameraActivity,KEY_WHITE_BALANCE,mappedValue)
+                saveInt(this@CameraActivity, KEY_WHITE_BALANCE, mappedValue)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -199,78 +242,69 @@ class CameraActivity : AppCompatActivity() {
 
     }
 
-    private fun setInitialStates()=binding.apply {
+    private fun setInitialStates() = binding.apply {
 
 
-
-        if (getBoolean(this@CameraActivity,KEY_SHARE_IMAGE))
-        {
+        if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
             switchMode(R.id.share_btn)
         }
-        if (getBoolean(this@CameraActivity,KEY_CAMERA_LEVEL))
-        {
-            camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+        if (getBoolean(this@CameraActivity, KEY_CAMERA_LEVEL)) {
+            camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             cameraLevel.setLevelEnabled(true)
-        }
-        else cameraLevel.setLevelEnabled(false)
+        } else cameraLevel.setLevelEnabled(false)
 
 
-        if (getBoolean(this@CameraActivity,KEY_CAMERA_GRID))
-        {
-            gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+        if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
+            gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             gridOverlay.updateGrid(true, 4)
-        }
-        else
+        } else
             gridOverlay.updateGrid(false, 0)
 
-        when(getInt(this@CameraActivity,KEY_CAMERA_RATIO,16))
-        {
-            16->{
+        when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)) {
+            16 -> {
                 ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
                 cameraManager.setAspectRatio(AspectRatio.RATIO_16_9)
             }
-            4->{
+
+            4 -> {
                 ratioBtn.setDrawable(top = R.drawable.ratio4_ic)
                 cameraManager.setAspectRatio(AspectRatio.RATIO_4_3)
             }
         }
 
-        if (getBoolean(this@CameraActivity,KEY_CAMERA_FLASH))
-        {
+        if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
             flashBtn.setTintColor(R.color.blue)
             cameraManager.toggleFlash(true)
         }
 
-        if (getBoolean(this@CameraActivity,KEY_CAMERA_TIMER))
-        {
-            when(getInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE))
-            {
-                0->{
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+        if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
+            when (getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE)) {
+                0 -> {
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
 //                    saveCameraTimer(this@CameraActivity,0,false)
 //                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,false)
 //                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,0)
                 }
-                3->{
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+
+                3 -> {
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
 //                    saveCameraTimer(this@CameraActivity,3,true)
                 }
-                5->{
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red,R.color.red)
+
+                5 -> {
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red, R.color.red)
 //                    saveCameraTimer(this@CameraActivity,5,true)
                 }
             }
         }
 
-        if (getBoolean(this@CameraActivity,KEY_CAMERA_MIRROR))
-        {
-            mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+        if (getBoolean(this@CameraActivity, KEY_CAMERA_MIRROR)) {
+            mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             cameraManager.setMirror(true)
         }
 
-        if (getBoolean(this@CameraActivity,KEY_CAPTURE_SOUND))
-        {
-            volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+        if (getBoolean(this@CameraActivity, KEY_CAPTURE_SOUND)) {
+            volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             cameraManager.captureSound(true)
         }
 
@@ -279,13 +313,13 @@ class CameraActivity : AppCompatActivity() {
 //            camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
 //        }
 
-        if (getBoolean(this@CameraActivity,KEY_AUTO_FOCUS))
-            focusBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+        if (getBoolean(this@CameraActivity, KEY_AUTO_FOCUS))
+            focusBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
         previewView.implementationMode = PreviewView.ImplementationMode.COMPATIBLE
 
     }
 
-    private fun setClickListeners()=binding.apply {
+    private fun setClickListeners() = binding.apply {
 
         galleyGotoBtn.setOnClickListener {
             openLatestImageFromFolder("${appViewModel.fileSavePath}%")
@@ -297,39 +331,36 @@ class CameraActivity : AppCompatActivity() {
         }
 
         pickGalleyBtn.setOnClickListener {
-            launchActivity<SavedPathActivity> {  }
+            launchActivity<SavedPathActivity> { }
         }
 
         fileNameBtn.setOnClickListener {
-            launchActivity<FileNameActivity> {  }
+            launchActivity<FileNameActivity> { }
         }
 
         flashBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity,KEY_CAMERA_FLASH))
-            {
+            if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
                 flashBtn.setTintColor(R.color.white)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_FLASH,false)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, false)
                 cameraManager.toggleFlash(false)
-            }
-            else
-            {
+            } else {
                 flashBtn.setTintColor(R.color.blue)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_FLASH,true)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, true)
                 cameraManager.toggleFlash(true)
             }
         }
 
         ratioBtn.setOnClickListener {
-            when(getInt(this@CameraActivity,KEY_CAMERA_RATIO,16))
-            {
-                4->{
-                    saveInt(this@CameraActivity,KEY_CAMERA_RATIO,16)
+            when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)) {
+                4 -> {
+                    saveInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)
                     ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
                     cameraManager.setAspectRatio(AspectRatio.RATIO_16_9)
 
                 }
-                16->{
-                    saveInt(this@CameraActivity,KEY_CAMERA_RATIO,4)
+
+                16 -> {
+                    saveInt(this@CameraActivity, KEY_CAMERA_RATIO, 4)
                     ratioBtn.setDrawable(top = R.drawable.ratio4_ic)
                     cameraManager.setAspectRatio(AspectRatio.RATIO_4_3)
                 }
@@ -337,137 +368,120 @@ class CameraActivity : AppCompatActivity() {
         }
 
         gridBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity,KEY_CAMERA_GRID))
-            {
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_GRID,false)
+            if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, false)
                 gridOverlay.updateGrid(false, 0)
-            }
-            else
-            {
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_GRID,true)
+            } else {
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, true)
                 gridOverlay.updateGrid(true, 4)
             }
         }
 
         timerBtn.setOnClickListener {
-            when(getInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE))
-            {
-                0->{
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+            when (getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE)) {
+                0 -> {
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
 //                    saveCameraTimer(this@CameraActivity,3,true)
-                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,true)
-                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,3)
+                    saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, true)
+                    saveInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE, 3)
                 }
-                3->{
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red,R.color.red)
+
+                3 -> {
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red, R.color.red)
 //                    saveCameraTimer(this@CameraActivity,5,true)
-                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,true)
-                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,5)
+                    saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, true)
+                    saveInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE, 5)
                 }
-                5->{
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+
+                5 -> {
+                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
 //                    saveCameraTimer(this@CameraActivity,0,false)
-                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,false)
-                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,0)
+                    saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, false)
+                    saveInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE, 0)
                 }
             }
         }
 
         mirrorBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity,KEY_CAMERA_MIRROR))
-            {
-                mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_MIRROR,false)
+            if (getBoolean(this@CameraActivity, KEY_CAMERA_MIRROR)) {
+                mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_MIRROR, false)
                 cameraManager.setMirror(false)
-            }
-            else
-            {
-                mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_MIRROR,true)
+            } else {
+                mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_MIRROR, true)
                 cameraManager.setMirror(true)
             }
         }
 
         volumeBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity,KEY_CAPTURE_SOUND))
-            {
-                volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                saveBoolean(this@CameraActivity,KEY_CAPTURE_SOUND,false)
+            if (getBoolean(this@CameraActivity, KEY_CAPTURE_SOUND)) {
+                volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                saveBoolean(this@CameraActivity, KEY_CAPTURE_SOUND, false)
                 cameraManager.captureSound(false)
-            }
-            else
-            {
-                volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                saveBoolean(this@CameraActivity,KEY_CAPTURE_SOUND,true)
+            } else {
+                volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                saveBoolean(this@CameraActivity, KEY_CAPTURE_SOUND, true)
                 cameraManager.captureSound(true)
             }
         }
 
         focusBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity,KEY_AUTO_FOCUS))
-            {
-                focusBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                saveBoolean(this@CameraActivity,KEY_AUTO_FOCUS,false)
-            }
-            else
-            {
-                focusBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                saveBoolean(this@CameraActivity,KEY_AUTO_FOCUS,true)
+            if (getBoolean(this@CameraActivity, KEY_AUTO_FOCUS)) {
+                focusBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                saveBoolean(this@CameraActivity, KEY_AUTO_FOCUS, false)
+            } else {
+                focusBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                saveBoolean(this@CameraActivity, KEY_AUTO_FOCUS, true)
             }
         }
 
         camLevelBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity,KEY_CAMERA_LEVEL))
-            {
-                camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_LEVEL,false)
+            if (getBoolean(this@CameraActivity, KEY_CAMERA_LEVEL)) {
+                camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_LEVEL, false)
                 cameraLevel.setLevelEnabled(false)
-            }
-            else
-            {
-                camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                saveBoolean(this@CameraActivity,KEY_CAMERA_LEVEL,true)
+            } else {
+                camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                saveBoolean(this@CameraActivity, KEY_CAMERA_LEVEL, true)
                 cameraLevel.setLevelEnabled(true)
             }
         }
 
         brightnessBtn.setOnClickListener {
-            if (brightnessBarView.isVisible)
-            {
+            if (brightnessBarView.isVisible) {
                 brightnessBarView.gone()
-                brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-            }
-            else {
+                brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+            } else {
                 brightnessBarView.visible()
-                brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             }
         }
 
         captureBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity,KEY_CAMERA_TIMER))
-            {
-                cameraManager.takePhotoWithTimer(getInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE),binding.timmerTV){
+            if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
+                cameraManager.takePhotoWithTimer(
+                    getInt(
+                        this@CameraActivity,
+                        KEY_CAMERA_TIMER_VALUE
+                    ), binding.timmerTV
+                ) {
                     val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
                     intent.putExtra("image_uri", it.toString())
 //                            startActivity(intent)
-                    if (getBoolean(this@CameraActivity,KEY_SHARE_IMAGE))
-                    {
+                    if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
                         it?.let { shareImage(it) }
                     }
                 }
-            }
-            else
-            {
-                cameraManager.takePhoto() {uri->
-                    if (uri != null)
-                    {
+            } else {
+                cameraManager.takePhoto() { uri ->
+                    if (uri != null) {
                         val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
                         intent.putExtra("image_uri", uri.toString())
 //                            startActivity(intent)
-                        if (getBoolean(this@CameraActivity,KEY_SHARE_IMAGE))
-                        {
+                        if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
                             it?.let { shareImage(uri) }
                         }
                     }
@@ -530,14 +544,17 @@ class CameraActivity : AppCompatActivity() {
         }
 
         moreBtn.setOnClickListener {
-            if ( binding.detailTopMenuView.isVisible) {
+            if (binding.detailTopMenuView.isVisible) {
                 binding.detailTopMenuView.visibility = View.GONE
                 binding.defaultTopMenuView.visibility = View.VISIBLE
-            }
-            else {
+            } else {
                 binding.detailTopMenuView.visibility = View.VISIBLE
                 binding.defaultTopMenuView.visibility = View.GONE
             }
+        }
+
+        templateBtn.setOnClickListener {
+            launchActivity<AllTemplateActivity>() {}
         }
     }
 
@@ -546,38 +563,221 @@ class CameraActivity : AppCompatActivity() {
         activeMode = newMode
 
         when (newMode) {
-            R.id.share_btn->{
-                binding.shareBtn.setTextColorRes(R.color.blue,R.color.white,binding.photoBtn,binding.videoBtn)
+            R.id.share_btn -> {
+                binding.shareBtn.setTextColorRes(
+                    R.color.blue,
+                    R.color.white,
+                    binding.photoBtn,
+                    binding.videoBtn
+                )
                 binding.captureBtn.setImage(R.drawable.capture_btn_ic)
-                binding.videoRecordBtn.visibility=View.GONE
-                binding.templateBtn.visibility=View.VISIBLE
+                binding.videoRecordBtn.visibility = View.GONE
+                binding.templateBtn.visibility = View.VISIBLE
                 cameraManager.setVideoRecord(false)
-                saveBoolean(this,KEY_SHARE_IMAGE,true)
+                saveBoolean(this, KEY_SHARE_IMAGE, true)
 
                 cameraManager.stopVideoRecording()/// stop recording if started
                 binding.videoStopBtn.gone()
             }
-            R.id.photo_btn->{
-                binding.photoBtn.setTextColorRes(R.color.blue,R.color.white,binding.videoBtn,binding.shareBtn)
+
+            R.id.photo_btn -> {
+                binding.photoBtn.setTextColorRes(
+                    R.color.blue,
+                    R.color.white,
+                    binding.videoBtn,
+                    binding.shareBtn
+                )
                 binding.captureBtn.setImage(R.drawable.capture_btn_ic)
-                binding.videoRecordBtn.visibility=View.GONE
-                binding.templateBtn.visibility=View.VISIBLE
+                binding.videoRecordBtn.visibility = View.GONE
+                binding.templateBtn.visibility = View.VISIBLE
                 cameraManager.setVideoRecord(false)
-                saveBoolean(this,KEY_SHARE_IMAGE,false)
+                saveBoolean(this, KEY_SHARE_IMAGE, false)
 
                 cameraManager.stopVideoRecording()///stop recording if started
                 binding.videoStopBtn.gone()
 
             }
-            R.id.video_btn->{
-                binding.videoBtn.setTextColorRes(R.color.blue,R.color.white,binding.photoBtn,binding.shareBtn)
+
+            R.id.video_btn -> {
+                binding.videoBtn.setTextColorRes(
+                    R.color.blue,
+                    R.color.white,
+                    binding.photoBtn,
+                    binding.shareBtn
+                )
                 binding.captureBtn.setImage(R.drawable.capture_in_video_ic)
-                binding.videoRecordBtn.visibility=View.VISIBLE
-                binding.templateBtn.visibility=View.GONE
+                binding.videoRecordBtn.visibility = View.VISIBLE
+                binding.templateBtn.visibility = View.GONE
                 cameraManager.setVideoRecord(true)
-                saveBoolean(this,KEY_SHARE_IMAGE,false)
+                saveBoolean(this, KEY_SHARE_IMAGE, false)
             }
         }
+    }
+
+    private fun setUpTemplate() {
+
+        // Observe the appropriate LiveData based on the selected template
+        val stampConfigs = when (PrefManager.getString(
+            this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
+            Constants.CLASSIC_TEMPLATE
+        )) {
+            Constants.CLASSIC_TEMPLATE -> appViewModel.classicStampConfigs
+            Constants.ADVANCE_TEMPLATE -> appViewModel.advanceStampConfigs
+            Constants.REPORTING_TEMPLATE -> appViewModel.reportingStampConfigs
+            else -> appViewModel.classicStampConfigs // Fallback to classic
+        }
+
+        stampConfigs.observe(this) { allConfigs ->
+            val bottomItems =
+                allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
+            val centerItems =
+                allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
+            val rightItems =
+                allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
+
+            templateAdapterBottom.submitList(bottomItems as ArrayList)
+            templateAdapterCenter.submitList(centerItems as ArrayList)
+            templateAdapterRight.submitList(rightItems as ArrayList)
+
+
+            val templateType = PrefManager.getString(
+                this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
+                Constants.CLASSIC_TEMPLATE
+            )
+
+
+            // Inflate selected layout into FrameLayout
+            when (templateType) {
+                Constants.CLASSIC_TEMPLATE -> {
+                    setupClassicUI(allConfigs)
+                }
+
+                Constants.ADVANCE_TEMPLATE -> {
+                    setupAdvanceUI(allConfigs)
+                }
+
+                Constants.REPORTING_TEMPLATE -> {
+                    setupReportingUI(allConfigs)
+                }
+            }
+
+
+        }
+
+        appViewModel.dynamicValues.observe(this) { newDynamics ->
+            templateAdapterBottom.updateDynamics(newDynamics)
+            templateAdapterCenter.updateDynamics(newDynamics)
+            templateAdapterRight.updateDynamics(newDynamics)
+
+        }
+    }
+
+    private fun setupReportingUI(allConfigs: List<StampConfig>) {
+
+        reportingTemplateBinding?.run {
+            rvBottom.adapter = templateAdapterBottom
+            rvCenter.adapter = templateAdapterCenter
+            rvRight.adapter = templateAdapterRight
+        }
+
+
+        if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
+            reportingTemplateBinding?.map?.visible()
+        } else {
+            reportingTemplateBinding?.map?.gone()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == true) {
+            reportingTemplateBinding?.tvEnvironment?.visible()
+            val itemIndex = PrefManager.getInt(
+                this@CameraActivity,
+                Constants.SELECTED_REPORTING_TAG, 0
+            )
+            val reportingTagSavedList =
+                StampPreferences(this@CameraActivity).getWholeList(Constants.KEY_REPORTING_TAG)
+            if (reportingTagSavedList.isEmpty()) {
+                if (itemIndex < reportingTagsDefault.size) {
+                    reportingTemplateBinding?.tvEnvironment?.text = reportingTagsDefault[itemIndex]
+                }
+            } else {
+                if (itemIndex < reportingTagSavedList.size) {
+                    reportingTemplateBinding?.tvEnvironment?.text = reportingTagSavedList[itemIndex]
+                }
+            }
+        } else {
+            reportingTemplateBinding?.tvEnvironment?.gone()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == false &&
+            allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == false
+        ) {
+            reportingTemplateBinding?.mapContainer?.gone()
+        } else {
+            reportingTemplateBinding?.mapContainer?.visible()
+        }
+    }
+
+    private fun setupAdvanceUI(allConfigs: List<StampConfig>) {
+
+        advanceTemplateBinding?.run {
+            rvBottom.adapter = templateAdapterBottom
+            rvCenter.adapter = templateAdapterCenter
+            rvRight.adapter = templateAdapterRight
+        }
+
+
+        if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
+            advanceTemplateBinding?.map?.visible()
+        } else {
+            advanceTemplateBinding?.map?.gone()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == true) {
+//                advanceTemplateBinding?.tvEnvironment.visible()
+        } else {
+//                advanceTemplateBinding?.tvEnvironment.gone()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == false &&
+            allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == false
+        ) {
+            advanceTemplateBinding?.mapContainer?.gone()
+        } else {
+            advanceTemplateBinding?.mapContainer?.visible()
+        }
+    }
+
+
+    private fun setupClassicUI(allConfigs: List<StampConfig>) {
+
+
+        classicTemplateBinding?.run {
+            rvBottom.adapter = templateAdapterBottom
+            rvCenter.adapter = templateAdapterCenter
+            rvRight.adapter = templateAdapterRight
+        }
+
+
+        if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
+            classicTemplateBinding?.map?.visible()
+        } else {
+            classicTemplateBinding?.map?.gone()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == true) {
+//                classicTemplateBinding?.tvEnvironment.visible()
+        } else {
+//                classicTemplateBinding?.tvEnvironment.gone()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == false &&
+            allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == false
+        ) {
+            classicTemplateBinding?.mapContainer?.gone()
+        } else {
+            classicTemplateBinding?.mapContainer?.visible()
+        }
+
     }
 
 }

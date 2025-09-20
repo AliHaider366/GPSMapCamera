@@ -2,7 +2,6 @@ package com.example.gpsmapcamera.activities
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -12,21 +11,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.adapters.FileNameAdapter
 import com.example.gpsmapcamera.databinding.ActivityFileNameBinding
-import com.example.gpsmapcamera.models.AddressModel
 import com.example.gpsmapcamera.models.FieldItem
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager.loadItemOrder
 import com.example.gpsmapcamera.utils.formatForFile
-import com.example.gpsmapcamera.utils.getCurrentAddress
 import com.example.gpsmapcamera.utils.getCurrentDay
-import com.example.gpsmapcamera.utils.getCurrentLatLong
-import com.example.gpsmapcamera.utils.getCurrentPlusCode
 import com.example.gpsmapcamera.utils.getGmtOffset
 import com.example.gpsmapcamera.utils.registerGpsResolutionLauncher
-import com.example.gpsmapcamera.utils.toDMSPair
 import kotlinx.coroutines.launch
 import java.util.Date
-
 
 
 class FileNameActivity : AppCompatActivity() {

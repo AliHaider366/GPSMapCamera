@@ -5,7 +5,7 @@ data class FieldItem(
     val name: String,
     var value: String,
     val day: String="",
-    val address: AddressModel?=null,
+    val address: AddressLineModel?=null,
     val latLongDMS: String="",
     var isChecked: Boolean = false,
     var isCheckBox1Checked: Boolean = false,

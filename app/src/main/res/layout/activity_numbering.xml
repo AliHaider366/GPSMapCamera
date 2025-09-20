@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bgColor"
+    tools:context=".activities.template.technical.NumberingActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/nav_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/_5sdp"
+        android:paddingVertical="@dimen/_5sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/back_btn"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:padding="@dimen/_8sdp"
+            android:src="@drawable/back_ic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="@string/template"
+            android:gravity="center|start"
+            android:textSize="@dimen/_14sdp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:paddingHorizontal="@dimen/_20sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/back_btn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/nav_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="@dimen/_16sdp">
+
+        <!-- Prefix -->
+        <TextView
+            android:id="@+id/tvPrefix"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/prefix"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/textMainColor"
+            app:layout_constraintEnd_toStartOf="@+id/tvSuffix"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_chainStyle="spread" />
+
+        <EditText
+            android:id="@+id/etPrefix"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_prefix"
+            android:textSize="@dimen/_12sdp"
+            android:maxLength="15"
+            android:textColor="@color/textMainColor"
+            android:textColorHint="@color/textDescColor2"
+            app:layout_constraintTop_toBottomOf="@id/tvPrefix"
+            app:layout_constraintStart_toStartOf="@id/tvPrefix"
+            app:layout_constraintEnd_toEndOf="@id/tvPrefix" />
+
+        <!-- Suffix -->
+        <TextView
+            android:id="@+id/tvSuffix"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/suffix"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/textMainColor"
+            app:layout_constraintStart_toEndOf="@+id/tvPrefix"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/etSuffix"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_suffix"
+            android:textSize="@dimen/_12sdp"
+            android:maxLength="15"
+            android:textColor="@color/textMainColor"
+            android:textColorHint="@color/textDescColor2"
+            app:layout_constraintTop_toBottomOf="@id/tvSuffix"
+            app:layout_constraintStart_toStartOf="@id/tvSuffix"
+            app:layout_constraintEnd_toEndOf="@id/tvSuffix" />
+
+        <!-- Sequence Number Label -->
+        <TextView
+            android:id="@+id/tvSequenceLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sequence_number"
+            android:textSize="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:textColor="@color/textMainColor"
+            app:layout_constraintTop_toBottomOf="@id/etPrefix"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0" />
+
+        <!-- Sequence Number Value -->
+
+        <EditText
+            android:id="@+id/etSequenceValue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="1"
+            android:textColor="@color/textMainColor"
+            android:textSize="@dimen/_12sdp"
+            android:inputType="number"
+            android:maxLength="10"
+            android:textColorHint="@color/textDescColor2"
+            app:layout_constraintEnd_toEndOf="@+id/etPrefix"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSequenceLabel" />
+
+
+        <!-- Sequence Number Again -->
+        <TextView
+            android:id="@+id/tvSequenceNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sequence_type"
+            android:textSize="@dimen/_12sdp"
+            android:textColor="@color/textMainColor"
+            android:layout_marginTop="@dimen/_10sdp"
+            app:layout_constraintTop_toBottomOf="@id/etSequenceValue"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- +1 Box -->
+
+
+        <TextView
+            android:id="@+id/tvPlusOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+1"
+            android:textSize="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_15sdp"
+            android:textColor="@color/textMainColor"
+            android:background="@drawable/bg_stroke_5"
+            app:layout_constraintTop_toBottomOf="@id/tvSequenceNumber"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- -1 Box -->
+
+
+        <TextView
+            android:id="@+id/tvMinusOne"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-1"
+            android:textSize="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:paddingHorizontal="@dimen/_10sdp"
+            android:paddingVertical="@dimen/_15sdp"
+            android:textColor="@color/textMainColor"
+            android:background="@drawable/bg_stroke_5"
+            app:layout_constraintTop_toBottomOf="@id/tvPlusOne"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+        <!-- Reset Button -->
+        <TextView
+            android:id="@+id/btnReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_radius_5"
+            android:backgroundTint="@color/blue"
+            android:paddingHorizontal="@dimen/_16sdp"
+            android:paddingVertical="@dimen/_8sdp"
+            android:text="@string/reset"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_12sdp"
+            app:layout_constraintTop_toBottomOf="@id/tvMinusOne"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="@dimen/_15sdp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

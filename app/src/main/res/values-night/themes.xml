@@ -5,5 +5,10 @@
          <item name="colorPrimary">@color/blue</item>
         <item name="android:statusBarColor">@color/blue</item>
 
+
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowIsTranslucent">false</item>
+
     </style>
 </resources>

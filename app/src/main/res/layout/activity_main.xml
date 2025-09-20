@@ -44,6 +44,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         />
+
     <TextView
         android:id="@+id/countdownText"
         android:layout_width="match_parent"
@@ -53,8 +54,7 @@
         android:textColor="@android:color/white"
         android:textSize="64sp"
         android:textStyle="bold"
-        android:visibility="gone"
-        />
+        android:visibility="gone" />
 
     <SeekBar
         android:id="@+id/brightnessSeekBar"

@@ -159,6 +159,7 @@
 
         </LinearLayout>
 
+
 <!--detail top menu-->
         <LinearLayout
             android:id="@+id/detailTopMenuView"
@@ -294,6 +295,17 @@
 
             </LinearLayout>
         </LinearLayout>
+
+
+    <FrameLayout
+        android:id="@+id/layoutContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        app:layout_constraintTop_toBottomOf="@+id/topBlurView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 
 
     <!--bottom controls-->

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.databinding.ActivitySplashBinding
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
 import com.example.gpsmapcamera.utils.PrefManager.getBoolean

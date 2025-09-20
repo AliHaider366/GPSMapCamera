@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.databinding.ActivityPermissionBinding
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
 import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
