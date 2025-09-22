@@ -331,6 +331,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
         return currentLocation
     }
 
+    private var locationCallback: ((Location) -> Unit)? = null
+
+
+    fun getLocationAndFetch(callback: (Location?) -> Unit) {
+        if (currentLocation!=null){
+            callback(currentLocation!!)
+        }else{
+            locationCallback = callback
+        }
+    }
+
 
     private fun getDefaultConfigs(): List<StampConfig> {
         return listOf(
@@ -424,27 +435,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
 
 
 
-
-//    fun updateStampVisibility(itemName: StampItemName, isChecked: Boolean) {
-//        val currentList = _stampConfigs.value?.toMutableList() ?: mutableListOf()
-//        val index = currentList.indexOfFirst { it.name == itemName }
-//        if (index != -1) {
-//            currentList[index] = currentList[index].copy(visibility = isChecked)
-//            _stampConfigs.value = currentList
-//            prefs.saveList(currentList)
-//        }
-//    }
-//
-//    fun updateStaticTitle(itemName: StampItemName, newTitle: String) {
-//        val currentList = _stampConfigs.value?.toMutableList() ?: mutableListOf()
-//        val index = currentList.indexOfFirst { it.name == itemName }
-//        if (index != -1) {
-//            currentList[index] = currentList[index].copy(staticTitle = newTitle)
-//            _stampConfigs.value = currentList
-//            prefs.saveList(currentList)
-//        }
-//    }
-
     private fun startDynamicUpdates() {
         // Check location permission
         if (ContextCompat.checkSelfPermission(
@@ -485,6 +475,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 currentLocation = location
                 currentLocation?.let { it ->
+
+                    locationCallback?.invoke(location) // notify waiting getLocation()
+                    locationCallback = null
                     fetchWeatherData(it.latitude, it.longitude)
                 }
             }

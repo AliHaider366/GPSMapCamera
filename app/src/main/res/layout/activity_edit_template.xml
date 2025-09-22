@@ -46,7 +46,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
-        android:id="@+id/layoutContainer"
+        android:id="@+id/stampContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/_5sdp"
@@ -69,7 +69,7 @@
         android:elevation="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_20sdp"
         android:background="@drawable/bg_tab"
-        app:layout_constraintTop_toBottomOf="@+id/layoutContainer"
+        app:layout_constraintTop_toBottomOf="@+id/stampContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 

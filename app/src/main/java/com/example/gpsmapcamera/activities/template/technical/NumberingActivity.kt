@@ -50,7 +50,7 @@ class NumberingActivity : AppCompatActivity() {
             etSuffix.setText("")
             PrefManager.setString(this@NumberingActivity, Constants.NUMBERING_SUFFIX + passedTemplate, "")
             etSequenceValue.setText("")
-            PrefManager.setString(this@NumberingActivity, Constants.NUMBERING_SEQUENCE_NUMBER + passedTemplate, "")
+            PrefManager.setInt(this@NumberingActivity, Constants.NUMBERING_SEQUENCE_NUMBER + passedTemplate, 0)
         }
     }
 

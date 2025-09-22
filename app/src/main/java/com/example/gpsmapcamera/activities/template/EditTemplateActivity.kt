@@ -58,15 +58,15 @@ class EditTemplateActivity : AppCompatActivity() {
 
     // Keep references for your template bindings
     private val classicTemplateBinding by lazy {
-        StampClassicTemplateLayoutBinding.inflate(layoutInflater, binding.layoutContainer, true)
+        StampClassicTemplateLayoutBinding.inflate(layoutInflater, binding.stampContainer, true)
     }
 
     private val advanceTemplateBinding by lazy {
-        StampAdvanceTemplateLayoutBinding.inflate(layoutInflater, binding.layoutContainer, true)
+        StampAdvanceTemplateLayoutBinding.inflate(layoutInflater, binding.stampContainer, true)
     }
 
     private val reportingTemplateBinding by lazy {
-        StampReportingTemplateLayoutBinding.inflate(layoutInflater, binding.layoutContainer, true)
+        StampReportingTemplateLayoutBinding.inflate(layoutInflater, binding.stampContainer, true)
     }
 
 

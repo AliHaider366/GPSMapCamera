@@ -76,6 +76,7 @@
             android:maxLength="15"
             android:textColor="@color/textMainColor"
             android:textColorHint="@color/textDescColor2"
+            android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintTop_toBottomOf="@id/tvPrefix"
             app:layout_constraintStart_toStartOf="@id/tvPrefix"
             app:layout_constraintEnd_toEndOf="@id/tvPrefix" />
@@ -101,6 +102,7 @@
             android:maxLength="15"
             android:textColor="@color/textMainColor"
             android:textColorHint="@color/textDescColor2"
+            android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintTop_toBottomOf="@id/tvSuffix"
             app:layout_constraintStart_toStartOf="@id/tvSuffix"
             app:layout_constraintEnd_toEndOf="@id/tvSuffix" />
@@ -130,6 +132,7 @@
             android:inputType="number"
             android:maxLength="10"
             android:textColorHint="@color/textDescColor2"
+            android:textCursorDrawable="@drawable/custom_cursor"
             app:layout_constraintEnd_toEndOf="@+id/etPrefix"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSequenceLabel" />

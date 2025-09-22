@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.template.EditTemplateActivity
+import com.example.gpsmapcamera.activities.template.basic.AddPersonActivity
 import com.example.gpsmapcamera.activities.template.basic.AddNoteActivity
 import com.example.gpsmapcamera.activities.template.basic.ContactNumberActivity
 import com.example.gpsmapcamera.activities.template.basic.CoordinateLatLongActivity
@@ -340,6 +341,10 @@ class BasicFragment : Fragment() {
                     } else if (itemName == StampItemName.LAT_LONG || itemName == StampItemName.PLUS_CODE) {
                         requireActivity().launchActivity<CoordinateLatLongActivity>() {
                             putExtra(Constants.FROM_PLUS_CODE, itemName == StampItemName.PLUS_CODE)
+                            putExtra(Constants.PASSED_STAMP_TEMPLATE, passedTemplate)
+                        }
+                    } else if (itemName == StampItemName.PERSON_NAME) {
+                        requireActivity().launchActivity<AddPersonActivity>() {
                             putExtra(Constants.PASSED_STAMP_TEMPLATE, passedTemplate)
                         }
                     } else {

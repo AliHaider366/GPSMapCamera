@@ -1,6 +1,5 @@
 package com.example.gpsmapcamera.adapters
 
-import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -71,6 +70,16 @@ class StampCenterAdapter(
                 val latLong = currentDynamics.latLong
                 titleTv.text = buildString {
                     append(latLong?.formatLatLong(root.context, template))
+                }
+            } else if (config.name == StampItemName.PERSON_NAME) {
+                val personName = PrefManager.getString(
+                    root.context,
+                    Constants.SELECTED_PERSON_NAME + template,
+                    ""
+                )
+                titleTv.text = buildString {
+                    append("Person Name : ")
+                    append(personName)
                 }
             } else if (config.name == StampItemName.PLUS_CODE) {
                 val latLong = currentDynamics.latLong

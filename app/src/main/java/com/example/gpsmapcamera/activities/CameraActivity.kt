@@ -52,6 +52,7 @@ import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
 import com.example.gpsmapcamera.utils.isPermissionGranted
 import com.example.gpsmapcamera.utils.launchActivity
+import com.example.gpsmapcamera.utils.loadGoogleMap
 import com.example.gpsmapcamera.utils.openAppSettings
 import com.example.gpsmapcamera.utils.openLatestImageFromFolder
 import com.example.gpsmapcamera.utils.registerGpsResolutionLauncher
@@ -81,17 +82,17 @@ class CameraActivity : AppCompatActivity() {
     // Keep references for your template bindings
     private val classicTemplateBinding by lazy {
         StampClassicTemplateLayoutBinding.inflate(
-            layoutInflater, binding.layoutContainer, true
+            layoutInflater, binding.stampContainer, true
         )
     }
     private val advanceTemplateBinding by lazy {
         StampAdvanceTemplateLayoutBinding.inflate(
-            layoutInflater, binding.layoutContainer, true
+            layoutInflater, binding.stampContainer, true
         )
     }
     private val reportingTemplateBinding by lazy {
         StampReportingTemplateLayoutBinding.inflate(
-            layoutInflater, binding.layoutContainer, true
+            layoutInflater, binding.stampContainer, true
         )
     }
 
@@ -549,7 +550,7 @@ class CameraActivity : AppCompatActivity() {
                 binding.defaultTopMenuView.visibility = View.VISIBLE
             } else {
                 binding.detailTopMenuView.visibility = View.VISIBLE
-                binding.defaultTopMenuView.visibility = View.GONE
+//                binding.defaultTopMenuView.visibility = View.GONE
             }
         }
 
@@ -680,6 +681,18 @@ class CameraActivity : AppCompatActivity() {
             rvRight.adapter = templateAdapterRight
         }
 
+        (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+
+            reportingTemplateBinding.map.loadGoogleMap(
+                context = this,
+                location = location!!,
+                fragmentManager = supportFragmentManager,
+                Constants.REPORTING_TEMPLATE,
+            ) { googleMap ->
+//            googleMapRef = googleMap
+            }
+
+        }
 
         if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
             reportingTemplateBinding?.map?.visible()
@@ -725,6 +738,18 @@ class CameraActivity : AppCompatActivity() {
             rvRight.adapter = templateAdapterRight
         }
 
+        (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+
+            advanceTemplateBinding.map.loadGoogleMap(
+                context = this,
+                location = location!!,
+                fragmentManager = supportFragmentManager,
+                Constants.ADVANCE_TEMPLATE
+            ) { googleMap ->
+//            googleMapRef = googleMap
+            }
+
+        }
 
         if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
             advanceTemplateBinding?.map?.visible()
@@ -757,6 +782,23 @@ class CameraActivity : AppCompatActivity() {
             rvRight.adapter = templateAdapterRight
         }
 
+        (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+
+            classicTemplateBinding.map.loadGoogleMap(
+                context = this,
+                location = location!!,
+                fragmentManager = supportFragmentManager,
+                Constants.CLASSIC_TEMPLATE
+            ) { googleMap ->
+//            googleMapRef = googleMap
+
+            }
+
+        }
+
+
+
+
 
         if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
             classicTemplateBinding?.map?.visible()
@@ -778,6 +820,13 @@ class CameraActivity : AppCompatActivity() {
             classicTemplateBinding?.mapContainer?.visible()
         }
 
+    }
+
+
+    override fun onPause() {
+        super.onPause()
+        binding.detailTopMenuView.gone()
+        binding.defaultTopMenuView.visible()
     }
 
 }

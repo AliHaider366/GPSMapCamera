@@ -42,6 +42,17 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"/>
 
+
+    <FrameLayout
+        android:id="@+id/stampContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintTop_toTopOf="@+id/previewContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
     <!--timmer textview-->
     <TextView
         android:id="@+id/timmerTV"
@@ -295,16 +306,6 @@
 
             </LinearLayout>
         </LinearLayout>
-
-
-    <FrameLayout
-        android:id="@+id/layoutContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_5sdp"
-        app:layout_constraintTop_toBottomOf="@+id/topBlurView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
 
 
