@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.adapters.SettingsAdapter
 import com.example.gpsmapcamera.databinding.ActivitySettingsBinding
+import com.example.gpsmapcamera.utils.launchActivity
 import com.example.mycam.models.SettingsModel
 
 class SettingsActivity : AppCompatActivity() {
@@ -42,7 +43,14 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         init()
+        clickListeners()
+    }
 
+
+    private fun clickListeners() = binding.run {
+        backBtn.setOnClickListener {
+            finish()
+        }
     }
 
     private fun init()=binding.apply {
@@ -51,13 +59,25 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        languageAdapter = SettingsAdapter(settingList)
+        languageAdapter = SettingsAdapter(settingList, ::onItemClick)
 
         binding.rvSettings.apply {
             adapter = languageAdapter
             layoutManager = LinearLayoutManager(this@SettingsActivity)
         }
 
+    }
+
+    private fun onItemClick(title : String){
+        when(title){
+            getString(R.string.app_language)->{
+                launchActivity<LanguageActivity>()
+            }
+
+
+            else->{}
+
+        }
     }
 
 

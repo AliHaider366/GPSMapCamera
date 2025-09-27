@@ -1,6 +1,7 @@
 package com.example.gpsmapcamera.activities.template.basic
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
@@ -34,16 +35,17 @@ class ReportingTagActivity : AppCompatActivity() {
 
     private val reportingAdapter by lazy {
         ReportingTagAdapter { position ->
-            setInt(this@ReportingTagActivity,  Constants.SELECTED_REPORTING_TAG,position)
+            setInt(this@ReportingTagActivity, Constants.SELECTED_REPORTING_TAG, position)
             updateAppLevelTag()
         }
     }
 
-    private lateinit var stampPref : StampPreferences
+    private lateinit var stampPref: StampPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         initUI()
         setUpRV()
@@ -52,27 +54,36 @@ class ReportingTagActivity : AppCompatActivity() {
 
     private fun clickListeners() = binding.run {
         btnAdd.setOnClickListener {
-            if (etMain.text.trim().isNotEmpty()){
+            if (etMain.text.trim().isNotEmpty()) {
                 addReportingTag(etMain.text.trim().toString())
                 etMain.setText("")
-            }else{
+            } else {
                 showToast(getString(R.string.please_enter_tag))
             }
         }
+
+
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
+        }
+
     }
 
     private fun addReportingTag(tag: String) {
         var newListToSave = arrayListOf<String>()
         newListToSave.add(tag)
-        if (savedList.isEmpty()){
+        if (savedList.isEmpty()) {
             newListToSave.addAll(reportingTagsDefault)
-        }else{
+        } else {
             newListToSave.addAll(savedList)
         }
 
-        stampPref.saveWholeList(Constants.KEY_REPORTING_TAG,newListToSave)
+        stampPref.saveWholeList(Constants.KEY_REPORTING_TAG, newListToSave)
         setInt(this@ReportingTagActivity, Constants.SELECTED_REPORTING_TAG, 0)
-        reportingAdapter.setList(newListToSave, getInt(this@ReportingTagActivity, Constants.SELECTED_REPORTING_TAG, 0))
+        reportingAdapter.setList(
+            newListToSave,
+            getInt(this@ReportingTagActivity, Constants.SELECTED_REPORTING_TAG, 0)
+        )
         binding.recyclerView.scrollToPosition(0)
 
         updateAppLevelTag()
@@ -84,9 +95,9 @@ class ReportingTagActivity : AppCompatActivity() {
         stampPref = StampPreferences(this@ReportingTagActivity)
 
 
-        reportingTagList = if (savedList.isEmpty()){
+        reportingTagList = if (savedList.isEmpty()) {
             reportingTagsDefault
-        }else{
+        } else {
             savedList as ArrayList
         }
 
@@ -96,12 +107,29 @@ class ReportingTagActivity : AppCompatActivity() {
         // Initialize RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this@ReportingTagActivity)
         recyclerView.adapter = reportingAdapter
-        reportingAdapter.setList(reportingTagList, getInt(this@ReportingTagActivity, Constants.SELECTED_REPORTING_TAG, 0))
+        reportingAdapter.setList(
+            reportingTagList,
+            getInt(this@ReportingTagActivity, Constants.SELECTED_REPORTING_TAG, 0)
+        )
     }
 
     private fun updateAppLevelTag() {
-        appViewModel.updateStampVisibility(Constants.REPORTING_TEMPLATE, StampItemName.REPORTING_TAG, true)
+        appViewModel.updateStampVisibility(
+            Constants.REPORTING_TEMPLATE,
+            StampItemName.REPORTING_TAG,
+            true
+        )
     }
+
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+
+
 
 
 }

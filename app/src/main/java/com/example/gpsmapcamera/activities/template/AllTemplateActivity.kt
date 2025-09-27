@@ -1,8 +1,11 @@
 package com.example.gpsmapcamera.activities.template
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.transition.TransitionManager
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
@@ -37,6 +40,14 @@ class AllTemplateActivity : AppCompatActivity() {
         ActivityAllTemplateBinding.inflate(layoutInflater)
     }
 
+    // Activity Result Launcher
+    private val activityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                setUpTemplate()
+            }
+        }
+
 
     private val appViewModel by lazy {
         (applicationContext as MyApp).appViewModel
@@ -59,6 +70,7 @@ class AllTemplateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         initUI()
         setUpTemplate()
@@ -66,25 +78,32 @@ class AllTemplateActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        val stamp = PrefManager.getString(this@AllTemplateActivity, Constants.SELECTED_STAMP_TEMPLATE,
-            Constants.CLASSIC_TEMPLATE)
+        val stamp = PrefManager.getString(
+            this@AllTemplateActivity, Constants.SELECTED_STAMP_TEMPLATE,
+            Constants.CLASSIC_TEMPLATE
+        )
         selectTemplate(stamp)
     }
 
     private fun clickListeners() = binding.run {
 
-        ivEditClassicTemplate.setOnClickListener {
-            launchActivity<EditTemplateActivity>(){
-                putExtra(Constants.PASSED_STAMP_TEMPLATE, Constants.CLASSIC_TEMPLATE)
-            }
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
         }
+
+        ivEditClassicTemplate.setOnClickListener {
+            val intent = Intent(this@AllTemplateActivity, EditTemplateActivity::class.java)
+            intent.putExtra(Constants.PASSED_STAMP_TEMPLATE, Constants.CLASSIC_TEMPLATE)
+            activityLauncher.launch(intent)
+        }
+
         ivEditAdvanceTemplate.setOnClickListener {
-            launchActivity<EditTemplateActivity>(){
+            launchActivity<EditTemplateActivity>() {
                 putExtra(Constants.PASSED_STAMP_TEMPLATE, Constants.ADVANCE_TEMPLATE)
             }
         }
         ivEditReportingTemplate.setOnClickListener {
-            launchActivity<EditTemplateActivity>(){
+            launchActivity<EditTemplateActivity>() {
                 putExtra(Constants.PASSED_STAMP_TEMPLATE, Constants.REPORTING_TEMPLATE)
             }
         }
@@ -110,11 +129,13 @@ class AllTemplateActivity : AppCompatActivity() {
                 binding.ivEditAdvanceTemplate.invisible()
                 binding.ivEditReportingTemplate.invisible()
             }
+
             Constants.ADVANCE_TEMPLATE -> {
                 binding.ivEditClassicTemplate.invisible()
                 binding.ivEditAdvanceTemplate.visible()
                 binding.ivEditReportingTemplate.invisible()
             }
+
             Constants.REPORTING_TEMPLATE -> {
                 binding.ivEditClassicTemplate.invisible()
                 binding.ivEditAdvanceTemplate.invisible()
@@ -126,9 +147,12 @@ class AllTemplateActivity : AppCompatActivity() {
     private fun setUpTemplate() {
         // Observe Classic template configurations
         appViewModel.classicStampConfigs.observe(this) { allConfigs ->
-            val bottomItems = allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
-            val centerItems = allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
-            val rightItems = allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
+            val bottomItems =
+                allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
+            val centerItems =
+                allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
+            val rightItems =
+                allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
 
             classicAdapterBottom.submitList(bottomItems as ArrayList)
             classicAdapterCenter.submitList(centerItems as ArrayList)
@@ -185,9 +209,12 @@ class AllTemplateActivity : AppCompatActivity() {
 
         // Observe Advance template configurations
         appViewModel.advanceStampConfigs.observe(this) { allConfigs ->
-            val bottomItems = allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
-            val centerItems = allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
-            val rightItems = allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
+            val bottomItems =
+                allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
+            val centerItems =
+                allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
+            val rightItems =
+                allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
 
             advanceAdapterBottom.submitList(bottomItems as ArrayList)
             advanceAdapterCenter.submitList(centerItems as ArrayList)
@@ -247,9 +274,12 @@ class AllTemplateActivity : AppCompatActivity() {
 
         // Observe Reporting template configurations
         appViewModel.reportingStampConfigs.observe(this) { allConfigs ->
-            val bottomItems = allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
-            val centerItems = allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
-            val rightItems = allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
+            val bottomItems =
+                allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
+            val centerItems =
+                allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
+            val rightItems =
+                allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
 
             reportingAdapterBottom.submitList(bottomItems as ArrayList)
             reportingAdapterCenter.submitList(centerItems as ArrayList)
@@ -273,7 +303,6 @@ class AllTemplateActivity : AppCompatActivity() {
                 tvEnvironment.typeface = typeface
 
 
-
 //                root.scaleX = 1.5f
 //                root.scaleY = 1.2f
                 // Optional: Set pivot for scaling from center (adjust if needed)
@@ -294,13 +323,15 @@ class AllTemplateActivity : AppCompatActivity() {
                         this@AllTemplateActivity,
                         Constants.SELECTED_REPORTING_TAG, 0
                     )
-                    val reportingTagSavedList = StampPreferences(this@AllTemplateActivity).getWholeList(
-                        Constants.KEY_REPORTING_TAG)
+                    val reportingTagSavedList =
+                        StampPreferences(this@AllTemplateActivity).getWholeList(
+                            Constants.KEY_REPORTING_TAG
+                        )
                     if (reportingTagSavedList.isEmpty()) {
                         if (itemIndex < reportingTagsDefault.size) {
                             tvEnvironment.text = reportingTagsDefault[itemIndex]
                         }
-                    }else{
+                    } else {
                         if (itemIndex < reportingTagSavedList.size) {
                             tvEnvironment.text = reportingTagSavedList[itemIndex]
                         }
@@ -345,5 +376,14 @@ class AllTemplateActivity : AppCompatActivity() {
             binding.lytClassicTemplate.tvCenterTitle.text = newDynamics.shortAddress
         }
     }
+
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+
 
 }

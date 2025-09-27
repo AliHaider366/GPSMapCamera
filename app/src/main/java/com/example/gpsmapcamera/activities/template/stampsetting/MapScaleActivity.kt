@@ -2,6 +2,7 @@ package com.example.gpsmapcamera.activities.template.stampsetting
 
 import android.os.Bundle
 import android.widget.SeekBar
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -33,9 +34,17 @@ class MapScaleActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         initViews()
         setUpSeekBar()
+        clickListeners()
+    }
+
+    private fun clickListeners() = binding.run {
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
+        }
     }
 
     private fun initViews() {
@@ -103,5 +112,15 @@ class MapScaleActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
+    }
+
+
+
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
     }
 }

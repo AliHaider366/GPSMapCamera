@@ -2,6 +2,7 @@ package com.example.gpsmapcamera.activities.template.basic
 
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.adapters.DateFormatAdapter
@@ -31,8 +32,17 @@ class DateFormatActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         setUpRV()
+        clickListeners()
+    }
+
+
+    private fun clickListeners() = binding.run {
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
+        }
     }
 
     private fun setUpRV() = binding.run {
@@ -45,5 +55,16 @@ class DateFormatActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
     }
+
+
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+
+
 
 }

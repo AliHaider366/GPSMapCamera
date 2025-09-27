@@ -1,6 +1,7 @@
 package com.example.gpsmapcamera.activities.template.technical
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.adapters.AltitudeAccuracyAdapter
@@ -29,8 +30,17 @@ class AltitudeAccuracyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         setUpRV()
+        clickListeners()
+    }
+
+
+    private fun clickListeners() = binding.run {
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
+        }
     }
 
 
@@ -51,6 +61,16 @@ class AltitudeAccuracyActivity : AppCompatActivity() {
             }
         recyclerView.adapter = adapter
     }
+
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+
+
 
 
 

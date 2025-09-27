@@ -1,6 +1,7 @@
 package com.example.gpsmapcamera.activities.template.basic
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import com.example.gpsmapcamera.databinding.ActivityAddPersonBinding
@@ -22,8 +23,16 @@ class AddPersonActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         initViews()
+        clickListeners()
+    }
+
+    private fun clickListeners() = binding.run {
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
+        }
     }
 
     private fun initViews() = binding.run {
@@ -44,6 +53,14 @@ class AddPersonActivity : AppCompatActivity() {
                 Constants.SELECTED_PERSON_NAME + passedTemplate,
                 text.toString()
             )
+        }
+    }
+
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
         }
     }
 }

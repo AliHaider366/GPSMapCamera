@@ -16,6 +16,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -51,6 +52,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.enums.ImageFormat
 import com.example.gpsmapcamera.enums.ImageQuality
+import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FOLDER_NAME
@@ -642,6 +644,163 @@ class CameraManager(
             true
         }
     }
+
+
+    fun takePhotoWithStamp(
+        stampContainer: FrameLayout,
+        stampPosition : StampCameraPosition = StampCameraPosition.TOP,
+        onSaved: (Uri?) -> Unit
+    ) {
+        val imageCapture = imageCapture ?: return
+
+        if (captureSoundEnabled) {
+            MediaActionSound().play(MediaActionSound.SHUTTER_CLICK)
+        }
+
+        imageCapture.takePicture(
+            ContextCompat.getMainExecutor(context),
+            object : ImageCapture.OnImageCapturedCallback() {
+                override fun onCaptureSuccess(image: ImageProxy) {
+                    val bitmap = imageProxyToBitmap(image)
+                    val rotationDegrees = image.imageInfo.rotationDegrees
+                    image.close()
+                    showShutterEffect()
+
+                    if (bitmap != null) {
+                        val matrix = Matrix().apply {
+                            postRotate(rotationDegrees.toFloat())
+                            if (isMirrorEnabled) {
+                                postScale(-1f, 1f, bitmap.width / 2f, bitmap.height / 2f)
+                            }
+                        }
+                        val cameraBitmap = Bitmap.createBitmap(
+                            bitmap, 0, 0,
+                            bitmap.width, bitmap.height,
+                            matrix, true
+                        )
+
+                        // --- render stamp container ---
+                        val stampBitmap = getViewBitmap(stampContainer)
+
+                        // --- merge both bitmaps ---
+                        val mergedBitmap = mergeBitmaps(cameraBitmap, stampBitmap,stampPosition)
+
+                        // save
+                        val filename = appViewModel.fileNameFromPattern()
+                        saveCapturedBitmap(mergedBitmap, filename, format = ImageFormat.JPG) { uri ->
+                            onSaved(uri)
+                        }
+                    } else {
+                        onSaved(null)
+                    }
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    context.showToast("Capture failed: ${exception.message}")
+                    onSaved(null)
+                }
+            }
+        )
+    }
+
+    // Helper: render view into bitmap
+    private fun getViewBitmap(view: View): Bitmap {
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = android.graphics.Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
+    }
+
+    private fun mergeBitmaps(
+        camera: Bitmap,
+        overlay: Bitmap,
+        position: StampCameraPosition = StampCameraPosition.TOP,
+    ): Bitmap {
+        val result = camera.copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = android.graphics.Canvas(result)
+
+        // Convert dp to px
+        val marginPx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            10f,
+            context.resources.displayMetrics
+        ).toInt()
+
+        // Scale overlay to match width of camera
+        val scaledOverlay = Bitmap.createScaledBitmap(
+            overlay,
+            camera.width - (marginPx * 2), // subtract horizontal margins
+            overlay.height * (camera.width - marginPx * 2) / overlay.width, // keep ratio
+            true
+        )
+
+        val x = marginPx.toFloat()
+        val y = when (position) {
+            StampCameraPosition.TOP -> marginPx.toFloat()
+            StampCameraPosition.BOTTOM -> (camera.height - scaledOverlay.height - marginPx).toFloat()
+        }
+
+        canvas.drawBitmap(scaledOverlay, x, y, null)
+        return result
+    }
+
+
+    /*    private fun mergeBitmaps(
+            camera: Bitmap,
+            overlay: Bitmap,
+            position: StampCameraPosition = StampCameraPosition.TOP // default
+        ): Bitmap {
+            val result = camera.copy(Bitmap.Config.ARGB_8888, true)
+            val canvas = android.graphics.Canvas(result)
+
+            // Scale overlay to match width of camera
+            val scaledOverlay = Bitmap.createScaledBitmap(
+                overlay,
+                camera.width,
+                overlay.height * camera.width / overlay.width, // maintain aspect ratio
+                true
+            )
+
+            val x = 0f
+            val y = when (position) {
+                StampCameraPosition.TOP -> 0f
+                StampCameraPosition.BOTTOM -> (camera.height - scaledOverlay.height).toFloat()
+            }
+
+            canvas.drawBitmap(scaledOverlay, x, y, null)
+            return result
+        }*/
+
+    fun takePhotoWithTimer(
+        seconds: Int,
+        countdownText: TextView,
+        stampContainer: FrameLayout,
+        stampPosition : StampCameraPosition = StampCameraPosition.TOP,
+        onSaved: (Uri?) -> Unit
+    ) {
+        countdownText.visibility = View.VISIBLE
+        var currentSecond = seconds
+        val handler = Handler(Looper.getMainLooper())
+
+        val countdownRunnable = object : Runnable {
+            override fun run() {
+                if (currentSecond > 0) {
+                    countdownText.text = currentSecond.toString()
+                    currentSecond--
+                    handler.postDelayed(this, 1000)
+                } else {
+                    countdownText.visibility = View.GONE
+                    countdownText.text = ""
+
+                    // 🚀 Capture with stamp
+                    takePhotoWithStamp(stampContainer, stampPosition,onSaved)
+                }
+            }
+        }
+        handler.post(countdownRunnable)
+    }
+
+
 
 
 }

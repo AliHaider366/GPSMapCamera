@@ -1,6 +1,7 @@
 package com.example.gpsmapcamera.activities.template.weather
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.adapters.WeatherModuleAdapter
@@ -33,9 +34,18 @@ class WeatherModuleActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         initList()
         setUpRV()
+        clickListeners()
+    }
+
+
+    private fun clickListeners() = binding.run {
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
+        }
     }
 
     private fun initList() {
@@ -71,6 +81,14 @@ class WeatherModuleActivity : AppCompatActivity() {
             }
         recyclerView.adapter = adapter
     }
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
+    }
+
 
 
 }

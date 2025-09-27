@@ -64,6 +64,7 @@ import androidx.annotation.DrawableRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.TextViewCompat
@@ -73,6 +74,7 @@ import androidx.viewbinding.ViewBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.models.AddressLineModel
 import com.example.gpsmapcamera.models.AddressModel
@@ -1132,6 +1134,51 @@ fun FrameLayout.loadGoogleMap(
 
         onMapReady?.invoke(googleMap) // optional callback if caller wants ref
     }
+}
+
+
+fun FrameLayout.loadStaticMap(
+    context: Context,
+    location: Location,
+    template: String
+) {
+    val lat = location.latitude
+    val lng = location.longitude
+    val zoom = PrefManager.getFloat(
+        context,
+        Constants.SELECTED_MAP_ZOOM_LEVEL + template,
+        12.5f
+    )
+    val mapType = PrefManager.getString(
+        context,
+        Constants.SELECTED_MAP_TYPE + template,
+        Constants.MAP_TYPE_NORMAL
+    )
+
+    val typeParam = when (mapType) {
+        Constants.MAP_TYPE_NORMAL -> "roadmap"
+        Constants.MAP_TYPE_SATELLITE -> "satellite"
+        Constants.MAP_TYPE_TERRAIN -> "terrain"
+        Constants.MAP_TYPE_HYBRID -> "hybrid"
+        else -> "roadmap"
+    }
+
+    val apiKey = "AIzaSyB9bZ09nESdvT2kRmFEAKbQ3gUqJJwOApI" // your API key
+    val url = "https://maps.googleapis.com/maps/api/staticmap" +
+            "?center=$lat,$lng&zoom=$zoom&size=600x400&maptype=$typeParam" +
+            "&markers=color:red%7C$lat,$lng&key=$apiKey"
+
+    this.removeAllViews()
+    val imageView = ImageView(context).apply {
+        scaleType = ImageView.ScaleType.CENTER_CROP
+        layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        )
+    }
+//    imageView.setImageURI(url.toUri())
+    Glide.with(context).load(url).into(imageView)
+    this.addView(imageView)
 }
 
 

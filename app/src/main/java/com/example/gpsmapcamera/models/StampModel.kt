@@ -48,6 +48,11 @@ enum class StampPosition {
     BOTTOM, CENTER, RIGHT, NONE
 }
 
+
+enum class StampCameraPosition {
+    BOTTOM, TOP
+}
+
 enum class StampItemName {
     REPORTING_TAG,
     DATE_TIME,

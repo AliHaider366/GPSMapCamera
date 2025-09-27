@@ -1,6 +1,7 @@
 package com.example.gpsmapcamera.activities.template.basic
 
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -57,6 +58,7 @@ class AddNoteActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         initUI()
         setUpRV()
@@ -71,6 +73,10 @@ class AddNoteActivity : AppCompatActivity() {
             }else{
                 showToast(getString(R.string.please_enter_tag))
             }
+        }
+
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
         }
     }
 
@@ -112,6 +118,14 @@ class AddNoteActivity : AppCompatActivity() {
         rvRecentNotes.layoutManager = LinearLayoutManager(this@AddNoteActivity)
         rvRecentNotes.adapter = recentNotesAdapter
         recentNotesAdapter.setList(recentNotesList, getInt(this@AddNoteActivity, Constants.SELECTED_NOTE, 0))
+    }
+
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
     }
 
 

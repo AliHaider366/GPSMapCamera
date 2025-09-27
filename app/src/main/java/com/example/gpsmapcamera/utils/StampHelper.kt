@@ -3,6 +3,8 @@ package com.example.gpsmapcamera.utils
 import android.content.Context
 import android.transition.TransitionManager
 import android.util.Log
+import android.widget.FrameLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
@@ -10,6 +12,7 @@ import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampReportingTemplateLayoutBinding
 import com.example.gpsmapcamera.models.LatLon
 import com.example.gpsmapcamera.models.NoteModel
+import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.utils.PrefManager.getInt
 import com.google.openlocationcode.OpenLocationCode
 import java.text.SimpleDateFormat
@@ -83,7 +86,6 @@ val altitudeAccuracyFormats = arrayListOf(
     "m",
     "ft",
 )
-
 
 
 val recentNotesDefault = arrayListOf<NoteModel>(
@@ -161,32 +163,51 @@ fun Date.formatTimeZone(context: Context, template: String): String {
 
     return when (timeZoneFormats[timeZoneFormatIndex]) {
         "+0500" -> {
-            SimpleDateFormat("Z", Locale.getDefault()).apply { timeZone = TimeZone.getTimeZone(timeZoneId) }
+            SimpleDateFormat("Z", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone(timeZoneId)
+            }
                 .format(this)
         }
+
         "UTC +0500" -> {
-            "UTC " + SimpleDateFormat("Z", Locale.getDefault()).apply { timeZone = TimeZone.getTimeZone(timeZoneId) }
+            "UTC " + SimpleDateFormat("Z", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone(timeZoneId)
+            }
                 .format(this)
         }
+
         "GMT +0500" -> {
-            "GMT " + SimpleDateFormat("Z", Locale.getDefault()).apply { timeZone = TimeZone.getTimeZone(timeZoneId) }
+            "GMT " + SimpleDateFormat("Z", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone(timeZoneId)
+            }
                 .format(this)
         }
+
         "UTC +05:00" -> {
-            "UTC " + SimpleDateFormat("XXX", Locale.getDefault()).apply { timeZone = TimeZone.getTimeZone(timeZoneId) }
+            "UTC " + SimpleDateFormat("XXX", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone(timeZoneId)
+            }
                 .format(this)
         }
+
         "GMT +05:00" -> {
-            "GMT " + SimpleDateFormat("XXX", Locale.getDefault()).apply { timeZone = TimeZone.getTimeZone(timeZoneId) }
+            "GMT " + SimpleDateFormat("XXX", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone(timeZoneId)
+            }
                 .format(this)
         }
+
         "+05:00" -> {
-            SimpleDateFormat("XXX", Locale.getDefault()).apply { timeZone = TimeZone.getTimeZone(timeZoneId) }
+            SimpleDateFormat("XXX", Locale.getDefault()).apply {
+                timeZone = TimeZone.getTimeZone(timeZoneId)
+            }
                 .format(this)
         }
+
         "Pakistan Standard Time" -> {
             TimeZone.getTimeZone(timeZoneId).getDisplayName(false, TimeZone.LONG, Locale.ENGLISH)
         }
+
         else -> "N/A"
     }
 
@@ -198,8 +219,8 @@ fun Date.formatTimeZone(context: Context, template: String): String {
 // -------------------------
 
 
-fun LatLon.formatCoordinatesByPosition(position: Int): String{
-    return when(position){
+fun LatLon.formatCoordinatesByPosition(position: Int): String {
+    return when (position) {
         0 -> toDecimal()
         1 -> toDecDegs()
         2 -> toDecDegsMicro()
@@ -211,8 +232,8 @@ fun LatLon.formatCoordinatesByPosition(position: Int): String{
     }
 }
 
-fun LatLon.formatPlusCodeByPosition(position: Int): String{
-    return when(position){
+fun LatLon.formatPlusCodeByPosition(position: Int): String {
+    return when (position) {
         0 -> toAccuratePlusCode()
         1 -> toConcisePlusCode()
         else -> toAccuratePlusCode()
@@ -326,9 +347,6 @@ fun LatLon.toMGRS(): String {
 }
 
 
-
-
-
 // Accurate / full Plus Code
 fun LatLon.toAccuratePlusCode(): String {
     return "Plus Code:  ${OpenLocationCode.encode(lat, lon)}"
@@ -347,8 +365,9 @@ fun LatLon.toConcisePlusCode(): String {
     }
 }
 
-fun Double.toTemperature(context : Context,passedTemplate : String): String {
-    val selectedTemperatureIndex = getInt(context, Constants.FROM_TEMPERATURE_MODULE + passedTemplate, 0)
+fun Double.toTemperature(context: Context, passedTemplate: String): String {
+    val selectedTemperatureIndex =
+        getInt(context, Constants.FROM_TEMPERATURE_MODULE + passedTemplate, 0)
     return when (selectedTemperatureIndex) {
         1 -> "${((this * 9 / 5) + 32).toInt()}°F"   // Celsius → Fahrenheit
         else -> "${this}°C"
@@ -396,9 +415,6 @@ fun Double.toAccuracy(context: Context, passedTemplate: String): String {
 }
 
 
-
-
-
 fun Context.setUpMapPositionForAdvancedTemplate(binding: StampAdvanceTemplateLayoutBinding) {
     binding.apply {
         val constraintSet = ConstraintSet()
@@ -410,7 +426,11 @@ fun Context.setUpMapPositionForAdvancedTemplate(binding: StampAdvanceTemplateLay
         val sideMargin10sdp = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._10sdp)
         val logoMargin = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._20sdp)
 
-        val mapPosition = PrefManager.getInt(this@setUpMapPositionForAdvancedTemplate, Constants.SELECTED_MAP_POSITION + Constants.ADVANCE_TEMPLATE, 0)
+        val mapPosition = PrefManager.getInt(
+            this@setUpMapPositionForAdvancedTemplate,
+            Constants.SELECTED_MAP_POSITION + Constants.ADVANCE_TEMPLATE,
+            0
+        )
 
         // Clear all relevant constraints first to avoid undefined references
         constraintSet.clear(mapContainer.id, ConstraintSet.START)
@@ -568,7 +588,11 @@ fun Context.setUpMapPositionForClassicTemplate(binding: StampClassicTemplateLayo
         val sideMargin10sdp = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._10sdp)
         val bottomMargin = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._5sdp)
 
-        val mapPosition = PrefManager.getInt(this@setUpMapPositionForClassicTemplate, Constants.SELECTED_MAP_POSITION + Constants.CLASSIC_TEMPLATE, 0)
+        val mapPosition = PrefManager.getInt(
+            this@setUpMapPositionForClassicTemplate,
+            Constants.SELECTED_MAP_POSITION + Constants.CLASSIC_TEMPLATE,
+            0
+        )
 
         // Clear all relevant constraints first to avoid undefined references
         constraintSet.clear(mapContainer.id, ConstraintSet.START)
@@ -825,7 +849,11 @@ fun Context.setUpMapPositionForReportingTemplate(binding: StampReportingTemplate
         val logoMargin = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._20sdp)
         val bottomMargin = resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._2sdp)
 
-        val mapPosition = PrefManager.getInt(this@setUpMapPositionForReportingTemplate, Constants.SELECTED_MAP_POSITION + Constants.REPORTING_TEMPLATE, 0)
+        val mapPosition = PrefManager.getInt(
+            this@setUpMapPositionForReportingTemplate,
+            Constants.SELECTED_MAP_POSITION + Constants.REPORTING_TEMPLATE,
+            0
+        )
 
         // Clear all relevant constraints first to avoid undefined references
         constraintSet.clear(mapContainer.id, ConstraintSet.START)
@@ -1021,15 +1049,55 @@ fun Context.setUpMapPositionForReportingTemplate(binding: StampReportingTemplate
 }
 
 
-
-fun Context.getFontSizeFactor(passedTemplate : String): Float {
-    return when (getInt(this@getFontSizeFactor, Constants.SELECTED_STAMP_SIZE + passedTemplate, 0)) {
+fun Context.getFontSizeFactor(passedTemplate: String): Float {
+    return when (getInt(
+        this@getFontSizeFactor,
+        Constants.SELECTED_STAMP_SIZE + passedTemplate,
+        0
+    )) {
         0 -> 1.15f
         1 -> 1.05f
         2 -> 0.95f
         3 -> 0.85f
         else -> 1f
     }
+}
+
+
+fun ConstraintLayout.setStampPosition(stampPosition: StampCameraPosition) {
+    val constraintSet = ConstraintSet()
+    constraintSet.clone(this)
+
+    if (stampPosition == StampCameraPosition.TOP) {
+        constraintSet.clear(R.id.stampContainer, ConstraintSet.BOTTOM)
+        constraintSet.connect(
+            R.id.stampContainer,
+            ConstraintSet.TOP,
+            R.id.previewContainer,
+            ConstraintSet.TOP
+        )
+        // keep marginTop = 10sdp
+        constraintSet.setMargin(
+            R.id.stampContainer,
+            ConstraintSet.TOP,
+            context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._10sdp)
+        )
+    } else {
+        constraintSet.clear(R.id.stampContainer, ConstraintSet.TOP)
+        constraintSet.connect(
+            R.id.stampContainer,
+            ConstraintSet.BOTTOM,
+            R.id.previewContainer,
+            ConstraintSet.BOTTOM
+        )
+        // remove top margin
+        constraintSet.setMargin(
+            R.id.stampContainer, ConstraintSet.BOTTOM,
+            context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._10sdp)
+        )
+    }
+
+    constraintSet.applyTo(this)
 }
 
 

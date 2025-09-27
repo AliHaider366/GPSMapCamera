@@ -5,16 +5,19 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.template.AllTemplateActivity
@@ -25,6 +28,7 @@ import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampReportingTemplateLayoutBinding
+import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.models.StampConfig
 import com.example.gpsmapcamera.models.StampItemName
 import com.example.gpsmapcamera.models.StampPosition
@@ -48,11 +52,13 @@ import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.PrefManager.saveInt
 import com.example.gpsmapcamera.utils.StampPreferences
 import com.example.gpsmapcamera.utils.checkAndRequestGps
+import com.example.gpsmapcamera.utils.getFontSizeFactor
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
 import com.example.gpsmapcamera.utils.isPermissionGranted
 import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.loadGoogleMap
+import com.example.gpsmapcamera.utils.loadStaticMap
 import com.example.gpsmapcamera.utils.openAppSettings
 import com.example.gpsmapcamera.utils.openLatestImageFromFolder
 import com.example.gpsmapcamera.utils.registerGpsResolutionLauncher
@@ -63,11 +69,16 @@ import com.example.gpsmapcamera.utils.requestPermission
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
 import com.example.gpsmapcamera.utils.setDrawable
 import com.example.gpsmapcamera.utils.setImage
+import com.example.gpsmapcamera.utils.setStampPosition
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setTextColorRes
 import com.example.gpsmapcamera.utils.setTintColor
+import com.example.gpsmapcamera.utils.setUpMapPositionForAdvancedTemplate
+import com.example.gpsmapcamera.utils.setUpMapPositionForClassicTemplate
+import com.example.gpsmapcamera.utils.setUpMapPositionForReportingTemplate
 import com.example.gpsmapcamera.utils.shareImage
 import com.example.gpsmapcamera.utils.showToast
+import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 
 class CameraActivity : AppCompatActivity() {
@@ -79,22 +90,26 @@ class CameraActivity : AppCompatActivity() {
     private val templateAdapterCenter = StampCenterAdapter()
     private val templateAdapterRight = StampAdapter()
 
-    // Keep references for your template bindings
     private val classicTemplateBinding by lazy {
-        StampClassicTemplateLayoutBinding.inflate(
-            layoutInflater, binding.stampContainer, true
-        )
+        StampClassicTemplateLayoutBinding.inflate(layoutInflater)
     }
     private val advanceTemplateBinding by lazy {
-        StampAdvanceTemplateLayoutBinding.inflate(
-            layoutInflater, binding.stampContainer, true
-        )
+        StampAdvanceTemplateLayoutBinding.inflate(layoutInflater)
     }
     private val reportingTemplateBinding by lazy {
-        StampReportingTemplateLayoutBinding.inflate(
-            layoutInflater, binding.stampContainer, true
-        )
+        StampReportingTemplateLayoutBinding.inflate(layoutInflater)
     }
+
+    // Activity Result Launcher
+    private val activityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                setUpTemplate()
+            }
+        }
+
+    private var selectedStampPosition = StampCameraPosition.TOP
+    private var selectedTemplate = Constants.CLASSIC_TEMPLATE
 
 
     private lateinit var cameraManager: CameraManager
@@ -463,21 +478,36 @@ class CameraActivity : AppCompatActivity() {
 
         captureBtn.setOnClickListener {
             if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
+                /*                cameraManager.takePhotoWithTimer(
+                                    getInt(
+                                        this@CameraActivity,
+                                        KEY_CAMERA_TIMER_VALUE
+                                    ), binding.timmerTV
+                                ) {
+                                    val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                                    intent.putExtra("image_uri", it.toString())
+                //                            startActivity(intent)
+                                    if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                                        it?.let { shareImage(it) }
+                                    }
+                                }*/
+
                 cameraManager.takePhotoWithTimer(
-                    getInt(
-                        this@CameraActivity,
-                        KEY_CAMERA_TIMER_VALUE
-                    ), binding.timmerTV
-                ) {
-                    val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
-                    intent.putExtra("image_uri", it.toString())
-//                            startActivity(intent)
-                    if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
-                        it?.let { shareImage(it) }
+                    getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
+                    binding.timmerTV,
+                    stampContainer,// pass your overlay container
+                    selectedStampPosition
+                ) { uri ->
+                    uri?.let {
+                        val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                        intent.putExtra("image_uri", it.toString())
+                        if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                            shareImage(it)
+                        }
                     }
                 }
             } else {
-                cameraManager.takePhoto() { uri ->
+                cameraManager.takePhotoWithStamp(stampContainer, selectedStampPosition) { uri ->
                     if (uri != null) {
                         val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
                         intent.putExtra("image_uri", uri.toString())
@@ -554,8 +584,12 @@ class CameraActivity : AppCompatActivity() {
             }
         }
 
+        settingBtn.setOnClickListener {
+            launchActivity<SettingsActivity>() {}
+        }
+
         templateBtn.setOnClickListener {
-            launchActivity<AllTemplateActivity>() {}
+            activityLauncher.launch(Intent(this@CameraActivity, AllTemplateActivity::class.java))
         }
     }
 
@@ -616,12 +650,20 @@ class CameraActivity : AppCompatActivity() {
     }
 
     private fun setUpTemplate() {
-
-        // Observe the appropriate LiveData based on the selected template
-        val stampConfigs = when (PrefManager.getString(
+        selectedTemplate = PrefManager.getString(
             this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
             Constants.CLASSIC_TEMPLATE
-        )) {
+        )
+
+        selectedStampPosition = if (PrefManager.getInt(
+                this@CameraActivity,
+                Constants.SELECTED_STAMP_POSITION + selectedTemplate,
+                0
+            ) == 0
+        ) StampCameraPosition.TOP else StampCameraPosition.BOTTOM
+
+        // Observe the appropriate LiveData based on the selected template
+        val stampConfigs = when (selectedTemplate) {
             Constants.CLASSIC_TEMPLATE -> appViewModel.classicStampConfigs
             Constants.ADVANCE_TEMPLATE -> appViewModel.advanceStampConfigs
             Constants.REPORTING_TEMPLATE -> appViewModel.reportingStampConfigs
@@ -673,24 +715,61 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+
     private fun setupReportingUI(allConfigs: List<StampConfig>) {
+
+
+        binding.stampContainer.removeAllViews()
+        binding.stampContainer.addView(reportingTemplateBinding.root)
 
         reportingTemplateBinding?.run {
             rvBottom.adapter = templateAdapterBottom
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
+
+
+            val typeface = ResourcesCompat.getFont(
+                root.context, stampFontList[getInt(
+                    root.context,
+                    Constants.SELECTED_STAMP_FONT + selectedTemplate,
+                    0
+                )]
+            )
+            tvCenterTitle.typeface = typeface
+            tvEnvironment.typeface = typeface
+
+            setUpMapPositionForReportingTemplate(this@run)
+
+            val getScaleValue = root.context.getFontSizeFactor(selectedTemplate)
+            val baseTextSize =
+                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp).toFloat()
+            tvCenterTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSize * getScaleValue)
+
+            val baseTextSizeFortvEnv =
+                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._9sdp).toFloat()
+            tvEnvironment.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSizeFortvEnv * getScaleValue)
+
+
+
         }
+        binding.main.setStampPosition(selectedStampPosition)
 
         (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
 
-            reportingTemplateBinding.map.loadGoogleMap(
+/*            reportingTemplateBinding.map.loadGoogleMap(
                 context = this,
                 location = location!!,
                 fragmentManager = supportFragmentManager,
                 Constants.REPORTING_TEMPLATE,
             ) { googleMap ->
 //            googleMapRef = googleMap
-            }
+            }*/
+
+            reportingTemplateBinding.map.loadStaticMap(
+                context = this,
+                location = location!!,
+                Constants.CLASSIC_TEMPLATE
+            )
 
         }
 
@@ -732,22 +811,55 @@ class CameraActivity : AppCompatActivity() {
 
     private fun setupAdvanceUI(allConfigs: List<StampConfig>) {
 
+        binding.stampContainer.removeAllViews()
+        binding.stampContainer.addView(advanceTemplateBinding.root)
+
+
         advanceTemplateBinding?.run {
             rvBottom.adapter = templateAdapterBottom
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
+
+
+
+
+            val typeface = ResourcesCompat.getFont(
+                root.context, stampFontList[getInt(
+                    root.context,
+                    Constants.SELECTED_STAMP_FONT + selectedTemplate,
+                    0
+                )]
+            )
+            tvCenterTitle.typeface = typeface
+
+            setUpMapPositionForAdvancedTemplate(this@run)
+
+            val getScaleValue = root.context.getFontSizeFactor(selectedTemplate)
+            val baseTextSize =
+                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp).toFloat()
+            tvCenterTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSize * getScaleValue)
+
+
         }
+
+        binding.main.setStampPosition(selectedStampPosition)
 
         (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
 
-            advanceTemplateBinding.map.loadGoogleMap(
+/*            advanceTemplateBinding.map.loadGoogleMap(
                 context = this,
                 location = location!!,
                 fragmentManager = supportFragmentManager,
                 Constants.ADVANCE_TEMPLATE
             ) { googleMap ->
 //            googleMapRef = googleMap
-            }
+            }*/
+
+            advanceTemplateBinding.map.loadStaticMap(
+                context = this,
+                location = location!!,
+                Constants.CLASSIC_TEMPLATE
+            )
 
         }
 
@@ -775,16 +887,37 @@ class CameraActivity : AppCompatActivity() {
 
     private fun setupClassicUI(allConfigs: List<StampConfig>) {
 
+        binding.stampContainer.removeAllViews()
+        binding.stampContainer.addView(classicTemplateBinding.root)
 
         classicTemplateBinding?.run {
             rvBottom.adapter = templateAdapterBottom
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
+
+
+
+            val typeface = ResourcesCompat.getFont(
+                root.context, stampFontList[getInt(
+                    root.context,
+                    Constants.SELECTED_STAMP_FONT + selectedTemplate,
+                    0
+                )]
+            )
+            tvCenterTitle.typeface = typeface
+
+            setUpMapPositionForClassicTemplate(this@run)
+
+            val getScaleValue = root.context.getFontSizeFactor(selectedTemplate)
+            val baseTextSize =
+                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp).toFloat()
+            tvCenterTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSize * getScaleValue)
+
         }
 
         (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
 
-            classicTemplateBinding.map.loadGoogleMap(
+/*            classicTemplateBinding.map.loadGoogleMap(
                 context = this,
                 location = location!!,
                 fragmentManager = supportFragmentManager,
@@ -792,7 +925,14 @@ class CameraActivity : AppCompatActivity() {
             ) { googleMap ->
 //            googleMapRef = googleMap
 
-            }
+            }*/
+            classicTemplateBinding.map.loadStaticMap(
+                context = this,
+                location = location!!,
+                Constants.CLASSIC_TEMPLATE
+            )
+
+            binding.main.setStampPosition(selectedStampPosition)
 
         }
 

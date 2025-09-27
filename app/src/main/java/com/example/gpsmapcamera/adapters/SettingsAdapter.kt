@@ -17,6 +17,7 @@ import com.example.mycam.models.SettingsModel
 
 class SettingsAdapter(
     val userList: MutableList<SettingsModel>,
+    val onItemClick : (String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -39,7 +40,6 @@ class SettingsAdapter(
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
 
             VIEW_TYPE_HEADING -> {
@@ -113,7 +113,7 @@ class SettingsAdapter(
         }
     }
 
-    class GeneralViewHolder(private val binding: SettingGeneralItemBinding) :
+    inner class GeneralViewHolder(private val binding: SettingGeneralItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: SettingsModel.GeneralItem) {
@@ -126,6 +126,10 @@ class SettingsAdapter(
                 itemName.text=item.title
                 selectedOptionName.text=item.selectedOpt
                 selectedOptionName.setDrawable(end = item.selectedOptIcon)
+
+                root.setOnClickListener {
+                    onItemClick(item.title)
+                }
 
             }
         }

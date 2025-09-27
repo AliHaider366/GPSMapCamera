@@ -1,9 +1,12 @@
 package com.example.gpsmapcamera.activities.template
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.TypedValue
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
@@ -39,6 +42,14 @@ class EditTemplateActivity : AppCompatActivity() {
         ActivityEditTemplateBinding.inflate(layoutInflater)
     }
 
+    // Activity Result Launcher
+    private val activityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                setUpTemplate()
+            }
+        }
+
 
     private val appViewModel by lazy {
         (applicationContext as MyApp).appViewModel
@@ -73,10 +84,19 @@ class EditTemplateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
 
         setUpTemplate()
         setUpViewPager()
+        clickListeners()
+    }
+
+
+    private fun clickListeners() = binding.run {
+        backBtn.setOnClickListener {
+            backPressedCallback.handleOnBackPressed()
+        }
     }
 
     private fun setUpViewPager() {
@@ -267,7 +287,6 @@ class EditTemplateActivity : AppCompatActivity() {
 
     }
 
-
     private fun setupClassicUI(allConfigs: List<StampConfig>) {
 
 
@@ -307,6 +326,18 @@ class EditTemplateActivity : AppCompatActivity() {
             classicTemplateBinding.ivLogo.gone()
         }
 
+    }
+
+    // Public helper for fragments
+    fun launchOtherActivity(context: Context, intent: Intent) {
+        activityLauncher.launch(intent)
+    }
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            setResult(RESULT_OK)
+            finish()
+        }
     }
 }
 
