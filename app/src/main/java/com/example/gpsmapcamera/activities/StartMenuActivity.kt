@@ -5,12 +5,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.gpsmapcamera.activities.PermissionActivity
 import com.example.gpsmapcamera.adapters.StartMenuAdapter
 import com.example.gpsmapcamera.databinding.ActivityStartMenuBinding
 import com.example.gpsmapcamera.fragments.StartMenuFragment1
 import com.example.gpsmapcamera.fragments.StartMenuFragment2
 import com.example.gpsmapcamera.fragments.StartMenuFragment3
 import com.example.gpsmapcamera.fragments.StartMenuFragment4
+import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
+import com.example.gpsmapcamera.utils.PrefManager.SECOND_SESSION
+import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
+import com.example.gpsmapcamera.utils.launchActivity
 
 
 class StartMenuActivity : AppCompatActivity() {
@@ -23,9 +28,7 @@ class StartMenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-
         init()
-
     }
 
     private fun init()=binding.apply {
@@ -41,7 +44,8 @@ class StartMenuActivity : AppCompatActivity() {
             if (nextItem < adapter.itemCount) {
                 binding.viewPager.currentItem = nextItem
             } else {
-//                binding.viewPager.currentItem = 0
+                saveBoolean(this@StartMenuActivity, SECOND_SESSION ,false)
+                launchActivity<CameraActivity> {  }
             }
         }
     }

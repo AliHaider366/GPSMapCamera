@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gpsmapcamera.adapters.LanguageAdapter
 import com.example.gpsmapcamera.databinding.ActivityLanguageBinding
+import com.example.gpsmapcamera.utils.launchActivity
 import com.example.mycam.models.Language
 
 class LanguageActivity : AppCompatActivity() {
@@ -36,6 +37,15 @@ class LanguageActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         init()
+
+        clickListeners()
+    }
+
+    private fun clickListeners() = binding.run {
+        btnApply.setOnClickListener {
+            launchActivity<OnBoardingActivity> {  }
+            finish()
+        }
     }
 
     private fun init()=binding.apply {

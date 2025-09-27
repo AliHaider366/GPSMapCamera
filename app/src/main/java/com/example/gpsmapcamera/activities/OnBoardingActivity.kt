@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.adapters.OnBoardingAdapter
 import com.example.gpsmapcamera.databinding.ActivityOnBoardingBinding
+import com.example.gpsmapcamera.utils.launchActivity
 import com.google.android.material.tabs.TabLayoutMediator
 
 class OnBoardingActivity : AppCompatActivity() {
@@ -31,6 +32,7 @@ class OnBoardingActivity : AppCompatActivity() {
             if (nextItem < adapter.itemCount) {
                 binding.viewPager.currentItem = nextItem
             } else {
+                launchActivity<PermissionActivity> {  }
 //                binding.viewPager.currentItem = 0
             }
         }

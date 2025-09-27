@@ -154,7 +154,7 @@ class PermissionActivity : AppCompatActivity() {
                 locationPermissionLauncher.launch(locationPermissions)
             }
             btnContinue.setOnClickListener {
-                saveBoolean(this@PermissionActivity,KEY_FIRST_TIME,true)
+                saveBoolean(this@PermissionActivity,KEY_FIRST_TIME,false)
                 launchActivity<CameraActivity> {  }
             }
         }

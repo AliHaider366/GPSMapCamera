@@ -1,5 +1,6 @@
 package com.example.gpsmapcamera.activities
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,9 +12,11 @@ import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.databinding.ActivitySplashBinding
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
+import com.example.gpsmapcamera.utils.PrefManager.SECOND_SESSION
 import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.launchActivity
 
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivitySplashBinding.inflate(layoutInflater)
@@ -23,14 +26,16 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (!getBoolean(this,KEY_FIRST_TIME))
+            if (getBoolean(this,KEY_FIRST_TIME, true))
             {
-                launchActivity<PermissionActivity> {  }
+                launchActivity<LanguageActivity> {  }
             }
-            else launchActivity<CameraActivity> {  }
-
+            else if (getBoolean(this, SECOND_SESSION, true))
+            {
+                launchActivity<StartMenuActivity> {  }
+            } else launchActivity<CameraActivity> {  }
             finish()
-        }, 2000) // 2000ms = 2 seconds
+        }, 5000) // 2000ms = 2 seconds
 
     }
 }
