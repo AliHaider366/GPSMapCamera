@@ -35,6 +35,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.text.Editable
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -48,6 +49,7 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -126,6 +128,24 @@ fun View.gone() {
 
 fun View.invisible() {
     this.visibility = View.INVISIBLE
+}
+fun View.setViewBackgroundDrawableRes(@DrawableRes drawableRes: Int) {
+    background = ContextCompat.getDrawable(context, drawableRes)
+}
+
+fun View.setSelectionState(
+    selectedCheckBox: CheckBox,
+    vararg others: Pair<View, CheckBox>
+) {
+    // Set selected item
+    setViewBackgroundDrawableRes(R.drawable.bg_language_item_selected)
+    selectedCheckBox.isChecked = true
+
+    // Set other items
+    others.forEach { (view, checkbox) ->
+        view.setViewBackgroundDrawableRes(R.drawable.bg_language_item)
+        checkbox.isChecked = false
+    }
 }
 
 fun Date.formatForFile(use24Hour: Boolean = false): String {
@@ -542,6 +562,15 @@ fun String.updateFileNameWithCurrentValues(
     }
 
     return parts.joinToString("_") + ".jpg"
+}
+
+
+fun TextView.enableMarquee()
+{
+    isSelected=true
+    isSingleLine=true
+    ellipsize= TextUtils.TruncateAt.MARQUEE
+    marqueeRepeatLimit=-1
 }
 
 

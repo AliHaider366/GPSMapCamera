@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+
+    <TextView
+        android:id="@+id/titleTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingHorizontal="@dimen/_20sdp"
+        android:text="@string/choose_your_default_photo_ratio"
+        android:paddingVertical="@dimen/_10sdp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_16sdp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:layout_marginTop="@dimen/_20sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/titleTv">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            >
+
+            <!--wide view-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/wideView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:background="@drawable/bg_language_item"
+                android:paddingVertical="@dimen/_10sdp"
+                >
+
+                <CheckBox
+                    android:id="@+id/checkboxWide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/custom_tick_checkbox_selector"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvWideDetail"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <TextView
+                    android:id="@+id/tvWide"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10sdp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/tvWideDetail"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/checkboxWide"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    android:text="@string/_16_9_wide" />
+
+                <TextView
+                    android:id="@+id/tvWideDetail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:textColor="@color/grey_g3"
+                    android:textSize="@dimen/_9sdp"
+                    app:layout_constraintEnd_toEndOf="@+id/tvWide"
+                    app:layout_constraintStart_toStartOf="@+id/tvWide"
+                    app:layout_constraintTop_toBottomOf="@+id/tvWide"
+                    android:text="@string/perfect_for_videos_and_cinematic_photos" />
+
+                <TextView
+                    android:id="@+id/widePreview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintWidth_percent="0.43"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_apply_button"
+                    android:backgroundTint="@color/grey_g4"
+                    android:paddingVertical="@dimen/_20sdp"
+                    android:text="@string/_16_9_preview"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/tvWideDetail"
+                    app:layout_constraintStart_toStartOf="@+id/tvWideDetail"
+                    app:layout_constraintTop_toBottomOf="@+id/tvWideDetail" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--standard view-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/standardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_15sdp"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:background="@drawable/bg_language_item"
+                android:paddingVertical="@dimen/_10sdp"
+                >
+
+                <CheckBox
+                    android:id="@+id/checkboxStandard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@drawable/custom_tick_checkbox_selector"
+                    app:layout_constraintBottom_toBottomOf="@+id/tvStandardDetail"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+
+                <TextView
+                    android:id="@+id/tvStandard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10sdp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toTopOf="@+id/tvStandardDetail"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/checkboxStandard"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed"
+                    android:text="@string/_4_3_standard" />
+
+                <TextView
+                    android:id="@+id/tvStandardDetail"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_2sdp"
+                    android:textColor="@color/grey_g3"
+                    android:textSize="@dimen/_9sdp"
+                    app:layout_constraintEnd_toEndOf="@+id/tvStandard"
+                    app:layout_constraintStart_toStartOf="@+id/tvStandard"
+                    app:layout_constraintTop_toBottomOf="@+id/tvStandard"
+                    android:text="@string/classic_photo_format_for_most_cameras" />
+
+                <TextView
+                    android:id="@+id/standardPreview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:background="@drawable/bg_apply_button"
+                    android:backgroundTint="@color/grey_g4"
+                    android:paddingHorizontal="@dimen/_15sdp"
+                    android:paddingVertical="@dimen/_20sdp"
+                    android:text="@string/_4_3_preview"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/tvStandardDetail"
+                    app:layout_constraintStart_toStartOf="@+id/tvStandardDetail"
+                    app:layout_constraintTop_toBottomOf="@+id/tvStandardDetail" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

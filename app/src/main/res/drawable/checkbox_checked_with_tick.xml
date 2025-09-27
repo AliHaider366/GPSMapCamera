@@ -1,0 +1,15 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Base circle (outer ring + fill) -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="@dimen/_15sdp" android:height="@dimen/_15sdp" />
+            <solid android:color="@color/blue" />
+        </shape>
+    </item>
+
+    <!-- Centered checkmark icon -->
+    <item
+        android:drawable="@drawable/ic_check_selected"
+        android:gravity="center" />
+</layer-list>

@@ -82,6 +82,10 @@ dependencies {
 
     implementation ("com.google.android.gms:play-services-location:21.3.0")
 
+    implementation ("com.github.murgupluoglu:flagkit-android:1.0.5")
+    implementation ("com.airbnb.android:lottie:6.3.0" )
+
+
 
 }
 

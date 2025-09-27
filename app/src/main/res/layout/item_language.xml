@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_8sdp"
+    android:layout_marginVertical="@dimen/_5sdp"
+    android:background="@drawable/bg_language_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingHorizontal="@dimen/_10sdp"
+    android:paddingVertical="@dimen/_12sdp"
+    >
+
+    <!-- Flag Image -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivFlag"
+        android:layout_width="@dimen/_45sdp"
+        android:layout_height="@dimen/_30sdp"
+        android:scaleType="centerCrop"
+        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Small"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+         />
+
+
+    <!-- Language Name -->
+    <TextView
+        android:id="@+id/tvLanguageName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_5sdp"
+        android:textColor="#1A1A1A"
+        android:textSize="@dimen/_10sdp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvNativeName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ivFlag"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="English (US)" />
+
+    <!-- Native Name -->
+    <TextView
+        android:id="@+id/tvNativeName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:textColor="#6B7280"
+        android:textSize="@dimen/_9sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/tvLanguageName"
+        app:layout_constraintStart_toStartOf="@+id/tvLanguageName"
+        app:layout_constraintTop_toBottomOf="@+id/tvLanguageName"
+        tools:text="English" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
