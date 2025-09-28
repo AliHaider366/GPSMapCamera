@@ -221,6 +221,7 @@ class FileNameAdapter(
                             getBoolean(context,KEY_CUSTOM_NAME_2_CHECK), getString(context,KEY_CUSTOM_NAME_2_VALUE)
                         )
 
+                        customName2DropdownEdittext.inputType=EditorInfo.TYPE_CLASS_TEXT
                         customName2DropdownEdittext.addTextChanged { text ->
                             if (item.isDropDownVisible==true)
                             {
@@ -243,6 +244,7 @@ class FileNameAdapter(
                             getBoolean(context,KEY_CUSTOM_NAME_3_CHECK), getString(context,KEY_CUSTOM_NAME_3_VALUE)
                         )
 
+                        customName3DropdownEdittext.inputType=EditorInfo.TYPE_CLASS_TEXT
                         customName3DropdownEdittext.addTextChanged { text ->
                             if (item.isDropDownVisible==true)
                             {
@@ -346,6 +348,8 @@ class FileNameAdapter(
                         setupTextItem(checkbox,noteEdittext,item, getBoolean(context,KEY_NOTE_CHECK),
                             getString(context,KEY_NOTE_VALUE)
                         )
+
+                        noteEdittext.inputType=EditorInfo.TYPE_CLASS_TEXT
                         noteEdittext.addTextChanged  { text ->
                             if (item.isDropDownVisible==true)
                             {

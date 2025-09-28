@@ -29,6 +29,8 @@ object PrefManager {
     const val KEY_FIRST_TIME  = "first_time"
     const val KEY_FILE_NAME  = "file_name"
     const val KEY_SHARE_IMAGE  = "share_image"
+    const val KEY_IMAGE_QUALITY  = "image_quality"
+    const val KEY_TOUCH_SETTING  = "touch_setting"
     /*file name activity*/
     const val KEY_DAY_CHECK  = "day_check"
     const val KEY_24HOURS_CHECK  = "24hours_check"

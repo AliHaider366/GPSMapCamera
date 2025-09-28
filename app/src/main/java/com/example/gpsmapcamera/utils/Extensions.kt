@@ -13,6 +13,7 @@ import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -39,9 +40,6 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.PixelCopy
-import android.view.SurfaceView
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
@@ -53,6 +51,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -64,18 +63,19 @@ import androidx.annotation.DrawableRes
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.TextViewCompat
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.FragmentManager
 import androidx.viewbinding.ViewBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.adapters.DropdownMenuAdapter
 import com.example.gpsmapcamera.models.AddressLineModel
 import com.example.gpsmapcamera.models.AddressModel
 import com.example.gpsmapcamera.models.FullAddress
@@ -93,7 +93,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.openlocationcode.OpenLocationCode
-import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -502,6 +501,18 @@ fun Context.shareImage(imageUri: Uri, message: String = "Check out this photo I 
     startActivity(chooser)
 }
 
+fun Context.shareApp(appName: String = "my app") {
+    val packageName = this.packageName
+    val shareText = "Check out $appName: https://play.google.com/store/apps/details?id=$packageName"
+
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_SUBJECT, appName)
+        putExtra(Intent.EXTRA_TEXT, shareText)
+    }
+    startActivity(Intent.createChooser(intent, "Share via"))
+}
+
 fun getPlusCode(latitude: Double, longitude: Double): String {
     return OpenLocationCode.encode(latitude, longitude)
 }
@@ -515,6 +526,37 @@ inline fun <reified T : Activity> Context.launchActivity(
         extras?.invoke(this)
     }
     startActivity(intent)
+}
+
+
+fun TextView.showDropdownMenu(
+    items: List<String>,
+    onItemSelected: (String) -> Unit
+) {
+    val displayMetrics = Resources.getSystem().displayMetrics
+    val menuWidth = displayMetrics.widthPixels / 2
+
+    val popupView = LayoutInflater.from(context).inflate(R.layout.dropdown_menu, null)
+    val recyclerView = popupView.findViewById<RecyclerView>(R.id.dropdownRecycler)
+
+    val popupWindow = PopupWindow(
+        popupView,
+        menuWidth,
+        WindowManager.LayoutParams.WRAP_CONTENT,
+        true
+    )
+
+    recyclerView.layoutManager = LinearLayoutManager(context)
+    recyclerView.adapter = DropdownMenuAdapter(items) { selected ->
+        text = selected           // update the TextView text
+        onItemSelected(selected)  // return value to caller
+        popupWindow.dismiss()
+    }
+
+    popupWindow.isOutsideTouchable = true
+    popupWindow.elevation = 8f
+
+    popupWindow.showAsDropDown(this)
 }
 
 fun TextView.setDrawable(

@@ -239,5 +239,11 @@
     <string name="vintage">Vintage</string>
     <string name="bold">Bold</string>
     <string name="select_your_preferred_stamp_template">Select your preferred stamp template</string>
+    <string name="timer_3sec">Timer 3sec</string>
+    <string name="timer_5sec">Timer 5sec</string>
+    <string name="version">Version %1$s</string>
+    <string name="low">Low</string>
+    <string name="high">High</string>
+    <string name="photo_capture">Photo Capture</string>
 
 </resources>

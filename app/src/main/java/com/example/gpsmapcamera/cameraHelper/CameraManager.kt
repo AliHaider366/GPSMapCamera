@@ -50,12 +50,14 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.example.gpsmapcamera.BuildConfig
+import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.enums.ImageFormat
 import com.example.gpsmapcamera.enums.ImageQuality
 import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FOLDER_NAME
+import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_WHITE_BALANCE
 import com.example.gpsmapcamera.utils.PrefManager.getInt
 import com.example.gpsmapcamera.utils.PrefManager.getString
@@ -75,20 +77,21 @@ import java.util.Locale
 
 class CameraManager(
     private val context: Context,
-    private val previewView: PreviewView,
+    val previewView: PreviewView,
 
     )
 {
     private val appViewModel=(context.applicationContext as MyApp).appViewModel
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
-    private var camera: Camera? = null
+    var camera: Camera? = null
     private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-    private var flashEnabled = false
+//    private var flashEnabled = false
+    private var flashEnabled = 0
     private var aspectRatio: Int = AspectRatio.RATIO_4_3
     private var captureSoundEnabled = true
     private var isMirrorEnabled = false
-    private val tapCapture=false
+    private var tapCapture=false
     var selectedQuality: ImageQuality = ImageQuality.HIGH // default
     private var activeRecording: Recording? = null
     private var currentZoom=0.0f
@@ -127,6 +130,10 @@ class CameraManager(
 
     fun setMirror(enabled: Boolean) {
         isMirrorEnabled = enabled
+    }
+
+    fun setTapCapture(capture: Boolean) {
+        tapCapture = capture
     }
 
     fun setAspectRatio(ratio: Int) {
@@ -177,11 +184,18 @@ class CameraManager(
         startCamera()
     }
 
-    fun toggleFlash(isFlashEnabled:Boolean) {
+    fun toggleFlash(isFlashEnabled:Int) {
         flashEnabled = isFlashEnabled
         if (imageCapture != null)
         {
-            imageCapture?.setFlashMode(if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
+//            imageCapture?.setFlashMode(if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
+            imageCapture?.setFlashMode(when(flashEnabled){
+                0-> ImageCapture.FLASH_MODE_OFF
+                1-> ImageCapture.FLASH_MODE_ON
+                2-> ImageCapture.FLASH_MODE_AUTO
+                else -> ImageCapture.FLASH_MODE_OFF
+            })
+
         }
         else startCamera()
     }
@@ -315,7 +329,7 @@ class CameraManager(
             .start()
     }
 
-    fun startCamera(onStarted: (() -> Unit)?=null) {
+    fun startCamera(imageQuality:ImageQuality?=null,onStarted: (() -> Unit)?=null) {
 
         if (isQRCodeEnabled && qrCodeAnalyzer != null) {
             qrImageAnalysis = ImageAnalysis.Builder()
@@ -341,6 +355,9 @@ class CameraManager(
                     it.setSurfaceProvider(previewView.surfaceProvider)
                 }
 
+            if (imageQuality != null) {
+                selectedQuality=imageQuality
+            }
             imageCapture=buildImageCapture(flashEnabled,selectedQuality,aspectRatio)
 
             // Recorder with quality
@@ -573,7 +590,7 @@ class CameraManager(
     }
 
     fun buildImageCapture(
-        flashEnabled: Boolean,
+        flashEnabled: Int,
         quality: ImageQuality,
         aspectRatio: Int
     ): ImageCapture {
@@ -591,7 +608,13 @@ class CameraManager(
             .build()
 
         return ImageCapture.Builder()
-            .setFlashMode(if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
+//            .setFlashMode(if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
+            .setFlashMode(when(flashEnabled){
+                0-> ImageCapture.FLASH_MODE_OFF
+                1-> ImageCapture.FLASH_MODE_ON
+                2-> ImageCapture.FLASH_MODE_AUTO
+                else -> ImageCapture.FLASH_MODE_OFF
+            })
             .setResolutionSelector(resolutionSelector)
             .build()
     }
@@ -611,7 +634,7 @@ class CameraManager(
             .build()
     }
 
-    fun setupTouchControls(onTap:()->Unit) {
+    fun setupTouchControls(onTap:(x: Float, y: Float)->Unit) {
         val scaleGestureDetector = ScaleGestureDetector(context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector): Boolean {
                 val zoom = camera?.cameraInfo?.zoomState?.value?.zoomRatio ?: 1f
@@ -625,9 +648,9 @@ class CameraManager(
 
             if (event.pointerCount == 1 && event.action == MotionEvent.ACTION_DOWN) {
 
-                onTap()
+                onTap(event.x, event.y) // pass tap coords
 
-                if (tapCapture)
+              /*  if (tapCapture)
                 {
                     takePhoto {
                         Toast.makeText(context, "Saved: it", Toast.LENGTH_SHORT).show()
@@ -638,7 +661,7 @@ class CameraManager(
                     val point = previewView.meteringPointFactory.createPoint(event.x, event.y)
                     val action = FocusMeteringAction.Builder(point).build()
                     camera?.cameraControl?.startFocusAndMetering(action)
-                }
+                }*/
 
             }
             true

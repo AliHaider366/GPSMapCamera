@@ -2,9 +2,14 @@ package com.example.gpsmapcamera.adapters
 
 import android.app.Application
 import android.content.Context
+import android.content.res.ColorStateList
+import android.graphics.Typeface
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gpsmapcamera.R
@@ -12,12 +17,14 @@ import com.example.gpsmapcamera.databinding.SettingAboutItemBinding
 import com.example.gpsmapcamera.databinding.SettingFeatureItemBinding
 import com.example.gpsmapcamera.databinding.SettingGeneralItemBinding
 import com.example.gpsmapcamera.databinding.SettingHeadingItemBinding
+import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
 import com.example.gpsmapcamera.utils.setDrawable
 import com.example.mycam.models.SettingsModel
 
 class SettingsAdapter(
     val userList: MutableList<SettingsModel>,
-    val onItemClick : (String) -> Unit
+    val onItemClick : (String) -> Unit,
+    val onMenuClick : (TextView,String) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 
@@ -102,13 +109,27 @@ class SettingsAdapter(
 
     // ─────────────── ViewHolders ───────────────
 
-    class HeadingViewHolder(private val binding: SettingHeadingItemBinding) :
+    inner class HeadingViewHolder(private val binding: SettingHeadingItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
 
         fun bind(item: SettingsModel.Heading) {
             binding.apply {
+                val context=root.context
                 headingName.text=item.heading
+
+                if (position==userList.lastIndex)
+                {
+                    headingName.gravity=Gravity.CENTER
+                    headingName.setCompoundDrawableTintAndTextColor(
+                       textColorRes =  R.color.grey_g3
+                    )
+                    headingName.setTypeface(null, Typeface.NORMAL) // normal
+                    headingName.setTextSize(
+                        TypedValue.COMPLEX_UNIT_PX,
+                        context.resources.getDimension(com.intuit.sdp.R.dimen._12sdp)
+                    )
+                }
             }
         }
     }
@@ -129,6 +150,9 @@ class SettingsAdapter(
 
                 root.setOnClickListener {
                     onItemClick(item.title)
+                }
+                selectedOptionName.setOnClickListener {
+                    onMenuClick(selectedOptionName,item.title)
                 }
 
             }
@@ -165,6 +189,9 @@ class SettingsAdapter(
                     .into(icon)
                 itemName.text=item.title
 
+                root.setOnClickListener {
+                    onItemClick(item.title)
+                }
             }
 
         }

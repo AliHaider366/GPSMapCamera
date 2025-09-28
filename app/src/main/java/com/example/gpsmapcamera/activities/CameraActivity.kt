@@ -8,14 +8,13 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
 import android.widget.SeekBar
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
+import androidx.camera.core.FocusMeteringAction
 import androidx.camera.view.PreviewView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
@@ -28,10 +27,13 @@ import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampReportingTemplateLayoutBinding
+import com.example.gpsmapcamera.enums.ImageQuality
 import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.models.StampConfig
 import com.example.gpsmapcamera.models.StampItemName
 import com.example.gpsmapcamera.models.StampPosition
+import com.example.gpsmapcamera.interfaces.CameraSettingsListener
+import com.example.gpsmapcamera.objects.CameraSettingsNotifier
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
@@ -44,10 +46,13 @@ import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_RATIO
 import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_TIMER
 import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_TIMER_VALUE
 import com.example.gpsmapcamera.utils.PrefManager.KEY_CAPTURE_SOUND
+import com.example.gpsmapcamera.utils.PrefManager.KEY_IMAGE_QUALITY
 import com.example.gpsmapcamera.utils.PrefManager.KEY_SHARE_IMAGE
+import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_WHITE_BALANCE
 import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.PrefManager.getInt
+import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.PrefManager.saveInt
 import com.example.gpsmapcamera.utils.StampPreferences
@@ -57,7 +62,6 @@ import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
 import com.example.gpsmapcamera.utils.isPermissionGranted
 import com.example.gpsmapcamera.utils.launchActivity
-import com.example.gpsmapcamera.utils.loadGoogleMap
 import com.example.gpsmapcamera.utils.loadStaticMap
 import com.example.gpsmapcamera.utils.openAppSettings
 import com.example.gpsmapcamera.utils.openLatestImageFromFolder
@@ -72,7 +76,6 @@ import com.example.gpsmapcamera.utils.setImage
 import com.example.gpsmapcamera.utils.setStampPosition
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setTextColorRes
-import com.example.gpsmapcamera.utils.setTintColor
 import com.example.gpsmapcamera.utils.setUpMapPositionForAdvancedTemplate
 import com.example.gpsmapcamera.utils.setUpMapPositionForClassicTemplate
 import com.example.gpsmapcamera.utils.setUpMapPositionForReportingTemplate
@@ -80,8 +83,9 @@ import com.example.gpsmapcamera.utils.shareImage
 import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
+import java.util.concurrent.TimeUnit
 
-class CameraActivity : AppCompatActivity() {
+class CameraActivity : AppCompatActivity(), CameraSettingsListener {
     private val binding by lazy {
         ActivityCameraBinding.inflate(layoutInflater)
     }
@@ -155,6 +159,8 @@ class CameraActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        CameraSettingsNotifier.listener = this
         enableEdgeToEdge()
         hideSystemBars()
         checkAndRequestGps(gpsResolutionLauncher)
@@ -165,6 +171,15 @@ class CameraActivity : AppCompatActivity() {
 
     private fun init() = binding.apply {
         setUpTemplate()
+
+        val imageCaptureQuality = when(getString(this@CameraActivity, KEY_IMAGE_QUALITY,getString(R.string.high)))
+        {
+            getString(R.string.low)-> ImageQuality.LOW
+            getString(R.string.medium)->ImageQuality.MEDIUM
+            getString(R.string.high)-> ImageQuality.HIGH
+            else -> {ImageQuality.HIGH}
+        }
+
         cameraManager = CameraManager(this@CameraActivity, previewView)
 
         micPermissionLauncher = registerPermissionLauncher(
@@ -184,7 +199,7 @@ class CameraActivity : AppCompatActivity() {
             registerMultiplePermissionsLauncher(
                 permissions = PERMISSIONS,
                 onGranted = {
-                    cameraManager.startCamera {
+                    cameraManager.startCamera(imageQuality = imageCaptureQuality) {
                         //set camera values after start
                         cameraManager.setBrightness(
                             getInt(
@@ -194,19 +209,8 @@ class CameraActivity : AppCompatActivity() {
                             )
                         )
                     }
-                    cameraManager.setupTouchControls {
-                        if (binding.detailTopMenuView.isVisible) {
-                            binding.detailTopMenuView.visibility = View.GONE
-                            binding.defaultTopMenuView.visibility = View.VISIBLE
+                    setupCameraTouch()
 
-                            // hide brightness bar if shown
-                            brightnessBarView.gone()
-                            brightnessBtn.setCompoundDrawableTintAndTextColor(
-                                R.color.white,
-                                R.color.white
-                            )
-                        }
-                    }
                     setInitialStates()
                 },
                 onDenied = { permanentlyDenied ->
@@ -218,20 +222,13 @@ class CameraActivity : AppCompatActivity() {
                 }
             )
         } else {
-            cameraManager.startCamera {
+            cameraManager.startCamera(imageQuality = imageCaptureQuality ) {
                 //set camera values after start
                 cameraManager.setBrightness(getInt(this@CameraActivity, KEY_WHITE_BALANCE, 40))
 
             }
-            cameraManager.setupTouchControls {
-                if (binding.detailTopMenuView.isVisible) {
-                    binding.detailTopMenuView.visibility = View.GONE
-                    binding.defaultTopMenuView.visibility = View.VISIBLE
-                    // hide brightness bar if shown
-                    brightnessBarView.gone()
-                    brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
-                }
-            }
+            setupCameraTouch()
+
             setInitialStates()
             appViewModel.getLocation()
         }
@@ -288,27 +285,56 @@ class CameraActivity : AppCompatActivity() {
             }
         }
 
-        if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
+    /*    if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
             flashBtn.setTintColor(R.color.blue)
             cameraManager.toggleFlash(true)
+        }*/
+
+        when(getInt(this@CameraActivity, KEY_CAMERA_FLASH,0))
+        {
+            0->{
+                flashBtn.setImage(R.drawable.flash_off_ic)
+                cameraManager.toggleFlash(0)  /*flash off*/
+            }
+            1->{
+                flashBtn.setImage(R.drawable.flash_on_ic)
+                cameraManager.toggleFlash(1) /*flash on*/
+
+            }
+            2->{
+                flashBtn.setImage(R.drawable.flash_auto_ic)
+                cameraManager.toggleFlash(2) /*flash auto*/
+
+            }
         }
+
 
         if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
             when (getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE)) {
                 0 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+//                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.white)
+                    timerBtn.setDrawable(top = R.drawable.timer_ic)
+                    timerBtn.text=getString(R.string.timer_off)
+
 //                    saveCameraTimer(this@CameraActivity,0,false)
 //                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,false)
 //                    saveInt(this@CameraActivity,KEY_CAMERA_TIMER_VALUE,0)
                 }
 
                 3 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+//                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setDrawable(top = R.drawable.timer_3s_ic)
+                    timerBtn.text= getString(R.string.timer_3sec)
 //                    saveCameraTimer(this@CameraActivity,3,true)
                 }
 
                 5 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red, R.color.red)
+//                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red, R.color.red)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setDrawable(top = R.drawable.timer_5sec_ic)
+                    timerBtn.text= getString(R.string.timer_5sec)
 //                    saveCameraTimer(this@CameraActivity,5,true)
                 }
             }
@@ -347,15 +373,19 @@ class CameraActivity : AppCompatActivity() {
         }
 
         pickGalleyBtn.setOnClickListener {
-            launchActivity<SavedPathActivity> { }
+
         }
 
         fileNameBtn.setOnClickListener {
+            launchActivity<SavedPathActivity> { }
+        }
+
+        textBtn.setOnClickListener {
             launchActivity<FileNameActivity> { }
         }
 
         flashBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
+   /*         if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
                 flashBtn.setTintColor(R.color.white)
                 saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, false)
                 cameraManager.toggleFlash(false)
@@ -363,6 +393,27 @@ class CameraActivity : AppCompatActivity() {
                 flashBtn.setTintColor(R.color.blue)
                 saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, true)
                 cameraManager.toggleFlash(true)
+            }*/
+
+            when(getInt(this@CameraActivity, KEY_CAMERA_FLASH,0))
+            {
+                0->{
+                    flashBtn.setImage(R.drawable.flash_on_ic)
+                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 1)
+                    cameraManager.toggleFlash(1)  /*flash on*/
+                }
+                1->{
+                    flashBtn.setImage(R.drawable.flash_auto_ic)
+                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+                    cameraManager.toggleFlash(2) /*flash auto*/
+
+                }
+                2->{
+                    flashBtn.setImage(R.drawable.flash_off_ic)
+                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
+                    cameraManager.toggleFlash(0) /*flash off*/
+
+                }
             }
         }
 
@@ -398,21 +449,29 @@ class CameraActivity : AppCompatActivity() {
         timerBtn.setOnClickListener {
             when (getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE)) {
                 0 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setDrawable(top = R.drawable.timer_3s_ic)
+                    timerBtn.text=getString(R.string.timer_3sec)
+
 //                    saveCameraTimer(this@CameraActivity,3,true)
                     saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, true)
                     saveInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE, 3)
                 }
 
                 3 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red, R.color.red)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setDrawable(top = R.drawable.timer_5sec_ic)
+                    timerBtn.text=getString(R.string.timer_5sec)
+
 //                    saveCameraTimer(this@CameraActivity,5,true)
                     saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, true)
                     saveInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE, 5)
                 }
 
                 5 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.white)
+                    timerBtn.setDrawable(top = R.drawable.timer_ic)
+                    timerBtn.text=getString(R.string.timer_off)
 //                    saveCameraTimer(this@CameraActivity,0,false)
                     saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, false)
                     saveInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE, 0)
@@ -649,8 +708,69 @@ class CameraActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupCameraTouch()=binding.apply{
+        cameraManager.setupTouchControls { x, y ->
+            if (binding.detailTopMenuView.isVisible) {
+                binding.detailTopMenuView.visibility = View.GONE
+                binding.defaultTopMenuView.visibility = View.VISIBLE
+
+                // hide brightness bar if shown
+                brightnessBarView.gone()
+                brightnessBtn.setCompoundDrawableTintAndTextColor(
+                    R.color.white,
+                    R.color.white
+                )
+            }
+            else
+            {
+                when(getString(this@CameraActivity,KEY_TOUCH_SETTING,getString(R.string.focus)))
+                {
+                    getString(R.string.focus)->{
+                        val point = cameraManager.previewView.meteringPointFactory.createPoint(x, y)
+                        val action = FocusMeteringAction.Builder(point)
+                            .setAutoCancelDuration(3, TimeUnit.SECONDS)
+                            .build()
+                        cameraManager.camera?.cameraControl?.startFocusAndMetering(action)
+                    }
+                    getString(R.string.photo_capture)->{
+
+                        if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
+
+                            cameraManager.takePhotoWithTimer(
+                                getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
+                                binding.timmerTV,
+                                stampContainer,// pass your overlay container
+                                selectedStampPosition
+                            ) { uri ->
+                                uri?.let {
+                                    val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                                    intent.putExtra("image_uri", it.toString())
+                                    if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                                        shareImage(it)
+                                    }
+                                }
+                            }
+                        } else {
+                            cameraManager.takePhotoWithStamp(stampContainer, selectedStampPosition) { uri ->
+                                if (uri != null) {
+                                    if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                                        shareImage(uri)
+                                    }
+                                }
+
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+    }
+
     private fun setUpTemplate() {
-        selectedTemplate = PrefManager.getString(
+        selectedTemplate = getString(
             this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
             Constants.CLASSIC_TEMPLATE
         )
@@ -683,7 +803,7 @@ class CameraActivity : AppCompatActivity() {
             templateAdapterRight.submitList(rightItems as ArrayList)
 
 
-            val templateType = PrefManager.getString(
+            val templateType = getString(
                 this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
                 Constants.CLASSIC_TEMPLATE
             )
@@ -967,6 +1087,10 @@ class CameraActivity : AppCompatActivity() {
         super.onPause()
         binding.detailTopMenuView.gone()
         binding.defaultTopMenuView.visible()
+    }
+
+    override fun onQualityChanged(newQuality: ImageQuality) {
+        cameraManager.startCamera(newQuality)
     }
 
 }

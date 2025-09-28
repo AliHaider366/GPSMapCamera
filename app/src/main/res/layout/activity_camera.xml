@@ -138,7 +138,7 @@
                 android:layout_height="@dimen/_28sdp"
                 android:padding="@dimen/_5sdp"
                 android:layout_weight="1"
-                android:src="@drawable/flash_ic"
+                android:src="@drawable/flash_on_ic"
                  />
 
             <ImageView
