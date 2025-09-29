@@ -53,6 +53,26 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
 
+    <!--video record timmer textview-->
+    <TextView
+        android:id="@+id/videoTimmerTV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:text="00:00:00"
+        android:visibility="gone"
+        android:background="@drawable/bg_radius_20"
+        android:backgroundTint="@color/red_r2"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:paddingVertical="@dimen/_5sdp"
+        app:layout_constraintVertical_bias="0.05"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/zoom_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/defaultTopMenuView" />
+
+
     <!--timmer textview-->
     <TextView
         android:id="@+id/timmerTV"
@@ -65,6 +85,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/defaultTopMenuView" />
+
     <!--brightness bar-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/brightnessBarView"

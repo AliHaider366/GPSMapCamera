@@ -23,6 +23,7 @@ import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.adapters.StampAdapter
 import com.example.gpsmapcamera.adapters.StampCenterAdapter
 import com.example.gpsmapcamera.cameraHelper.CameraManager
+import com.example.gpsmapcamera.cameraHelper.RecordingTimer
 import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
@@ -84,6 +85,7 @@ import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 import java.util.concurrent.TimeUnit
+import androidx.core.view.isGone
 
 class CameraActivity : AppCompatActivity(), CameraSettingsListener {
     private val binding by lazy {
@@ -93,6 +95,8 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
     private val templateAdapterBottom = StampAdapter()
     private val templateAdapterCenter = StampCenterAdapter()
     private val templateAdapterRight = StampAdapter()
+
+    lateinit var recordingTimer: RecordingTimer
 
     private val classicTemplateBinding by lazy {
         StampClassicTemplateLayoutBinding.inflate(layoutInflater)
@@ -171,6 +175,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
 
     private fun init() = binding.apply {
         setUpTemplate()
+        recordingTimer = RecordingTimer(videoTimmerTV)
 
         val imageCaptureQuality = when(getString(this@CameraActivity, KEY_IMAGE_QUALITY,getString(R.string.high)))
         {
@@ -583,9 +588,11 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
 
         videoRecordBtn.setOnClickListener {
             videoStopBtn.visible()
+            videoTimmerTV.visible()
             videoRecordBtn.gone()
             cameraManager.startVideoRecording(
                 onStarted = {
+                    recordingTimer.start()
 
                 },
                 onSaved = { uri ->
@@ -600,7 +607,10 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
 
         videoStopBtn.setOnClickListener {
             cameraManager.stopVideoRecording()
+            recordingTimer.stop()
+
             videoStopBtn.gone()
+            videoTimmerTV.gone()
             videoRecordBtn.visible()
         }
 
@@ -733,31 +743,35 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
                         cameraManager.camera?.cameraControl?.startFocusAndMetering(action)
                     }
                     getString(R.string.photo_capture)->{
+                        if (binding.videoRecordBtn.isGone && binding.videoStopBtn.isGone)
+                        {
+                            /// only allow touch capture when in photo mode not in record
 
-                        if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
+                            if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
 
-                            cameraManager.takePhotoWithTimer(
-                                getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
-                                binding.timmerTV,
-                                stampContainer,// pass your overlay container
-                                selectedStampPosition
-                            ) { uri ->
-                                uri?.let {
-                                    val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
-                                    intent.putExtra("image_uri", it.toString())
-                                    if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
-                                        shareImage(it)
+                                cameraManager.takePhotoWithTimer(
+                                    getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
+                                    binding.timmerTV,
+                                    stampContainer,// pass your overlay container
+                                    selectedStampPosition
+                                ) { uri ->
+                                    uri?.let {
+                                        val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                                        intent.putExtra("image_uri", it.toString())
+                                        if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                                            shareImage(it)
+                                        }
                                     }
                                 }
-                            }
-                        } else {
-                            cameraManager.takePhotoWithStamp(stampContainer, selectedStampPosition) { uri ->
-                                if (uri != null) {
-                                    if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
-                                        shareImage(uri)
+                            } else {
+                                cameraManager.takePhotoWithStamp(stampContainer, selectedStampPosition) { uri ->
+                                    if (uri != null) {
+                                        if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                                            shareImage(uri)
+                                        }
                                     }
-                                }
 
+                                }
                             }
                         }
 
