@@ -29,23 +29,29 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <ImageView
             android:id="@+id/back_btn"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:padding="@dimen/_6sdp"
+            android:elevation="@dimen/_50sdp"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:background="@drawable/bg_radius_5"
+            android:backgroundTint="@color/white"
             android:src="@drawable/back_ic"
-            android:padding="@dimen/_4sdp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/grey_g3" />
+            />
         <View
             android:layout_width="wrap_content"
             android:layout_height="@dimen/_1sdp"
-            android:background="@color/grey_g3"
+            android:background="@color/grey_g4"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

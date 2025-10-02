@@ -453,7 +453,7 @@ fun Context.openLatestImageFromFolder(folderPath: String) {
             val mimeType = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) "video/*" else "image/*"
             val baseIntent = Intent(Intent.ACTION_VIEW).apply {
 //                setDataAndType(contentUri, "image/*")
-                setDataAndType(contentUri, "image/*")
+                setDataAndType(contentUri, mimeType)
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
 

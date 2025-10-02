@@ -87,7 +87,11 @@ class PermissionActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.apply {
-            btnContinue.isEnabled = areAllPermissionsGranted()
+            backBtn.setOnClickListener {
+            finish()
+            }
+
+            enableContinueButtonState()
 
             cameraPermissionLauncher = registerPermissionLauncher(
                 Manifest.permission.CAMERA,

@@ -19,7 +19,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
             <androidx.camera.view.PreviewView
                 android:id="@+id/previewView"
                 android:layout_width="match_parent"
@@ -29,13 +28,15 @@
                 app:implementationMode="performance"
             app:scaleType="fillCenter" />
             <!-- app:implementationMode="compatible"-->
+
+            <com.example.gpsmapcamera.cameraHelper.GridOverlayView
+                android:id="@+id/gridOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                />
         </FrameLayout>
-        <com.example.gpsmapcamera.cameraHelper.GridOverlayView
-            android:id="@+id/gridOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            />
+
         <com.example.gpsmapcamera.cameraHelper.LevelView
             android:id="@+id/cameraLevel"
             android:layout_width="match_parent"
@@ -129,9 +130,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="6"
+            android:weightSum="5"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/black"
+            android:background="@color/dim_black"
             android:paddingVertical="@dimen/_8sdp"
            >
 
@@ -150,6 +151,7 @@
                 android:layout_height="@dimen/_28sdp"
                 android:padding="@dimen/_5sdp"
                 android:layout_weight="1"
+                android:visibility="gone"
                 android:src="@drawable/text_ic"
                 />
 
@@ -228,7 +230,7 @@
                     android:id="@+id/grid_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/grid_ic"
+                    android:drawableTop="@drawable/grid_3_ic"
                     android:drawablePadding="@dimen/_5sdp"
                     android:text="@string/grid"
                     android:gravity="center"
@@ -380,6 +382,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/dim_black"
+            android:paddingHorizontal="@dimen/_5sdp"
             app:layout_constraintBottom_toTopOf="@+id/bottomBtnsView">
 
             <ImageView
@@ -448,7 +451,7 @@
                 android:id="@+id/bottomBtnsView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/black"
+                android:background="@color/dim_black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent">
@@ -456,6 +459,7 @@
                     android:id="@+id/capture_btn"
                     android:layout_width="@dimen/_90sdp"
                     android:layout_height="0dp"
+                    android:visibility="visible"
                     android:src="@drawable/capture_btn_ic"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintDimensionRatio="w,1:1.2"
@@ -492,16 +496,27 @@
                 <!--video record btn-->
                 <ImageView
                     android:id="@+id/video_record_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/_90sdp"
+                    android:layout_height="0dp"
+                    android:src="@drawable/capture_in_video_ic"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/capture_btn"
+                    app:layout_constraintEnd_toEndOf="@+id/capture_btn"
+                    app:layout_constraintStart_toStartOf="@+id/capture_btn"
+                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />
+                <ImageView
+                    android:id="@+id/video_stop_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
                     android:src="@drawable/video_start_btn"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/capture_btn"
+                    android:translationY="@dimen/_4sdp"
+                    app:layout_constraintBottom_toBottomOf="@+id/capture_btn"
+                    app:layout_constraintEnd_toEndOf="@+id/capture_btn"
+                    app:layout_constraintStart_toStartOf="@+id/capture_btn"
                     app:layout_constraintTop_toTopOf="@+id/capture_btn" />
                 <!--video record btn-->
-                <ImageView
+              <!--  <ImageView
                     android:id="@+id/video_stop_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -510,7 +525,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/capture_btn"
-                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />
+                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />-->
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

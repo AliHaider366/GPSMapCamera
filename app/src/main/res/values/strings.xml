@@ -245,5 +245,8 @@
     <string name="low">Low</string>
     <string name="high">High</string>
     <string name="photo_capture">Photo Capture</string>
+    <string name="grid_3_3">Grid 3*3</string>
+    <string name="grid_4_4">Grid 4*4</string>
+    <string name="grid_phi">Grid PHI</string>
 
 </resources>

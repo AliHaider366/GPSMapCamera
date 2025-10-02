@@ -86,6 +86,8 @@ import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 import java.util.concurrent.TimeUnit
 import androidx.core.view.isGone
+import com.example.gpsmapcamera.utils.invisible
+import com.example.gpsmapcamera.utils.setTintColor
 
 class CameraActivity : AppCompatActivity(), CameraSettingsListener {
     private val binding by lazy {
@@ -229,7 +231,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         } else {
             cameraManager.startCamera(imageQuality = imageCaptureQuality ) {
                 //set camera values after start
-                cameraManager.setBrightness(getInt(this@CameraActivity, KEY_WHITE_BALANCE, 40))
+                cameraManager.setBrightness(getInt(this@CameraActivity, KEY_WHITE_BALANCE, 0))
 
             }
             setupCameraTouch()
@@ -240,8 +242,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
 
         setClickListeners()
 
-        brightnessValue =
-            getInt(this@CameraActivity, KEY_WHITE_BALANCE, 40)        // set initial brightness
+        brightnessValue =  getInt(this@CameraActivity, KEY_WHITE_BALANCE, 0)        // set initial brightness
         brightnessBar.max = 80
         brightnessBar.progress = brightnessValue + 40
         progressText.text = brightnessValue.toString()
@@ -272,11 +273,45 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         } else cameraLevel.setLevelEnabled(false)
 
 
-        if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
+/*        if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
             gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             gridOverlay.updateGrid(true, 4)
         } else
-            gridOverlay.updateGrid(false, 0)
+            gridOverlay.updateGrid(false, 0)*/
+
+        when(getInt(this@CameraActivity, KEY_CAMERA_GRID))
+        {
+            0->{
+                saveInt(this@CameraActivity,KEY_CAMERA_GRID,0)
+                gridBtn.setDrawable(top = R.drawable.grid_3_ic)
+                gridBtn.text=getString(R.string.grid)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                gridOverlay.updateGrid(true,0)
+
+            }
+            3->{
+                saveInt(this@CameraActivity,KEY_CAMERA_GRID,3)
+                gridBtn.setDrawable(top = R.drawable.grid_3_ic)
+                gridBtn.text=getString(R.string.grid_3_3)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                gridOverlay.updateGrid(true,3)
+            }
+            4->{
+                saveInt(this@CameraActivity,KEY_CAMERA_GRID,4)
+                gridBtn.setDrawable(top = R.drawable.grid_4_ic)
+                gridBtn.text=getString(R.string.grid_4_4)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                gridOverlay.updateGrid(true,4)
+            }
+            -3->{
+                saveInt(this@CameraActivity,KEY_CAMERA_GRID,-3)
+                gridBtn.setDrawable(top = R.drawable.phi_grid_ic)
+                gridBtn.text=getString(R.string.grid_phi)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                gridOverlay.updateGrid(true,3,true)
+            }
+        }
+
 
         when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)) {
             16 -> {
@@ -299,15 +334,18 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         {
             0->{
                 flashBtn.setImage(R.drawable.flash_off_ic)
+                flashBtn.setTintColor(  R.color.white)
                 cameraManager.toggleFlash(0)  /*flash off*/
             }
             1->{
                 flashBtn.setImage(R.drawable.flash_on_ic)
+                flashBtn.setTintColor(  R.color.blue)
                 cameraManager.toggleFlash(1) /*flash on*/
 
             }
             2->{
                 flashBtn.setImage(R.drawable.flash_auto_ic)
+                flashBtn.setTintColor( R.color.blue)
                 cameraManager.toggleFlash(2) /*flash auto*/
 
             }
@@ -378,7 +416,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         }
 
         pickGalleyBtn.setOnClickListener {
-
+            launchActivity<FileNameActivity> { }
         }
 
         fileNameBtn.setOnClickListener {
@@ -386,7 +424,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         }
 
         textBtn.setOnClickListener {
-            launchActivity<FileNameActivity> { }
+
         }
 
         flashBtn.setOnClickListener {
@@ -404,17 +442,20 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
             {
                 0->{
                     flashBtn.setImage(R.drawable.flash_on_ic)
+                    flashBtn.setTintColor(  R.color.blue)
                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 1)
                     cameraManager.toggleFlash(1)  /*flash on*/
                 }
                 1->{
                     flashBtn.setImage(R.drawable.flash_auto_ic)
+                    flashBtn.setTintColor(  R.color.blue)
                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
                     cameraManager.toggleFlash(2) /*flash auto*/
 
                 }
                 2->{
                     flashBtn.setImage(R.drawable.flash_off_ic)
+                    flashBtn.setTintColor(  R.color.white)
                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
                     cameraManager.toggleFlash(0) /*flash off*/
 
@@ -440,7 +481,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         }
 
         gridBtn.setOnClickListener {
-            if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
+           /* if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
                 gridBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
                 saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, false)
                 gridOverlay.updateGrid(false, 0)
@@ -448,6 +489,38 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
                 gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
                 saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, true)
                 gridOverlay.updateGrid(true, 4)
+            }*/
+            when(getInt(this@CameraActivity, KEY_CAMERA_GRID))
+            {
+                0->{
+                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,3)
+                    gridBtn.setDrawable(top = R.drawable.grid_3_ic)
+                    gridBtn.text= getString(R.string.grid_3_3)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                    gridOverlay.updateGrid(true,3)
+
+                }
+                3->{
+                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,4)
+                    gridBtn.setDrawable(top = R.drawable.grid_4_ic)
+                    gridBtn.text= getString(R.string.grid_4_4)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                    gridOverlay.updateGrid(true,4)
+                }
+                4->{
+                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,-3)
+                    gridBtn.setDrawable(top = R.drawable.phi_grid_ic)
+                    gridBtn.text= getString(R.string.grid_phi)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
+                    gridOverlay.updateGrid(true,3,true)
+                }
+                -3->{
+                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,0)
+                    gridBtn.setDrawable(top = R.drawable.grid_3_ic)
+                    gridBtn.text= getString(R.string.grid)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
+                    gridOverlay.updateGrid(true,0)
+                }
             }
         }
 
@@ -674,9 +747,10 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
                     binding.photoBtn,
                     binding.videoBtn
                 )
-                binding.captureBtn.setImage(R.drawable.capture_btn_ic)
-                binding.videoRecordBtn.visibility = View.GONE
-                binding.templateBtn.visibility = View.VISIBLE
+//                binding.captureBtn.setImage(R.drawable.capture_btn_ic)
+                binding.captureBtn.visible()
+                binding.videoRecordBtn.gone()
+                binding.templateBtn.visible()
                 cameraManager.setVideoRecord(false)
                 saveBoolean(this, KEY_SHARE_IMAGE, true)
 
@@ -691,9 +765,10 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
                     binding.videoBtn,
                     binding.shareBtn
                 )
-                binding.captureBtn.setImage(R.drawable.capture_btn_ic)
-                binding.videoRecordBtn.visibility = View.GONE
-                binding.templateBtn.visibility = View.VISIBLE
+//                binding.captureBtn.setImage(R.drawable.capture_btn_ic)
+                binding.captureBtn.visible()
+                binding.videoRecordBtn.gone()
+                binding.templateBtn.visible()
                 cameraManager.setVideoRecord(false)
                 saveBoolean(this, KEY_SHARE_IMAGE, false)
 
@@ -709,9 +784,10 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
                     binding.photoBtn,
                     binding.shareBtn
                 )
-                binding.captureBtn.setImage(R.drawable.capture_in_video_ic)
-                binding.videoRecordBtn.visibility = View.VISIBLE
-                binding.templateBtn.visibility = View.GONE
+//                binding.captureBtn.setImage(R.drawable.capture_in_video_ic)
+                binding.captureBtn.invisible()
+//                binding.templateBtn.gone()
+                binding.videoRecordBtn.visible()
                 cameraManager.setVideoRecord(true)
                 saveBoolean(this, KEY_SHARE_IMAGE, false)
             }
