@@ -162,6 +162,8 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         )
     }
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -1175,8 +1177,18 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
 
     override fun onPause() {
         super.onPause()
-        binding.detailTopMenuView.gone()
-        binding.defaultTopMenuView.visible()
+        binding.apply {
+            detailTopMenuView.gone()
+            defaultTopMenuView.visible()
+
+//            stop recording
+            cameraManager.stopVideoRecording()
+            recordingTimer.stop()
+            videoStopBtn.gone()
+            videoTimmerTV.gone()
+            videoRecordBtn.visible()
+        }
+
     }
 
     override fun onQualityChanged(newQuality: ImageQuality) {
