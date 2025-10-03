@@ -48,7 +48,6 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation("androidx.activity:activity:1.8.0")
-    implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.code.gson:gson:2.13.1")
     implementation("androidx.navigation:navigation-fragment-ktx:2.9.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.9.0")
@@ -58,12 +57,8 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
 
     implementation ("com.intuit.sdp:sdp-android:1.1.1")
-
-    implementation ("jp.co.cyberagent.android:gpuimage:2.1.0")
     implementation ("com.github.bumptech.glide:glide:5.0.5")
-
     implementation ("com.google.mlkit:barcode-scanning:17.3.0")
-
     implementation ("androidx.camera:camera-core:1.4.2")
     implementation ("androidx.camera:camera-camera2:1.4.2")
     implementation ("androidx.camera:camera-lifecycle:1.4.2")
@@ -71,23 +66,17 @@ dependencies {
     implementation("androidx.camera:camera-video:1.3.0")
     implementation ("androidx.camera:camera-extensions:1.4.2")
 
-    implementation("com.github.Dimezis:BlurView:version-3.1.0")
 
     implementation("com.google.openlocationcode:openlocationcode:1.0.4") //get plus code
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.9.3")
-
-
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-
     implementation ("com.google.android.gms:play-services-location:21.3.0")
-
     implementation ("com.github.murgupluoglu:flagkit-android:1.0.5")
     implementation ("com.airbnb.android:lottie:6.3.0" )
 
-    implementation ("com.github.bumptech.glide:glide:5.0.5")
-
-
+    implementation( "androidx.media3:media3-transformer:1.8.0" )
+    implementation( "androidx.media3:media3-common:1.8.0")
 
 }
 

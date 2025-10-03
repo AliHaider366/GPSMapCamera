@@ -18,7 +18,7 @@ import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.launchActivity
 
 
-class StartMenuActivity : AppCompatActivity() {
+class StartMenuActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityStartMenuBinding.inflate(layoutInflater)

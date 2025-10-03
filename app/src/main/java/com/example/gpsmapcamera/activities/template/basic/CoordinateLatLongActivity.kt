@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.LatLongAdapter
 import com.example.gpsmapcamera.databinding.ActivityCoordinateLatLongBinding
 import com.example.gpsmapcamera.utils.Constants
@@ -11,7 +12,7 @@ import com.example.gpsmapcamera.utils.PrefManager.setInt
 import com.example.gpsmapcamera.utils.coordinateFormats
 import com.example.gpsmapcamera.utils.plusCodeFormats
 
-class CoordinateLatLongActivity : AppCompatActivity() {
+class CoordinateLatLongActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityCoordinateLatLongBinding.inflate(layoutInflater)

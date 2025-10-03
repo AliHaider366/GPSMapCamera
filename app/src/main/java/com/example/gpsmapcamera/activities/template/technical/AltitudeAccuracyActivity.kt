@@ -4,13 +4,14 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.AltitudeAccuracyAdapter
 import com.example.gpsmapcamera.databinding.ActivityAltitudeAccuracyBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager.setInt
 import com.example.gpsmapcamera.utils.altitudeAccuracyFormats
 
-class AltitudeAccuracyActivity : AppCompatActivity() {
+class AltitudeAccuracyActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityAltitudeAccuracyBinding.inflate(layoutInflater)

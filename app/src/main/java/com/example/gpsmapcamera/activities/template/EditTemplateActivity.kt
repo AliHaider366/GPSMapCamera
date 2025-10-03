@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.StampAdapter
 import com.example.gpsmapcamera.adapters.StampCenterAdapter
 import com.example.gpsmapcamera.adapters.ViewPagerAdapter
@@ -36,7 +37,7 @@ import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 import com.google.android.material.tabs.TabLayoutMediator
 
-class EditTemplateActivity : AppCompatActivity() {
+class EditTemplateActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityEditTemplateBinding.inflate(layoutInflater)

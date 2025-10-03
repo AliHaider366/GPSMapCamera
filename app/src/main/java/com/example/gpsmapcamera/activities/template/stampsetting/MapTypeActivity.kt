@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.activities.template.technical.AltitudeAccuracyActivity
 import com.example.gpsmapcamera.adapters.AltitudeAccuracyAdapter
 import com.example.gpsmapcamera.adapters.MapTypeAdapter
@@ -20,7 +21,7 @@ import com.example.gpsmapcamera.utils.PrefManager.setString
 import com.example.gpsmapcamera.utils.altitudeAccuracyFormats
 import com.example.gpsmapcamera.utils.saveSelectedMapType
 
-class MapTypeActivity : AppCompatActivity() {
+class MapTypeActivity : BaseActivity() {
 
 
     private val binding by lazy {

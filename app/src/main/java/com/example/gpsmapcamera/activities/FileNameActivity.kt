@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 
-class FileNameActivity : AppCompatActivity() {
+class FileNameActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityFileNameBinding.inflate(layoutInflater)

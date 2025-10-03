@@ -8,7 +8,7 @@ import com.example.gpsmapcamera.databinding.ActivityOnBoardingBinding
 import com.example.gpsmapcamera.utils.launchActivity
 import com.google.android.material.tabs.TabLayoutMediator
 
-class OnBoardingActivity : AppCompatActivity() {
+class OnBoardingActivity : BaseActivity() {
     private val binding by lazy {
         ActivityOnBoardingBinding.inflate(layoutInflater)
     }

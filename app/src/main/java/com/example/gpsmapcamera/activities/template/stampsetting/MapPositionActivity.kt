@@ -5,6 +5,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.MapPositionAdapter
 import com.example.gpsmapcamera.databinding.ActivityMapPositionBinding
 import com.example.gpsmapcamera.models.MapType
@@ -14,7 +15,7 @@ import com.example.gpsmapcamera.utils.PrefManager.setInt
 import com.example.gpsmapcamera.utils.dateFormats
 import com.example.gpsmapcamera.utils.timeZoneFormats
 
-class MapPositionActivity : AppCompatActivity() {
+class MapPositionActivity : BaseActivity() {
 
 
     private val binding by lazy {

@@ -4,11 +4,12 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.databinding.ActivityAddPersonBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager
 
-class AddPersonActivity : AppCompatActivity() {
+class AddPersonActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityAddPersonBinding.inflate(layoutInflater)

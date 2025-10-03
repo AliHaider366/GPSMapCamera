@@ -66,9 +66,6 @@ import com.example.gpsmapcamera.utils.formatForFile
 import com.example.gpsmapcamera.utils.getCurrentDay
 import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.tooBitmap
-import com.example.gpsmapcamera.utils.updateFileNameWithCurrentValues
-import jp.co.cyberagent.android.gpuimage.GPUImage
-import jp.co.cyberagent.android.gpuimage.filter.GPUImageGrayscaleFilter
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -571,23 +568,7 @@ class CameraManager(
         matrix.postRotate(rotation.toFloat())
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
-    fun applyFilterToImage(uri: Uri, callback: (Uri) -> Unit) {
-        // Load and correct orientation
-        val rotatedBitmap = getCorrectlyOrientedBitmap(uri)        // Initialize GPUImage
-        val gpuImage = GPUImage(context)
-//        gpuImage.setFilter(GPUImageSketchFilter()) // Replace with your desired filter
-        gpuImage.setFilter(GPUImageGrayscaleFilter()) // Replace with your desired filter
-//        gpuImage.setFilter(GPUImageContrastFilter(2.0f)) // Replace with your desired filter
-        gpuImage.setImage(rotatedBitmap)
-        val filteredBitmap = gpuImage.bitmapWithFilterApplied
 
-        val filteredFile = File(context.getExternalFilesDir(null), "filtered_${System.currentTimeMillis()}.jpg")
-        FileOutputStream(filteredFile).use {
-            filteredBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        }
-
-        callback(Uri.fromFile(filteredFile))
-    }
 
     fun buildImageCapture(
         flashEnabled: Int,

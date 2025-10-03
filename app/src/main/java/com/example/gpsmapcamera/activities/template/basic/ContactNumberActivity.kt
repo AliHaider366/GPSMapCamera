@@ -8,12 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.databinding.ActivityContactNumberBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.showToast
 
-class ContactNumberActivity : AppCompatActivity() {
+class ContactNumberActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityContactNumberBinding.inflate(layoutInflater)

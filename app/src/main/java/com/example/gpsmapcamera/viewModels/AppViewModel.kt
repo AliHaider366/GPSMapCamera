@@ -12,6 +12,7 @@ import android.location.Geocoder
 import android.location.Location
 import android.media.MediaRecorder
 import android.os.Build
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -354,34 +355,34 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
             ),
             StampConfig(
                 StampItemName.NOTE,
-                true,
+                false,
                 StampPosition.CENTER,
                 null,
                 "Note: Captured by GPS Map Camera"
             ),
             StampConfig(
                 StampItemName.PERSON_NAME,
-                true,
+                false,
                 StampPosition.CENTER,
                 null,
                 "Person name:"
             ),
-            StampConfig(StampItemName.NUMBERING, true, StampPosition.CENTER, null, "1"),
+            StampConfig(StampItemName.NUMBERING, false, StampPosition.CENTER, null, "1"),
             StampConfig(
                 StampItemName.SOUND_LEVEL,
-                true,
+                false,
                 StampPosition.BOTTOM,
                 StampItemName.SOUND_LEVEL.getIcon()
             ),
             StampConfig(
                 StampItemName.ALTITUDE,
-                true,
+                false,
                 StampPosition.BOTTOM,
                 StampItemName.ALTITUDE.getIcon()
             ),
             StampConfig(
                 StampItemName.ACCURACY,
-                true,
+                false,
                 StampPosition.BOTTOM,
                 StampItemName.ACCURACY.getIcon()
             ),
@@ -389,47 +390,47 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
             StampConfig(StampItemName.FULL_ADDRESS, true, StampPosition.CENTER),
             StampConfig(StampItemName.LAT_LONG, true, StampPosition.CENTER),
             StampConfig(StampItemName.DATE_TIME, true, StampPosition.CENTER),
-            StampConfig(StampItemName.TIME_ZONE, true, StampPosition.CENTER),
-            StampConfig(StampItemName.PLUS_CODE, true, StampPosition.CENTER),
+            StampConfig(StampItemName.TIME_ZONE, false, StampPosition.CENTER),
+            StampConfig(StampItemName.PLUS_CODE, false, StampPosition.CENTER),
             StampConfig(
                 StampItemName.WEATHER,
-                true,
+                false,
                 StampPosition.RIGHT,
                 StampItemName.WEATHER.getIcon()
             ),
             StampConfig(
                 StampItemName.COMPASS,
-                true,
+                false,
                 StampPosition.RIGHT,
                 StampItemName.COMPASS.getIcon()
             ),
             StampConfig(
                 StampItemName.MAGNETIC_FIELD,
-                true,
+                false,
                 StampPosition.RIGHT,
                 StampItemName.MAGNETIC_FIELD.getIcon()
             ),
             StampConfig(
                 StampItemName.PRESSURE,
-                true,
+                false,
                 StampPosition.RIGHT,
                 StampItemName.PRESSURE.getIcon()
             ),
             StampConfig(
                 StampItemName.WIND,
-                true,
+                false,
                 StampPosition.RIGHT,
                 StampItemName.WIND.getIcon()
             ),
             StampConfig(
                 StampItemName.HUMIDITY,
-                true,
+                false,
                 StampPosition.RIGHT,
                 StampItemName.HUMIDITY.getIcon()
             ),
             StampConfig(StampItemName.MAP_TYPE, true, StampPosition.NONE),
-            StampConfig(StampItemName.REPORTING_TAG, true, StampPosition.NONE),
-            StampConfig(StampItemName.LOGO, true, StampPosition.NONE)
+            StampConfig(StampItemName.REPORTING_TAG, false, StampPosition.NONE),
+            StampConfig(StampItemName.LOGO, false, StampPosition.NONE)
         )
     }
 
@@ -590,6 +591,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
                 addresses?.firstOrNull()?.let { address ->
                     shortAddress = "${address.locality}, ${address.countryName}"
 
+
                     // ✅ Add each part only if you want to show it
 
                     //Plus code / pin code
@@ -598,15 +600,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
 //                        Log.d("TAG", "updateDynamicValues:  featureName ${address.featureName}")
                     }
 
-
-                    if (/*showCity && */!address.locality.isNullOrEmpty()) {
+                    address.getAddressLine(0)?.let {
+                        fullAddressModel.locality = it
+                    }?:run {
+                        if (/*showCity && */!address.subAdminArea.isNullOrEmpty()) {
 //                        Log.d("TAG", "updateDynamicValues:  locality ${address.locality}")
-                        fullAddressModel.locality = address.locality
+                            fullAddressModel.locality = address.subAdminArea
+                        }
                     }
 
-                    if (/*showProvince && */!address.subAdminArea.isNullOrEmpty()) {
+                    if (/*showProvince && */!address.locality.isNullOrEmpty()) {
 //                        Log.d("TAG", "updateDynamicValues:  subAdminArea ${address.subAdminArea}")
-                        fullAddressModel.city = address.subAdminArea
+                        fullAddressModel.city = address.locality
                     }
 
                     if (/*showState &&*/ !address.adminArea.isNullOrEmpty()) {
@@ -614,10 +619,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
                         fullAddressModel.state = address.adminArea
 
                     }
+
                     if (/*showCountry &&*/ !address.countryName.isNullOrEmpty()) {
 //                        Log.d("TAG", "updateDynamicValues:  countryName ${address.countryName}")
                         fullAddressModel.country = address.countryName
                     }
+
+                    Log.d("TAG", "updateDynamicValues: address $address")
+                    Log.d("TAG", "updateDynamicValues: fullAddressModel $fullAddressModel")
+                    Log.d("TAG", "updateDynamicValues: fullAddressModel $fullAddressModel")
 
 
                 }

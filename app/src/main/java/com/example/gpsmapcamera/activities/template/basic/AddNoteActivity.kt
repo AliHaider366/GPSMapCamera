@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.activities.template.basic.CoordinateLatLongActivity
 import com.example.gpsmapcamera.activities.template.basic.ReportingTagActivity
 import com.example.gpsmapcamera.adapters.LatLongAdapter
@@ -25,7 +26,7 @@ import com.example.gpsmapcamera.utils.recentNotesDefault
 import com.example.gpsmapcamera.utils.reportingTagsDefault
 import com.example.gpsmapcamera.utils.showToast
 
-class AddNoteActivity : AppCompatActivity() {
+class AddNoteActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityAddNoteBinding.inflate(layoutInflater)

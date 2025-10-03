@@ -2,18 +2,21 @@ package com.example.gpsmapcamera.adapters
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.ItemLanguageBinding
 import com.example.gpsmapcamera.utils.enableMarquee
 import com.example.gpsmapcamera.utils.setViewBackgroundDrawableRes
 import com.example.mycam.models.Language
 import com.murgupluoglu.flagkit.FlagKit
+import kotlin.math.log
 
 class LanguageAdapter(
     private val onLanguageSelected: (Language) -> Unit
@@ -36,6 +39,7 @@ class LanguageAdapter(
         val updatedList = currentList.map { language ->
             language.copy(isSelected = language.code == selectedLanguage.code)
         }
+        Log.d("TAG", "setupRecyclerView: $updatedList")
         submitList(updatedList)
     }
 
@@ -84,12 +88,10 @@ class LanguageAdapter(
             val flagDrawable = getFlag(context, language.countryCode)
 
             if (flagDrawable != null) {
-                binding.ivFlag.setImageDrawable(flagDrawable)
+                Glide.with(context).load(flagDrawable).into(binding.ivFlag)
             } else {
                 // Fallback to placeholder
-                binding.ivFlag.setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_launcher_background)
-                )
+                Glide.with(context).load(R.drawable.ic_launcher_background).into(binding.ivFlag)
             }
         }
 

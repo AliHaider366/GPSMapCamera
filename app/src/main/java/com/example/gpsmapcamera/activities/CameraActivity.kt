@@ -3,6 +3,7 @@ package com.example.gpsmapcamera.activities
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
@@ -88,6 +89,7 @@ import java.util.concurrent.TimeUnit
 import androidx.core.view.isGone
 import com.example.gpsmapcamera.utils.invisible
 import com.example.gpsmapcamera.utils.setTintColor
+import java.util.Locale
 
 class CameraActivity : AppCompatActivity(), CameraSettingsListener {
     private val binding by lazy {
@@ -163,11 +165,22 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
     }
 
 
+    private fun setEnglishLocale() {
+        val locale = Locale("en")
+        Locale.setDefault(locale)
+
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        // Optional: make sure layout direction also resets (LTR for English)
+        config.setLayoutDirection(locale)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        setEnglishLocale()
         CameraSettingsNotifier.listener = this
         enableEdgeToEdge()
         hideSystemBars()
@@ -924,6 +937,10 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
             templateAdapterCenter.updateDynamics(newDynamics)
             templateAdapterRight.updateDynamics(newDynamics)
 
+            reportingTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
+            advanceTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
+            classicTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
+
         }
     }
 
@@ -934,7 +951,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         binding.stampContainer.removeAllViews()
         binding.stampContainer.addView(reportingTemplateBinding.root)
 
-        reportingTemplateBinding?.run {
+        reportingTemplateBinding.run {
             rvBottom.adapter = templateAdapterBottom
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
@@ -986,13 +1003,13 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         }
 
         if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
-            reportingTemplateBinding?.map?.visible()
+            reportingTemplateBinding.map.visible()
         } else {
-            reportingTemplateBinding?.map?.gone()
+            reportingTemplateBinding.map.gone()
         }
 
         if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == true) {
-            reportingTemplateBinding?.tvEnvironment?.visible()
+            reportingTemplateBinding.tvEnvironment.visible()
             val itemIndex = PrefManager.getInt(
                 this@CameraActivity,
                 Constants.SELECTED_REPORTING_TAG, 0
@@ -1001,23 +1018,29 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
                 StampPreferences(this@CameraActivity).getWholeList(Constants.KEY_REPORTING_TAG)
             if (reportingTagSavedList.isEmpty()) {
                 if (itemIndex < reportingTagsDefault.size) {
-                    reportingTemplateBinding?.tvEnvironment?.text = reportingTagsDefault[itemIndex]
+                    reportingTemplateBinding.tvEnvironment.text = reportingTagsDefault[itemIndex]
                 }
             } else {
                 if (itemIndex < reportingTagSavedList.size) {
-                    reportingTemplateBinding?.tvEnvironment?.text = reportingTagSavedList[itemIndex]
+                    reportingTemplateBinding.tvEnvironment.text = reportingTagSavedList[itemIndex]
                 }
             }
         } else {
-            reportingTemplateBinding?.tvEnvironment?.gone()
+            reportingTemplateBinding.tvEnvironment.gone()
         }
 
         if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == false &&
             allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == false
         ) {
-            reportingTemplateBinding?.mapContainer?.gone()
+            reportingTemplateBinding.mapContainer.gone()
         } else {
-            reportingTemplateBinding?.mapContainer?.visible()
+            reportingTemplateBinding.mapContainer.visible()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.LOGO }?.visibility == true) {
+            reportingTemplateBinding.ivLogo.visible()
+        } else {
+            reportingTemplateBinding.ivLogo.gone()
         }
     }
 
@@ -1027,7 +1050,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         binding.stampContainer.addView(advanceTemplateBinding.root)
 
 
-        advanceTemplateBinding?.run {
+        advanceTemplateBinding.run {
             rvBottom.adapter = templateAdapterBottom
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
@@ -1076,23 +1099,29 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         }
 
         if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
-            advanceTemplateBinding?.map?.visible()
+            advanceTemplateBinding.map.visible()
         } else {
-            advanceTemplateBinding?.map?.gone()
+            advanceTemplateBinding.map.gone()
         }
 
         if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == true) {
-//                advanceTemplateBinding?.tvEnvironment.visible()
+//                advanceTemplateBinding.tvEnvironment.visible()
         } else {
-//                advanceTemplateBinding?.tvEnvironment.gone()
+//                advanceTemplateBinding.tvEnvironment.gone()
         }
 
         if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == false &&
             allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == false
         ) {
-            advanceTemplateBinding?.mapContainer?.gone()
+            advanceTemplateBinding.mapContainer.gone()
         } else {
-            advanceTemplateBinding?.mapContainer?.visible()
+            advanceTemplateBinding.mapContainer.visible()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.LOGO }?.visibility == true) {
+            advanceTemplateBinding.ivLogo.visible()
+        } else {
+            advanceTemplateBinding.ivLogo.gone()
         }
     }
 
@@ -1102,7 +1131,7 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
         binding.stampContainer.removeAllViews()
         binding.stampContainer.addView(classicTemplateBinding.root)
 
-        classicTemplateBinding?.run {
+        classicTemplateBinding.run {
             rvBottom.adapter = templateAdapterBottom
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
@@ -1153,23 +1182,29 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
 
 
         if (allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == true) {
-            classicTemplateBinding?.map?.visible()
+            classicTemplateBinding.map.visible()
         } else {
-            classicTemplateBinding?.map?.gone()
+            classicTemplateBinding.map.gone()
         }
 
         if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == true) {
-//                classicTemplateBinding?.tvEnvironment.visible()
+//                classicTemplateBinding.tvEnvironment.visible()
         } else {
-//                classicTemplateBinding?.tvEnvironment.gone()
+//                classicTemplateBinding.tvEnvironment.gone()
         }
 
         if (allConfigs.find { it.name == StampItemName.REPORTING_TAG }?.visibility == false &&
             allConfigs.find { it.name == StampItemName.MAP_TYPE }?.visibility == false
         ) {
-            classicTemplateBinding?.mapContainer?.gone()
+            classicTemplateBinding.mapContainer.gone()
         } else {
-            classicTemplateBinding?.mapContainer?.visible()
+            classicTemplateBinding.mapContainer.visible()
+        }
+
+        if (allConfigs.find { it.name == StampItemName.LOGO }?.visibility == true) {
+            classicTemplateBinding.ivLogo.visible()
+        } else {
+            classicTemplateBinding.ivLogo.gone()
         }
 
     }

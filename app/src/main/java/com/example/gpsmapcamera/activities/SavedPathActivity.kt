@@ -24,7 +24,7 @@ import com.example.gpsmapcamera.utils.showCustomDialog
 import com.example.gpsmapcamera.utils.showToast
 import java.io.File
 
-class SavedPathActivity : AppCompatActivity() {
+class SavedPathActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivitySavedPathBinding.inflate(layoutInflater)

@@ -26,7 +26,7 @@ import com.example.gpsmapcamera.utils.requestPermission
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.showToast
 
-class PermissionActivity : AppCompatActivity() {
+class PermissionActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityPermissionBinding.inflate(layoutInflater)

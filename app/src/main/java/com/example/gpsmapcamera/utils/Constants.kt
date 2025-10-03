@@ -67,9 +67,10 @@ object Constants {
     const val FULL_ADDRESS_COUNTRY = "FULL_ADDRESS_COUNTRY"
     const val FULL_ADDRESS_PIN_CODE = "FULL_ADDRESS_PIN_CODE"
 
-
-
-
     const val KEY_REPORTING_TAG = "KEY_REPORTING_TAG"
     const val KEY_RECENT_NOTES = "KEY_RECENT_NOTES"
+
+
+    const val SELECTED_LANGUAGE = "SELECTED_LANGUAGE"
+    const val FROM_SPLASH = "FROM_SPLASH"
 }

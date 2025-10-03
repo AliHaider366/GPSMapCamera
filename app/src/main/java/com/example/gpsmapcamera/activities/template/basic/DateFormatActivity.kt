@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.DateFormatAdapter
 import com.example.gpsmapcamera.databinding.ActivityDateFormatBinding
 import com.example.gpsmapcamera.utils.Constants
@@ -12,7 +13,7 @@ import com.example.gpsmapcamera.utils.PrefManager.setInt
 import com.example.gpsmapcamera.utils.dateFormats
 import com.example.gpsmapcamera.utils.timeZoneFormats
 
-class DateFormatActivity : AppCompatActivity() {
+class DateFormatActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityDateFormatBinding.inflate(layoutInflater)

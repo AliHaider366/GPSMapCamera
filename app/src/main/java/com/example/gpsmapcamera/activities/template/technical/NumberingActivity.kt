@@ -8,11 +8,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doOnTextChanged
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.databinding.ActivityNumberingBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager
 
-class NumberingActivity : AppCompatActivity() {
+class NumberingActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityNumberingBinding.inflate(layoutInflater)

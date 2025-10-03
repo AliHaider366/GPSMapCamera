@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.StampAdapter
 import com.example.gpsmapcamera.adapters.StampCenterAdapter
 import com.example.gpsmapcamera.databinding.ActivityAllTemplateBinding
@@ -34,7 +35,7 @@ import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 
 
-class AllTemplateActivity : AppCompatActivity() {
+class AllTemplateActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityAllTemplateBinding.inflate(layoutInflater)

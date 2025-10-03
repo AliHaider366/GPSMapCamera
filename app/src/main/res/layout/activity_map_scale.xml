@@ -18,11 +18,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+
         <ImageView
             android:id="@+id/back_btn"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
-            android:padding="@dimen/_8sdp"
+            android:layout_width="@dimen/_25sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:padding="@dimen/_6sdp"
+            android:elevation="@dimen/_50sdp"
+            android:background="@drawable/bg_radius_5"
+            android:backgroundTint="@color/white"
             android:src="@drawable/back_ic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -49,7 +53,7 @@
 
 
     <!-- Map container -->
-    <FrameLayout
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/map_view"
         android:layout_width="0dp"
         android:layout_height="0dp"

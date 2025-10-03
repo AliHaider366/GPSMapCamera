@@ -194,7 +194,7 @@
         </LinearLayout>
 
 
-<!--detail top menu-->
+        <!--detail top menu-->
         <LinearLayout
             android:id="@+id/detailTopMenuView"
             android:layout_width="match_parent"
@@ -215,7 +215,7 @@
 
                 <TextView
                     android:id="@+id/ratio_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/ratio16_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -228,7 +228,7 @@
 
                 <TextView
                     android:id="@+id/grid_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/grid_3_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -241,7 +241,7 @@
 
                 <TextView
                     android:id="@+id/timer_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/timer_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -253,7 +253,7 @@
                     />
                 <TextView
                     android:id="@+id/mirror_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/mirror_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -277,7 +277,7 @@
 
                 <TextView
                     android:id="@+id/volume_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/volume_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -290,7 +290,7 @@
 
                 <TextView
                     android:id="@+id/brightness_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/brightness_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -303,7 +303,7 @@
 
                 <TextView
                     android:id="@+id/cam_level_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/level_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -315,7 +315,7 @@
                     />
                 <TextView
                     android:id="@+id/focus_btn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableTop="@drawable/focus_ic"
                     android:drawablePadding="@dimen/_5sdp"
@@ -391,6 +391,7 @@
                 android:layout_height="@dimen/_30sdp"
                 android:padding="@dimen/_5sdp"
                 android:src="@drawable/location_ic"
+                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

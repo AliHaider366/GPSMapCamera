@@ -5,6 +5,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.ReportingTagAdapter
 import com.example.gpsmapcamera.databinding.ActivityReportingTagBinding
 import com.example.gpsmapcamera.models.StampItemName
@@ -16,7 +17,7 @@ import com.example.gpsmapcamera.utils.StampPreferences
 import com.example.gpsmapcamera.utils.reportingTagsDefault
 import com.example.gpsmapcamera.utils.showToast
 
-class ReportingTagActivity : AppCompatActivity() {
+class ReportingTagActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityReportingTagBinding.inflate(layoutInflater)

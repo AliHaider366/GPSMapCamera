@@ -11,6 +11,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Resources
@@ -130,6 +131,7 @@ fun View.gone() {
 fun View.invisible() {
     this.visibility = View.INVISIBLE
 }
+
 fun View.setViewBackgroundDrawableRes(@DrawableRes drawableRes: Int) {
     background = ContextCompat.getDrawable(context, drawableRes)
 }
@@ -266,7 +268,6 @@ suspend fun Context.getCurrentAddress(): AddressLineModel {
 }
 
 
-
 @Suppress("MissingPermission")
 suspend fun Context.requestFreshLocation(): Pair<Double, Double> {
     if (!isLocationEnabled()) {
@@ -275,7 +276,8 @@ suspend fun Context.requestFreshLocation(): Pair<Double, Double> {
 
     return withTimeoutOrNull(5000) { // wait max 5s
         suspendCancellableCoroutine { cont ->
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@requestFreshLocation)
+            val fusedLocationClient =
+                LocationServices.getFusedLocationProviderClient(this@requestFreshLocation)
 
             val request = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY, 1000
@@ -344,13 +346,13 @@ suspend fun Context.getCurrentPlusCode(): String {
 
     if (lastKnown != null) return lastKnown
 
- /*   // Otherwise request fresh location
-    val (lat, lng) = requestFreshLocation()
-    return if (lat != 0.0 && lng != 0.0) {
-        getPlusCode(lat, lng)
-    } else {
-        ""
-    }*/
+    /*   // Otherwise request fresh location
+       val (lat, lng) = requestFreshLocation()
+       return if (lat != 0.0 && lng != 0.0) {
+           getPlusCode(lat, lng)
+       } else {
+           ""
+       }*/
     // Try fresh location
     return try {
         val (lat, lng) = requestFreshLocation()
@@ -415,8 +417,7 @@ fun Context.openLatestImageFromFolder(folderPath: String) {
             MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE.toString(),
             MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO.toString()
         )
-    }
-    else {
+    } else {
         // Below Android 10 → use absolute DATA path
         val cameraPath = Environment.getExternalStoragePublicDirectory(
             Environment.DIRECTORY_DCIM
@@ -439,18 +440,22 @@ fun Context.openLatestImageFromFolder(folderPath: String) {
         if (cursor.moveToFirst()) {
 //            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
             val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID))
-            val type = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE))
+            val type =
+                cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE))
 
 //            val contentUri = ContentUris.withAppendedId(uri, id)
             val contentUri = when (type) {
                 MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE ->
                     ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+
                 MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO ->
                     ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
+
                 else -> null
             }
 
-            val mimeType = if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) "video/*" else "image/*"
+            val mimeType =
+                if (type == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) "video/*" else "image/*"
             val baseIntent = Intent(Intent.ACTION_VIEW).apply {
 //                setDataAndType(contentUri, "image/*")
                 setDataAndType(contentUri, mimeType)
@@ -578,13 +583,13 @@ fun TextView.setDrawable(
 fun String.updateFileNameWithCurrentValues(
     newDateTime: String,
     newDay: String,
-    newTimeZone: String?=null,
-    newLatLong: String?=null
+    newTimeZone: String? = null,
+    newLatLong: String? = null
 ): String {
     val parts = this.removeSuffix(".jpg").split("_").toMutableList()
 
     // Regex patterns
-    val date= Regex("\\d{8}")              // 20250831_154957
+    val date = Regex("\\d{8}")              // 20250831_154957
     val Time24h = Regex("\\d{6}")              // 20250831_154957
     val Time12h = Regex("\\d{6}(AM|PM)")       // 20250831_035521PM
     val dayRegex = Regex("(?i)(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday)")
@@ -597,7 +602,9 @@ fun String.updateFileNameWithCurrentValues(
 
     for (i in parts.indices) {
         when {
-            Time24h.matches(parts[i]) || Time12h.matches(parts[i]) -> parts[i] = newDateTime.split("_")[1]
+            Time24h.matches(parts[i]) || Time12h.matches(parts[i]) -> parts[i] =
+                newDateTime.split("_")[1]
+
             date.matches(parts[i]) -> parts[i] = newDateTime.split("_")[0]
             dayRegex.matches(parts[i]) -> parts[i] = newDay
 //            tzRegex.matches(parts[i]) -> parts[i] = newTimeZone
@@ -609,12 +616,11 @@ fun String.updateFileNameWithCurrentValues(
 }
 
 
-fun TextView.enableMarquee()
-{
-    isSelected=true
-    isSingleLine=true
-    ellipsize= TextUtils.TruncateAt.MARQUEE
-    marqueeRepeatLimit=-1
+fun TextView.enableMarquee() {
+    isSelected = true
+    isSingleLine = true
+    ellipsize = TextUtils.TruncateAt.MARQUEE
+    marqueeRepeatLimit = -1
 }
 
 
@@ -658,6 +664,7 @@ fun TextView.setTextColorAndBackgroundTint(textColorRes: Int, backgroundTintRes:
         ColorStateList.valueOf(ContextCompat.getColor(context, backgroundTintRes))
     )
 }
+
 fun EditText.addAfterTextChanged(onChanged: (String) -> Unit): TextWatcher {
     val watcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -1060,17 +1067,21 @@ fun FullAddress.updateAddressWithVisibility(context: Context, template: String):
         PrefManager.getBoolean(context, Constants.FULL_ADDRESS_COUNTRY + template, true)
 
     return buildString {
-        if (pinCodeVisibility) {
-            append(pinCode)
-            append(" ")
+//        if (pinCodeVisibility) {
+//            append(pinCode)
+//            append(" ")
+//        }
+//        append(locality)
+//        append(" ")
+
+        if (locality.isNotEmpty()) {
+            append(locality)
+            append(", ")
         }
         if (cityVisibility) {
             if (city.isNotEmpty()) {
-                append(locality)
-                append(" ")
                 append(city)
             } else {
-                append(locality)
                 append(city)
             }
             append(", ")
@@ -1088,18 +1099,20 @@ fun FullAddress.updateAddressWithVisibility(context: Context, template: String):
 
 
 fun Int.saveSelectedMapType(): String {
-    return when(this){
-        0-> Constants.MAP_TYPE_NORMAL
-        1-> Constants.MAP_TYPE_SATELLITE
-        2-> Constants.MAP_TYPE_TERRAIN
-        3-> Constants.MAP_TYPE_HYBRID
-        else-> Constants.MAP_TYPE_NORMAL
+    return when (this) {
+        0 -> Constants.MAP_TYPE_NORMAL
+        1 -> Constants.MAP_TYPE_SATELLITE
+        2 -> Constants.MAP_TYPE_TERRAIN
+        3 -> Constants.MAP_TYPE_HYBRID
+        else -> Constants.MAP_TYPE_NORMAL
     }
 }
 
 fun Context.getSelectedMapDrawable(passedTemplate: String): Int {
-    return when(PrefManager.getString(this, Constants.SELECTED_MAP_TYPE + passedTemplate,
-        Constants.MAP_TYPE_NORMAL)){
+    return when (PrefManager.getString(
+        this, Constants.SELECTED_MAP_TYPE + passedTemplate,
+        Constants.MAP_TYPE_NORMAL
+    )) {
         Constants.MAP_TYPE_NORMAL -> R.drawable.map_type_normal
         Constants.MAP_TYPE_SATELLITE -> R.drawable.map_type_satellite
         Constants.MAP_TYPE_TERRAIN -> R.drawable.map_type_terrain
@@ -1109,7 +1122,7 @@ fun Context.getSelectedMapDrawable(passedTemplate: String): Int {
 }
 
 fun String.selectedMapToInt(): Int {
-    return  when(this){
+    return when (this) {
         Constants.MAP_TYPE_NORMAL -> 0
         Constants.MAP_TYPE_SATELLITE -> 1
         Constants.MAP_TYPE_TERRAIN -> 2
@@ -1126,7 +1139,6 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
         }
     })
 }
-
 
 
 fun FrameLayout.loadGoogleMap(
@@ -1223,6 +1235,45 @@ fun FrameLayout.loadStaticMap(
     this.addView(imageView)
 }
 
+fun Activity.setPortraitOrientation() {
+    requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+}
+
+fun String.toLanguageName(): String {
+    return when (this.lowercase()) {
+        "en", "en-us" -> "English"
+        "en-gb" -> "English (UK)"
+        "fr", "fr-fr" -> "Français"
+        "fr-ca" -> "Français (Canada)"
+        "es", "es-es" -> "Español"
+        "de", "de-de" -> "Deutsch"
+        "zh", "zh-cn" -> "中文 (Chinese)"
+        "hi", "hi-in" -> "हिन्दी"
+        "pt", "pt-pt" -> "Português (Portugal)"
+        "pt-br" -> "Português (Brazil)"
+        "ru", "ru-ru" -> "Русский"
+        "in", "id" -> "Indonesian"
+        "fil", "ph" -> "Tagalog (Philippines)"
+        "bn", "bn-bd" -> "বাংলা"
+        "af" -> "Afrikaans"
+        "ko", "ko-kr" -> "한국어 (Korean)"
+        "nl", "nl-nl" -> "Nederlands"
+        else -> this // fallback if not matched
+    }
+}
+
+private var lastClickTime = 0L
+private const val CLICK_DELAY = 500L // milliseconds
+
+fun isSingleTouch(): Boolean {
+    val currentTime = System.currentTimeMillis()
+    return if (currentTime - lastClickTime > CLICK_DELAY) {
+        lastClickTime = currentTime
+        true
+    } else {
+        false
+    }
+}
 
 
 

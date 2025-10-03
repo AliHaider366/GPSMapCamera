@@ -5,6 +5,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.MapPositionAdapter
 import com.example.gpsmapcamera.adapters.StampFontAdapter
 import com.example.gpsmapcamera.adapters.StampFontSizeAdapter
@@ -13,7 +14,7 @@ import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager.setInt
 import com.example.gpsmapcamera.utils.stampFontList
 
-class StampFontActivity : AppCompatActivity() {
+class StampFontActivity : BaseActivity() {
 
 
     private val binding by lazy {

@@ -148,12 +148,18 @@ class SettingsAdapter(
                 selectedOptionName.text=item.selectedOpt
                 selectedOptionName.setDrawable(end = item.selectedOptIcon)
 
-                root.setOnClickListener {
-                    onItemClick(item.title)
+
+
+                if (root.context.getString(R.string.app_language) == item.title){
+                    root.setOnClickListener {
+                        onItemClick(item.title)
+                    }
+                }else{
+                    root.setOnClickListener {
+                        onMenuClick(selectedOptionName,item.title)
+                    }
                 }
-                selectedOptionName.setOnClickListener {
-                    onMenuClick(selectedOptionName,item.title)
-                }
+
 
             }
         }

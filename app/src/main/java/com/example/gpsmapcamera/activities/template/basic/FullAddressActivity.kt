@@ -5,6 +5,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.FullAddressAdapter
 import com.example.gpsmapcamera.databinding.ActivityFullAddressBinding
 import com.example.gpsmapcamera.models.AddressModel
@@ -13,7 +14,7 @@ import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.updateAddressPref
 
 
-class FullAddressActivity : AppCompatActivity() {
+class FullAddressActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityFullAddressBinding.inflate(layoutInflater)

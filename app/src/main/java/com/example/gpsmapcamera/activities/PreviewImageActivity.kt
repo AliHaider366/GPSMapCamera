@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.example.gpsmapcamera.databinding.ActivityPreviewImageBinding
 import java.io.File
 
-class PreviewImageActivity : AppCompatActivity() {
+class PreviewImageActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityPreviewImageBinding.inflate(layoutInflater)

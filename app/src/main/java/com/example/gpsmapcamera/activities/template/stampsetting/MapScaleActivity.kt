@@ -3,22 +3,15 @@ package com.example.gpsmapcamera.activities.template.stampsetting
 import android.os.Bundle
 import android.widget.SeekBar
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.gpsmapcamera.R
+import com.bumptech.glide.Glide
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.databinding.ActivityMapScaleBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 
-class MapScaleActivity : AppCompatActivity() {
+class MapScaleActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityMapScaleBinding.inflate(layoutInflater)
@@ -28,7 +21,18 @@ class MapScaleActivity : AppCompatActivity() {
         intent.getStringExtra(Constants.PASSED_STAMP_TEMPLATE) ?: Constants.CLASSIC_TEMPLATE
     }
 
-    private var googleMapRef: GoogleMap? = null
+    private val mapType by lazy {
+        PrefManager.getString(this@MapScaleActivity, Constants.SELECTED_MAP_TYPE + passedTemplate,
+            Constants.MAP_TYPE_NORMAL)
+    }
+
+    private val mapZoomLevel by lazy {
+        PrefManager.getFloat(this@MapScaleActivity, Constants.SELECTED_MAP_ZOOM_LEVEL + passedTemplate, 12.5f)
+    }
+
+    private val location by lazy {
+        (applicationContext as MyApp).appViewModel.getLocation()
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,46 +52,12 @@ class MapScaleActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        val mapFragmentTag = "map_fragment_${System.currentTimeMillis()}"
-        val mapFragment = SupportMapFragment.newInstance()
-
-        val location = (applicationContext as MyApp).appViewModel.getLocation()
-
         location?.let {
-
-            supportFragmentManager.beginTransaction()
-                .replace(binding.mapView.id, mapFragment, mapFragmentTag)
-                .commit()
-
-            mapFragment.getMapAsync { googleMap ->
-                googleMapRef = googleMap
-
-                val location = LatLng(location.latitude, location.longitude)
-                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12.5f))
-                googleMap.addMarker(MarkerOptions().position(location).title("You're here"))
-                googleMap.uiSettings.setAllGesturesEnabled(false)
-                googleMap.mapType = getSelectedMapType()
-            }
-
-        }
-
-    }
-
-    private fun getSelectedMapType() : Int{
-        val mapType = PrefManager.getString(this@MapScaleActivity, Constants.SELECTED_MAP_TYPE + passedTemplate,
-            Constants.MAP_TYPE_NORMAL)
-
-        return when(mapType){
-            Constants.MAP_TYPE_NORMAL -> GoogleMap.MAP_TYPE_NORMAL
-            Constants.MAP_TYPE_SATELLITE -> GoogleMap.MAP_TYPE_SATELLITE
-            Constants.MAP_TYPE_TERRAIN -> GoogleMap.MAP_TYPE_TERRAIN
-            Constants.MAP_TYPE_HYBRID -> GoogleMap.MAP_TYPE_HYBRID
-            else -> GoogleMap.MAP_TYPE_NORMAL
+            loadStaticMap(it.latitude, it.longitude, mapZoomLevel.toInt())
         }
     }
 
     private fun setUpSeekBar(){
-
 
         binding.zoomSeekBar.max = 100
         binding.zoomSeekBar.progress = 50 // default midpoint
@@ -97,14 +67,14 @@ class MapScaleActivity : AppCompatActivity() {
                 val minZoom = 5f
                 val maxZoom = 20f
 
-
-                // map progress (0–100) → zoom (2–21)
+                // map progress (0–100) → zoom (5–20)
                 val zoomLevel = minZoom + (progress / 100f) * (maxZoom - minZoom)
                 binding.zoomText.text = progress.toString()
-                googleMapRef?.let { map ->
-                    val currentLatLng = map.cameraPosition.target
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, zoomLevel))
-                    PrefManager.setFloat(this@MapScaleActivity, Constants.SELECTED_MAP_ZOOM_LEVEL, zoomLevel)
+
+                val location = (applicationContext as MyApp).appViewModel.getLocation()
+                location?.let {
+                    loadStaticMap(it.latitude, it.longitude, zoomLevel.toInt())
+                    PrefManager.setFloat(this@MapScaleActivity, Constants.SELECTED_MAP_ZOOM_LEVEL + passedTemplate, zoomLevel.toFloat())
                 }
             }
 
@@ -114,7 +84,31 @@ class MapScaleActivity : AppCompatActivity() {
 
     }
 
+    private fun loadStaticMap(lat: Double, lng: Double, zoom: Int) {
 
+        val typeParam = when (mapType) {
+            Constants.MAP_TYPE_NORMAL -> "roadmap"
+            Constants.MAP_TYPE_SATELLITE -> "satellite"
+            Constants.MAP_TYPE_TERRAIN -> "terrain"
+            Constants.MAP_TYPE_HYBRID -> "hybrid"
+            else -> "roadmap"
+        }
+
+        val apiKey = "AIzaSyB9bZ09nESdvT2kRmFEAKbQ3gUqJJwOApI" // your API key
+        val url = "https://maps.googleapis.com/maps/api/staticmap" +
+                "?center=$lat,$lng" +
+                "&zoom=$zoom" +
+                "&size=640x640" +        // max allowed
+                "&scale=2" +             // doubles to 1280x1280 (HD)
+                "&maptype=$typeParam" +
+                "&markers=color:red%7C$lat,$lng" +
+                "&key=$apiKey"
+
+        // load into ImageView (using Glide or Picasso)
+        Glide.with(this)
+            .load(url)
+            .into(binding.mapView) // replace with your ImageView
+    }
 
 
     private val backPressedCallback = object : OnBackPressedCallback(true) {

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.WeatherModuleAdapter
 import com.example.gpsmapcamera.databinding.ActivityWeatherModuleBinding
 import com.example.gpsmapcamera.utils.Constants
@@ -12,7 +13,7 @@ import com.example.gpsmapcamera.utils.pressureFormats
 import com.example.gpsmapcamera.utils.temperatureFormats
 import com.example.gpsmapcamera.utils.windFormats
 
-class WeatherModuleActivity : AppCompatActivity() {
+class WeatherModuleActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityWeatherModuleBinding.inflate(layoutInflater)
