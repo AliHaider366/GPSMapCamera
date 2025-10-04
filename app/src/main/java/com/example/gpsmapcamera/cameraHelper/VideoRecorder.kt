@@ -1,5 +1,6 @@
 package com.example.gpsmapcamera.cameraHelper
 
+import android.Manifest
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -12,13 +13,13 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
+import androidx.annotation.RequiresPermission
 import androidx.camera.view.PreviewView
 import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FOLDER_NAME
 import com.example.gpsmapcamera.utils.PrefManager.getString
 import java.io.File
-import java.io.InputStream
 
 class VideoRecorder(
     private val previewView: PreviewView,
@@ -38,6 +39,7 @@ class VideoRecorder(
     private var drawingRunnable: Runnable? = null
     private var isRecording = false
 
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun startRecording() {
         if (isRecording) return
 
@@ -48,7 +50,7 @@ class VideoRecorder(
         startDrawingLoop()
 
         isRecording = true
-        Log.d(TAG, "Video recording started")
+        Log.d(TAG, "Video recording with audio started")
     }
 
     fun stopRecording() {
@@ -60,15 +62,15 @@ class VideoRecorder(
         drawingRunnable = null
 
         encoder?.stopRecording()
-        
+
         // Save the video file after recording stops
         saveVideoFile()
-        
+
         encoder = null
 
-        Log.d(TAG, "Video recording stopped")
+        Log.d(TAG, "Video recording with audio stopped")
     }
-    
+
     private fun saveVideoFile() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -82,7 +84,7 @@ class VideoRecorder(
 
                 val resolver = previewView.context.contentResolver
                 val uri = resolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
-                
+
                 if (uri != null) {
                     // Copy the file to the MediaStore location
                     resolver.openOutputStream(uri)?.use { outputStream ->
@@ -118,7 +120,7 @@ class VideoRecorder(
 
                 try {
                     val canvas = inputSurface.lockCanvas(null)
-                    
+
                     // Draw camera preview
                     val previewBitmap = getPreviewBitmap()
                     if (previewBitmap != null) {
@@ -155,7 +157,7 @@ class VideoRecorder(
         try {
             // Create a bitmap from the stamp container
             val stampBitmap = getViewBitmap(stampContainer)
-            
+
             if (stampBitmap != null) {
                 // Scale the stamp to fit the video width
                 val scaledStamp = Bitmap.createScaledBitmap(
@@ -181,7 +183,7 @@ class VideoRecorder(
     private fun getViewBitmap(view: View): Bitmap? {
         return try {
             if (view.width <= 0 || view.height <= 0) return null
-            
+
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
