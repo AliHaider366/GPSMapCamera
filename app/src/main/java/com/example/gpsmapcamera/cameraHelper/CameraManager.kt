@@ -59,6 +59,7 @@ import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.tooBitmap
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 
 class CameraManager(
     private val context: Context,
@@ -85,6 +86,7 @@ class CameraManager(
     private var qrImageAnalysis: ImageAnalysis? = null
     private var isQRCodeEnabled = false
     private var isVideoRecordEnabled = false
+    private var videoRecorder: VideoRecorder? = null
 
     private val cameraProviderFuture by lazy {
         ProcessCameraProvider.getInstance(context)
@@ -193,6 +195,10 @@ class CameraManager(
     fun stopVideoRecording() {
         activeRecording?.stop()
         activeRecording = null
+        
+        // Stop custom video recorder if active
+        videoRecorder?.stopRecording()
+        videoRecorder = null
     }
 
     fun startVideoRecording(
@@ -797,7 +803,58 @@ class CameraManager(
         handler.post(countdownRunnable)
     }
 
+    fun startVideoRecordingWithStamp(
+        stampContainer: FrameLayout,
+        stampPosition: StampCameraPosition = StampCameraPosition.TOP,
+        onStarted: () -> Unit,
+        onSaved: (Uri) -> Unit,
+        onError: (String) -> Unit
+    ) {
+        try {
+            val filename = appViewModel.fileNameFromPattern().removeSuffix(".jpg") + ".mp4"
+            
+            // Create output file
+            val outputFile = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // For Android 10+, we'll use a temporary file and then move it
+                File(context.cacheDir, filename)
+            } else {
+                val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+                val subFolderName = getString(context, KEY_FOLDER_NAME)
+                val folderDir = if (subFolderName.isNotEmpty()) 
+                    File(picturesDir, "${BuildConfig.APPLICATION_ID}/$subFolderName")
+                else 
+                    File(picturesDir, BuildConfig.APPLICATION_ID)
+                
+                if (!folderDir.exists()) folderDir.mkdirs()
+                File(folderDir, filename)
+            }
 
+            val width = previewView.width.takeIf { it > 0 } ?: 1280
+            val height = previewView.height.takeIf { it > 0 } ?: 720
 
+            videoRecorder = VideoRecorder(
+                previewView = previewView,
+                stampContainer = stampContainer,
+                stampPosition = stampPosition,
+                width = width,
+                height = height,
+                outputFile = outputFile,
+                fileSavePath = appViewModel.fileSavePath,
+                onSaved = onSaved,
+                onError = onError
+            )
+
+            videoRecorder?.startRecording()
+            onStarted()
+
+        } catch (e: Exception) {
+            onError("Video recording failed: ${e.message}")
+        }
+    }
+
+    fun stopVideoRecordingWithStamp() {
+        videoRecorder?.stopRecording()
+        videoRecorder = null
+    }
 
 }

@@ -625,11 +625,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
                         fullAddressModel.country = address.countryName
                     }
 
-                    Log.d("TAG", "updateDynamicValues: address $address")
-                    Log.d("TAG", "updateDynamicValues: fullAddressModel $fullAddressModel")
-                    Log.d("TAG", "updateDynamicValues: fullAddressModel $fullAddressModel")
-
-
                 }
 
             } catch (e: Exception) {

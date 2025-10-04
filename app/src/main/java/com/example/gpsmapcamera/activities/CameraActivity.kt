@@ -18,6 +18,7 @@ import androidx.camera.core.FocusMeteringAction
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import android.content.Context
+import android.util.Log
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
@@ -667,15 +668,19 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             videoStopBtn.visible()
             videoTimmerTV.visible()
             videoRecordBtn.gone()
-            cameraManager.startVideoRecording(
+            cameraManager.startVideoRecordingWithStamp(
+                stampContainer = stampContainer,
+                stampPosition = selectedStampPosition,
                 onStarted = {
+                    Log.d("TAG", "setClickListeners: onStarted")
                     recordingTimer.start()
-
                 },
                 onSaved = { uri ->
+                    Log.d("TAG", "setClickListeners: onSaved $uri")
 //                    showToast("video saved:$uri")
                 },
                 onError = { msg ->
+                    Log.d("TAG", "setClickListeners: onError $msg")
                     videoStopBtn.gone()
                     videoRecordBtn.visible()
                 }
@@ -683,7 +688,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         videoStopBtn.setOnClickListener {
-            cameraManager.stopVideoRecording()
+            cameraManager.stopVideoRecordingWithStamp()
             recordingTimer.stop()
 
             videoStopBtn.gone()
@@ -1180,6 +1185,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
 //            stop recording
             cameraManager.stopVideoRecording()
+            cameraManager.stopVideoRecordingWithStamp()
             recordingTimer.stop()
             videoStopBtn.gone()
             videoTimmerTV.gone()
