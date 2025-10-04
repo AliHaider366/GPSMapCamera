@@ -1,6 +1,7 @@
 package com.example.gpsmapcamera.activities.template.stampsetting
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.SeekBar
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
@@ -59,13 +60,18 @@ class MapScaleActivity : BaseActivity() {
 
     private fun setUpSeekBar(){
 
+        val minZoom = 5f
+        val maxZoom = 20f
+
+        // map progress (0–100) → zoom (5–20)
+        val zoomProgress = ((mapZoomLevel - minZoom.toFloat()) / (maxZoom - minZoom)) * 100f
+
         binding.zoomSeekBar.max = 100
-        binding.zoomSeekBar.progress = 50 // default midpoint
+        binding.zoomSeekBar.progress = zoomProgress.toInt() // default midpoint
 
         binding.zoomSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val minZoom = 5f
-                val maxZoom = 20f
+
 
                 // map progress (0–100) → zoom (5–20)
                 val zoomLevel = minZoom + (progress / 100f) * (maxZoom - minZoom)
@@ -93,6 +99,9 @@ class MapScaleActivity : BaseActivity() {
             Constants.MAP_TYPE_HYBRID -> "hybrid"
             else -> "roadmap"
         }
+
+        Log.d("TAG", "loadStaticMap: $zoom")
+
 
         val apiKey = "AIzaSyB9bZ09nESdvT2kRmFEAKbQ3gUqJJwOApI" // your API key
         val url = "https://maps.googleapis.com/maps/api/staticmap" +

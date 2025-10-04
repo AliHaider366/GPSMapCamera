@@ -39,6 +39,7 @@ import android.provider.Settings
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -1163,10 +1164,19 @@ fun FrameLayout.loadStaticMap(
         else -> "roadmap"
     }
 
+    Log.d("TAG", "loadStaticMap: $zoom")
+
     val apiKey = "AIzaSyB9bZ09nESdvT2kRmFEAKbQ3gUqJJwOApI" // your API key
+
     val url = "https://maps.googleapis.com/maps/api/staticmap" +
-            "?center=$lat,$lng&zoom=$zoom&size=600x400&maptype=$typeParam" +
-            "&markers=color:red%7C$lat,$lng&key=$apiKey"
+            "?center=$lat,$lng" +
+            "&zoom=${zoom.toInt()}" +
+            "&size=640x640" +        // max allowed
+            "&scale=2" +             // doubles to 1280x1280 (HD)
+            "&maptype=$typeParam" +
+            "&markers=color:red%7C$lat,$lng" +
+            "&key=$apiKey"
+
 
     this.removeAllViews()
     val imageView = ImageView(context).apply {
@@ -1176,7 +1186,6 @@ fun FrameLayout.loadStaticMap(
             FrameLayout.LayoutParams.MATCH_PARENT
         )
     }
-//    imageView.setImageURI(url.toUri())
     Glide.with(context).load(url).into(imageView)
     this.addView(imageView)
 }

@@ -974,19 +974,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
 
-/*            reportingTemplateBinding.map.loadGoogleMap(
-                context = this,
-                location = location!!,
-                fragmentManager = supportFragmentManager,
-                Constants.REPORTING_TEMPLATE,
-            ) { googleMap ->
-//            googleMapRef = googleMap
-            }*/
-
             reportingTemplateBinding.map.loadStaticMap(
                 context = this,
                 location = location!!,
-                Constants.CLASSIC_TEMPLATE
+                Constants.REPORTING_TEMPLATE
             )
 
         }
@@ -1070,19 +1061,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
 
-/*            advanceTemplateBinding.map.loadGoogleMap(
-                context = this,
-                location = location!!,
-                fragmentManager = supportFragmentManager,
-                Constants.ADVANCE_TEMPLATE
-            ) { googleMap ->
-//            googleMapRef = googleMap
-            }*/
-
             advanceTemplateBinding.map.loadStaticMap(
                 context = this,
                 location = location!!,
-                Constants.CLASSIC_TEMPLATE
+                Constants.ADVANCE_TEMPLATE
             )
 
         }
@@ -1147,15 +1129,6 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
 
-/*            classicTemplateBinding.map.loadGoogleMap(
-                context = this,
-                location = location!!,
-                fragmentManager = supportFragmentManager,
-                Constants.CLASSIC_TEMPLATE
-            ) { googleMap ->
-//            googleMapRef = googleMap
-
-            }*/
             classicTemplateBinding.map.loadStaticMap(
                 context = this,
                 location = location!!,
