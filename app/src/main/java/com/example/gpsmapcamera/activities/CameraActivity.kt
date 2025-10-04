@@ -17,6 +17,7 @@ import androidx.camera.core.AspectRatio
 import androidx.camera.core.FocusMeteringAction
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import android.content.Context
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
@@ -87,11 +88,12 @@ import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 import java.util.concurrent.TimeUnit
 import androidx.core.view.isGone
+import com.example.gpsmapcamera.utils.LocaleHelper
 import com.example.gpsmapcamera.utils.invisible
 import com.example.gpsmapcamera.utils.setTintColor
 import java.util.Locale
 
-class CameraActivity : AppCompatActivity(), CameraSettingsListener {
+class CameraActivity : BaseActivity(), CameraSettingsListener {
     private val binding by lazy {
         ActivityCameraBinding.inflate(layoutInflater)
     }
@@ -165,29 +167,16 @@ class CameraActivity : AppCompatActivity(), CameraSettingsListener {
     }
 
 
-    private fun setEnglishLocale() {
-        val locale = Locale("en")
-        Locale.setDefault(locale)
 
-        val config = Configuration(resources.configuration)
-        config.setLocale(locale)
-        resources.updateConfiguration(config, resources.displayMetrics)
-
-        // Optional: make sure layout direction also resets (LTR for English)
-        config.setLayoutDirection(locale)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        setEnglishLocale()
         CameraSettingsNotifier.listener = this
         enableEdgeToEdge()
         hideSystemBars()
         checkAndRequestGps(gpsResolutionLauncher)
         init()
-
-
     }
 
     private fun init() = binding.apply {

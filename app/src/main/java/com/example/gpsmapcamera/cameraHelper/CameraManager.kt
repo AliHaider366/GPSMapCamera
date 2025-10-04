@@ -22,11 +22,9 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -50,27 +48,17 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.example.gpsmapcamera.BuildConfig
-import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.enums.ImageFormat
 import com.example.gpsmapcamera.enums.ImageQuality
 import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.utils.MyApp
-import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FOLDER_NAME
-import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
-import com.example.gpsmapcamera.utils.PrefManager.KEY_WHITE_BALANCE
-import com.example.gpsmapcamera.utils.PrefManager.getInt
 import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.animateRippleReveal
-import com.example.gpsmapcamera.utils.formatForFile
-import com.example.gpsmapcamera.utils.getCurrentDay
 import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.tooBitmap
 import java.io.File
 import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class CameraManager(
     private val context: Context,
@@ -281,6 +269,11 @@ class CameraManager(
             }
         }
     }
+
+
+
+
+
 
     // --- Capture frame from Preview while recording ---
     fun capturePhotoFromPreviewView(onCaptured: (Uri) -> Unit) {
