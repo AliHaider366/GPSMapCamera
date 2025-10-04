@@ -88,11 +88,6 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.openlocationcode.OpenLocationCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -1140,55 +1135,6 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
     })
 }
 
-
-fun FrameLayout.loadGoogleMap(
-    context: Context,
-    location: Location,
-    fragmentManager: androidx.fragment.app.FragmentManager,
-    template: String,
-    onMapReady: ((GoogleMap) -> Unit)? = null
-) {
-    val mapFragmentTag = "map_fragment_${System.currentTimeMillis()}"
-    val mapFragment = SupportMapFragment.newInstance()
-
-    fragmentManager.beginTransaction()
-        .replace(this.id, mapFragment, mapFragmentTag)
-        .commit()
-
-    mapFragment.getMapAsync { googleMap ->
-
-        val latLng = LatLng(location.latitude, location.longitude)
-
-        // default zoom (check saved or fallback)
-        val savedZoom = PrefManager.getFloat(
-            context,
-            Constants.SELECTED_MAP_ZOOM_LEVEL + template,
-            12.5f
-        )
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, savedZoom))
-        googleMap.addMarker(MarkerOptions().position(latLng).title("You're here"))
-
-        // disable gestures
-        googleMap.uiSettings.setAllGesturesEnabled(false)
-
-        // set map type from prefs
-        val mapType = PrefManager.getString(
-            context,
-            Constants.SELECTED_MAP_TYPE + template,
-            Constants.MAP_TYPE_NORMAL
-        )
-        googleMap.mapType = when (mapType) {
-            Constants.MAP_TYPE_NORMAL -> GoogleMap.MAP_TYPE_NORMAL
-            Constants.MAP_TYPE_SATELLITE -> GoogleMap.MAP_TYPE_SATELLITE
-            Constants.MAP_TYPE_TERRAIN -> GoogleMap.MAP_TYPE_TERRAIN
-            Constants.MAP_TYPE_HYBRID -> GoogleMap.MAP_TYPE_HYBRID
-            else -> GoogleMap.MAP_TYPE_NORMAL
-        }
-
-        onMapReady?.invoke(googleMap) // optional callback if caller wants ref
-    }
-}
 
 
 fun FrameLayout.loadStaticMap(
