@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -13,14 +15,31 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
-//        setProperty("archivesBaseName", "GPS-MAP-CAMERA-VN-$versionName-VC-$versionCode")
 
+
+        applicationVariants.all {
+            outputs.all {
+                val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                val versionName = versionName
+                val versionCode = versionCode
+                output.outputFileName = "GPS-MAP-CAMERA-VN-$versionName-VC-$versionCode.apk"
+            }
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            isShrinkResources = true
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        debug {
+            isShrinkResources = false
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -28,6 +47,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -35,9 +55,17 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+
+
+    bundle {
+        language {
+            enableSplit = false
+        }
     }
 }
 
@@ -78,6 +106,17 @@ dependencies {
     implementation("androidx.media3:media3-common:1.8.0")
     implementation("androidx.media3:media3-effect:1.8.0")
     implementation("androidx.media3:media3-ui:1.8.0")
+
+
+    //firebase + ads + billing
+    implementation("com.google.firebase:firebase-config:23.0.0")
+    implementation("com.google.firebase:firebase-ads:23.6.0")
+    implementation("com.google.firebase:firebase-core:21.1.1")
+    implementation("com.google.firebase:firebase-crashlytics:20.0.0")
+    implementation("com.google.firebase:firebase-analytics:23.0.0")
+    implementation("com.google.firebase:firebase-messaging-ktx:24.1.2")
+    implementation("com.android.billingclient:billing:8.0.0")
+    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
 
 }
 

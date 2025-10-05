@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "157970729571",
+    "project_id": "camera-gps-3e5d1",
+    "storage_bucket": "camera-gps-3e5d1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157970729571:android:99766b1821209c08cd0656",
+        "android_client_info": {
+          "package_name": "com.we.map.geotag.location.video.photo.gpscamera.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtxySRDNbgmjWWzvH-m0rQlcsWvI3dYbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
