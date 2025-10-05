@@ -66,10 +66,27 @@
         android:layout_marginBottom="@dimen/_10sdp"
         android:clipToPadding="false"
         android:paddingVertical="@dimen/_8sdp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tvVersion"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         tools:listitem="@layout/item_language" />
+
+    <!-- Language Name -->
+    <TextView
+        android:id="@+id/tvVersion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/grey_g3"
+        android:textSize="@dimen/_12sdp"
+        android:gravity="center"
+        android:text="@string/version"
+        android:layout_marginBottom="@dimen/_20sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

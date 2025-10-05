@@ -20,13 +20,13 @@ class LevelView(context: Context, attrs: AttributeSet? = null) : View(context, a
 
     private val paintFixed = Paint().apply {
         color = Color.YELLOW
-        strokeWidth = 6f
+        strokeWidth = 3f
         style = Paint.Style.STROKE
         isAntiAlias = true
     }
     private val paintMoving = Paint().apply {
         color = Color.WHITE
-        strokeWidth = 6f
+        strokeWidth = 3f
         style = Paint.Style.STROKE
         isAntiAlias = true
     }
@@ -38,7 +38,7 @@ class LevelView(context: Context, attrs: AttributeSet? = null) : View(context, a
 
     private var gravityValues = FloatArray(3)
 
-    private val tolerance = 2f
+    private val tolerance = 1f
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -89,6 +89,8 @@ class LevelView(context: Context, attrs: AttributeSet? = null) : View(context, a
 
             paintMoving.color =
                 if (Math.abs(offsetX) < 5 && Math.abs(offsetY) < 5) Color.GREEN else Color.WHITE
+            paintFixed.color =
+                if (Math.abs(offsetX) < 5 && Math.abs(offsetY) < 5) Color.GREEN else Color.WHITE
 
             drawCross(canvas, centerX - offsetX, centerY + offsetY, paintMoving)
         } else {
@@ -105,7 +107,10 @@ class LevelView(context: Context, attrs: AttributeSet? = null) : View(context, a
             )
 
             paintMoving.color = if (Math.abs(rollAngle) <= tolerance ||
-                Math.abs(rollAngle) >=178) Color.GREEN else Color.WHITE
+                Math.abs(rollAngle) >=179) Color.GREEN else Color.WHITE
+
+            paintFixed.color = if (Math.abs(rollAngle) <= tolerance ||
+                Math.abs(rollAngle) >=179) Color.GREEN else Color.WHITE
 
             Log.d("TAG", "rollangle ${Math.abs(rollAngle)}")
             canvas.save()

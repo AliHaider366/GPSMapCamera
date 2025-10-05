@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,14 +41,18 @@ class PermissionActivity : BaseActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
+
     private val galleryPermissions: Array<String>
-        get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arrayOf(
+        get() = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
                 Manifest.permission.READ_MEDIA_IMAGES,
                 Manifest.permission.READ_MEDIA_VIDEO
             )
-        } else {
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+            else -> arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
         }
@@ -171,6 +176,9 @@ class PermissionActivity : BaseActivity() {
     }
 
     private fun enableContinueButtonState()=binding.apply {
+        Log.d("TAG", "enableContinueButtonState: Manifest.permission.CAMERA ${isPermissionGranted(Manifest.permission.CAMERA)}")
+        Log.d("TAG", "enableContinueButtonState: locationPermissions ${arePermissionsGranted(locationPermissions)}")
+        Log.d("TAG", "enableContinueButtonState: galleryPermissions ${arePermissionsGranted(galleryPermissions)}")
         if (areAllPermissionsGranted())
         {
             btnContinue.isEnabled = true

@@ -202,12 +202,13 @@
     <string name="select_your_preferred_stamp_template">Select your preferred stamp template</string>
     <string name="timer_3sec">Timer 3sec</string>
     <string name="timer_5sec">Timer 5sec</string>
-    <string name="version">Version %1$s</string>
+    <string name="version">Version</string>
     <string name="low">Low</string>
     <string name="high">High</string>
     <string name="photo_capture">Photo Capture</string>
     <string name="grid_3_3" translatable="false">Grid 3*3</string>
     <string name="grid_4_4" translatable="false">Grid 4*4</string>
     <string name="grid_phi" translatable="false">Grid PHI</string>
+    <string name="tap_again_to_exit">Tap again to exit</string>
 
 </resources>

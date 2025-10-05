@@ -180,7 +180,7 @@
 <string name="select_your_preferred_stamp_template">select your preferred stamp template</string>
 <string name="timer_3sec">timer 3sec</string>
 <string name="timer_5sec">timer 5sec</string>
-<string name="version">version %1$s</string>
+<string name="version">version</string>
 <string name="low">low</string>
 <string name="high">high</string>
 <string name="photo_capture">photo capture</string>

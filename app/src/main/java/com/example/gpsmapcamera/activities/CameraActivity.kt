@@ -1,6 +1,7 @@
 package com.example.gpsmapcamera.activities
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -19,6 +20,8 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
@@ -90,6 +93,8 @@ import com.example.gpsmapcamera.utils.visible
 import java.util.concurrent.TimeUnit
 import androidx.core.view.isGone
 import com.example.gpsmapcamera.utils.LocaleHelper
+import com.example.gpsmapcamera.utils.disableClicks
+import com.example.gpsmapcamera.utils.enableClicks
 import com.example.gpsmapcamera.utils.invisible
 import com.example.gpsmapcamera.utils.setTintColor
 import java.util.Locale
@@ -134,6 +139,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     private var activeMode: Int = R.id.photo_btn
     private lateinit var micPermissionLauncher: ActivityResultLauncher<String>
     var brightnessValue = 0
+    var isZoom1x = true
 
     val requestCode = 1001
     private val PERMISSIONS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -168,11 +174,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     }
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
+
         CameraSettingsNotifier.listener = this
         enableEdgeToEdge()
         hideSystemBars()
@@ -184,13 +190,15 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         setUpTemplate()
         recordingTimer = RecordingTimer(videoTimmerTV)
 
-        val imageCaptureQuality = when(getString(this@CameraActivity, KEY_IMAGE_QUALITY,getString(R.string.high)))
-        {
-            getString(R.string.low)-> ImageQuality.LOW
-            getString(R.string.medium)->ImageQuality.MEDIUM
-            getString(R.string.high)-> ImageQuality.HIGH
-            else -> {ImageQuality.HIGH}
-        }
+        val imageCaptureQuality =
+            when (getString(this@CameraActivity, KEY_IMAGE_QUALITY, getString(R.string.high))) {
+                getString(R.string.low) -> ImageQuality.LOW
+                getString(R.string.medium) -> ImageQuality.MEDIUM
+                getString(R.string.high) -> ImageQuality.HIGH
+                else -> {
+                    ImageQuality.HIGH
+                }
+            }
 
         cameraManager = CameraManager(this@CameraActivity, previewView)
 
@@ -234,7 +242,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
             )
         } else {
-            cameraManager.startCamera(imageQuality = imageCaptureQuality ) {
+            cameraManager.startCamera(imageQuality = imageCaptureQuality) {
                 //set camera values after start
                 cameraManager.setBrightness(getInt(this@CameraActivity, KEY_WHITE_BALANCE, 0))
 
@@ -247,7 +255,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         setClickListeners()
 
-        brightnessValue =  getInt(this@CameraActivity, KEY_WHITE_BALANCE, 0)        // set initial brightness
+        brightnessValue =
+            getInt(this@CameraActivity, KEY_WHITE_BALANCE, 0)        // set initial brightness
         brightnessBar.max = 80
         brightnessBar.progress = brightnessValue + 40
         progressText.text = brightnessValue.toString()
@@ -278,42 +287,44 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         } else cameraLevel.setLevelEnabled(false)
 
 
-/*        if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
-            gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
-            gridOverlay.updateGrid(true, 4)
-        } else
-            gridOverlay.updateGrid(false, 0)*/
+        /*        if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                    gridOverlay.updateGrid(true, 4)
+                } else
+                    gridOverlay.updateGrid(false, 0)*/
 
-        when(getInt(this@CameraActivity, KEY_CAMERA_GRID))
-        {
-            0->{
-                saveInt(this@CameraActivity,KEY_CAMERA_GRID,0)
+        when (getInt(this@CameraActivity, KEY_CAMERA_GRID)) {
+            0 -> {
+                saveInt(this@CameraActivity, KEY_CAMERA_GRID, 0)
                 gridBtn.setDrawable(top = R.drawable.grid_3_ic)
-                gridBtn.text=getString(R.string.grid)
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                gridOverlay.updateGrid(true,0)
+                gridBtn.text = getString(R.string.grid)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                gridOverlay.updateGrid(true, 0)
 
             }
-            3->{
-                saveInt(this@CameraActivity,KEY_CAMERA_GRID,3)
+
+            3 -> {
+                saveInt(this@CameraActivity, KEY_CAMERA_GRID, 3)
                 gridBtn.setDrawable(top = R.drawable.grid_3_ic)
-                gridBtn.text=getString(R.string.grid_3_3)
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                gridOverlay.updateGrid(true,3)
+                gridBtn.text = getString(R.string.grid_3_3)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                gridOverlay.updateGrid(true, 3)
             }
-            4->{
-                saveInt(this@CameraActivity,KEY_CAMERA_GRID,4)
+
+            4 -> {
+                saveInt(this@CameraActivity, KEY_CAMERA_GRID, 4)
                 gridBtn.setDrawable(top = R.drawable.grid_4_ic)
-                gridBtn.text=getString(R.string.grid_4_4)
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                gridOverlay.updateGrid(true,4)
+                gridBtn.text = getString(R.string.grid_4_4)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                gridOverlay.updateGrid(true, 4)
             }
-            -3->{
-                saveInt(this@CameraActivity,KEY_CAMERA_GRID,-3)
+
+            -3 -> {
+                saveInt(this@CameraActivity, KEY_CAMERA_GRID, -3)
                 gridBtn.setDrawable(top = R.drawable.phi_grid_ic)
-                gridBtn.text=getString(R.string.grid_phi)
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                gridOverlay.updateGrid(true,3,true)
+                gridBtn.text = getString(R.string.grid_phi)
+                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                gridOverlay.updateGrid(true, 3, true)
             }
         }
 
@@ -330,27 +341,28 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             }
         }
 
-    /*    if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
-            flashBtn.setTintColor(R.color.blue)
-            cameraManager.toggleFlash(true)
-        }*/
+        /*    if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
+                flashBtn.setTintColor(R.color.blue)
+                cameraManager.toggleFlash(true)
+            }*/
 
-        when(getInt(this@CameraActivity, KEY_CAMERA_FLASH,0))
-        {
-            0->{
+        when (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)) {
+            0 -> {
                 flashBtn.setImage(R.drawable.flash_off_ic)
-                flashBtn.setTintColor(  R.color.white)
+                flashBtn.setTintColor(R.color.white)
                 cameraManager.toggleFlash(0)  /*flash off*/
             }
-            1->{
+
+            1 -> {
                 flashBtn.setImage(R.drawable.flash_on_ic)
-                flashBtn.setTintColor(  R.color.blue)
+                flashBtn.setTintColor(R.color.blue)
                 cameraManager.toggleFlash(1) /*flash on*/
 
             }
-            2->{
+
+            2 -> {
                 flashBtn.setImage(R.drawable.flash_auto_ic)
-                flashBtn.setTintColor( R.color.blue)
+                flashBtn.setTintColor(R.color.blue)
                 cameraManager.toggleFlash(2) /*flash auto*/
 
             }
@@ -361,9 +373,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             when (getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE)) {
                 0 -> {
 //                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
-                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.white)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.white)
                     timerBtn.setDrawable(top = R.drawable.timer_ic)
-                    timerBtn.text=getString(R.string.timer_off)
+                    timerBtn.text = getString(R.string.timer_off)
 
 //                    saveCameraTimer(this@CameraActivity,0,false)
 //                    saveBoolean(this@CameraActivity,KEY_CAMERA_TIMER,false)
@@ -372,17 +384,17 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 3 -> {
 //                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
-                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.blue)
                     timerBtn.setDrawable(top = R.drawable.timer_3s_ic)
-                    timerBtn.text= getString(R.string.timer_3sec)
+                    timerBtn.text = getString(R.string.timer_3sec)
 //                    saveCameraTimer(this@CameraActivity,3,true)
                 }
 
                 5 -> {
 //                    timerBtn.setCompoundDrawableTintAndTextColor(R.color.red, R.color.red)
-                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.blue)
                     timerBtn.setDrawable(top = R.drawable.timer_5sec_ic)
-                    timerBtn.text= getString(R.string.timer_5sec)
+                    timerBtn.text = getString(R.string.timer_5sec)
 //                    saveCameraTimer(this@CameraActivity,5,true)
                 }
             }
@@ -409,6 +421,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
     }
 
+    @SuppressLint("MissingPermission")
     private fun setClickListeners() = binding.apply {
 
         galleyGotoBtn.setOnClickListener {
@@ -433,39 +446,17 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         flashBtn.setOnClickListener {
-   /*         if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
-                flashBtn.setTintColor(R.color.white)
-                saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, false)
-                cameraManager.toggleFlash(false)
-            } else {
-                flashBtn.setTintColor(R.color.blue)
-                saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, true)
-                cameraManager.toggleFlash(true)
-            }*/
+            /*         if (getBoolean(this@CameraActivity, KEY_CAMERA_FLASH)) {
+                         flashBtn.setTintColor(R.color.white)
+                         saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, false)
+                         cameraManager.toggleFlash(false)
+                     } else {
+                         flashBtn.setTintColor(R.color.blue)
+                         saveBoolean(this@CameraActivity, KEY_CAMERA_FLASH, true)
+                         cameraManager.toggleFlash(true)
+                     }*/
 
-            when(getInt(this@CameraActivity, KEY_CAMERA_FLASH,0))
-            {
-                0->{
-                    flashBtn.setImage(R.drawable.flash_on_ic)
-                    flashBtn.setTintColor(  R.color.blue)
-                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 1)
-                    cameraManager.toggleFlash(1)  /*flash on*/
-                }
-                1->{
-                    flashBtn.setImage(R.drawable.flash_auto_ic)
-                    flashBtn.setTintColor(  R.color.blue)
-                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
-                    cameraManager.toggleFlash(2) /*flash auto*/
-
-                }
-                2->{
-                    flashBtn.setImage(R.drawable.flash_off_ic)
-                    flashBtn.setTintColor(  R.color.white)
-                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
-                    cameraManager.toggleFlash(0) /*flash off*/
-
-                }
-            }
+            updateFlash()
         }
 
         ratioBtn.setOnClickListener {
@@ -486,45 +477,47 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         gridBtn.setOnClickListener {
-           /* if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
-                saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, false)
-                gridOverlay.updateGrid(false, 0)
-            } else {
-                gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
-                saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, true)
-                gridOverlay.updateGrid(true, 4)
-            }*/
-            when(getInt(this@CameraActivity, KEY_CAMERA_GRID))
-            {
-                0->{
-                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,3)
+            /* if (getBoolean(this@CameraActivity, KEY_CAMERA_GRID)) {
+                 gridBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                 saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, false)
+                 gridOverlay.updateGrid(false, 0)
+             } else {
+                 gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                 saveBoolean(this@CameraActivity, KEY_CAMERA_GRID, true)
+                 gridOverlay.updateGrid(true, 4)
+             }*/
+            when (getInt(this@CameraActivity, KEY_CAMERA_GRID)) {
+                0 -> {
+                    saveInt(this@CameraActivity, KEY_CAMERA_GRID, 3)
                     gridBtn.setDrawable(top = R.drawable.grid_3_ic)
-                    gridBtn.text= getString(R.string.grid_3_3)
-                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                    gridOverlay.updateGrid(true,3)
+                    gridBtn.text = getString(R.string.grid_3_3)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                    gridOverlay.updateGrid(true, 3)
 
                 }
-                3->{
-                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,4)
+
+                3 -> {
+                    saveInt(this@CameraActivity, KEY_CAMERA_GRID, 4)
                     gridBtn.setDrawable(top = R.drawable.grid_4_ic)
-                    gridBtn.text= getString(R.string.grid_4_4)
-                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                    gridOverlay.updateGrid(true,4)
+                    gridBtn.text = getString(R.string.grid_4_4)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                    gridOverlay.updateGrid(true, 4)
                 }
-                4->{
-                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,-3)
+
+                4 -> {
+                    saveInt(this@CameraActivity, KEY_CAMERA_GRID, -3)
                     gridBtn.setDrawable(top = R.drawable.phi_grid_ic)
-                    gridBtn.text= getString(R.string.grid_phi)
-                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue,R.color.blue)
-                    gridOverlay.updateGrid(true,3,true)
+                    gridBtn.text = getString(R.string.grid_phi)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
+                    gridOverlay.updateGrid(true, 3, true)
                 }
-                -3->{
-                    saveInt(this@CameraActivity,KEY_CAMERA_GRID,0)
+
+                -3 -> {
+                    saveInt(this@CameraActivity, KEY_CAMERA_GRID, 0)
                     gridBtn.setDrawable(top = R.drawable.grid_3_ic)
-                    gridBtn.text= getString(R.string.grid)
-                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.white,R.color.white)
-                    gridOverlay.updateGrid(true,0)
+                    gridBtn.text = getString(R.string.grid)
+                    gridBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+                    gridOverlay.updateGrid(true, 0)
                 }
             }
         }
@@ -532,9 +525,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         timerBtn.setOnClickListener {
             when (getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE)) {
                 0 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.blue)
                     timerBtn.setDrawable(top = R.drawable.timer_3s_ic)
-                    timerBtn.text=getString(R.string.timer_3sec)
+                    timerBtn.text = getString(R.string.timer_3sec)
 
 //                    saveCameraTimer(this@CameraActivity,3,true)
                     saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, true)
@@ -542,9 +535,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
 
                 3 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.blue)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.blue)
                     timerBtn.setDrawable(top = R.drawable.timer_5sec_ic)
-                    timerBtn.text=getString(R.string.timer_5sec)
+                    timerBtn.text = getString(R.string.timer_5sec)
 
 //                    saveCameraTimer(this@CameraActivity,5,true)
                     saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, true)
@@ -552,9 +545,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
 
                 5 -> {
-                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes =  R.color.white)
+                    timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.white)
                     timerBtn.setDrawable(top = R.drawable.timer_ic)
-                    timerBtn.text=getString(R.string.timer_off)
+                    timerBtn.text = getString(R.string.timer_off)
 //                    saveCameraTimer(this@CameraActivity,0,false)
                     saveBoolean(this@CameraActivity, KEY_CAMERA_TIMER, false)
                     saveInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE, 0)
@@ -668,6 +661,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             videoStopBtn.visible()
             videoTimmerTV.visible()
             videoRecordBtn.gone()
+
+            disableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
+
             cameraManager.startVideoRecordingWithStamp(
                 stampContainer = stampContainer,
                 stampPosition = selectedStampPosition,
@@ -688,24 +684,25 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         videoStopBtn.setOnClickListener {
+            enableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
             cameraManager.stopVideoRecordingWithStamp()
             recordingTimer.stop()
 
             videoStopBtn.gone()
             videoTimmerTV.gone()
             videoRecordBtn.visible()
+            saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+            updateFlash()
         }
 
         x1ZoomTv.setOnClickListener {
-            binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
-            binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
-            cameraManager.zoom1x2x(1f)
+            isZoom1x = true
+            setZoom()
         }
 
         x2ZoomTv.setOnClickListener {
-            binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
-            binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
-            cameraManager.zoom1x2x(2f)
+            isZoom1x = false
+            setZoom()
         }
 
         shareBtn.setOnClickListener {
@@ -744,12 +741,60 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
+    private fun updateFlash() = binding.run {
+
+        when (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)) {
+            0 -> {
+                flashBtn.setImage(R.drawable.flash_on_ic)
+                flashBtn.setTintColor(R.color.blue)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 1)
+                cameraManager.toggleFlash(1)  /*flash on*/
+                if (activeMode == R.id.video_btn) {
+                    cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
+                }
+            }
+
+            1 -> {
+                flashBtn.setImage(R.drawable.flash_auto_ic)
+                flashBtn.setTintColor(R.color.blue)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+                cameraManager.toggleFlash(2) /*flash auto*/
+                if (activeMode == R.id.video_btn) {
+                    cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
+                }
+            }
+
+            2 -> {
+                flashBtn.setImage(R.drawable.flash_off_ic)
+                flashBtn.setTintColor(R.color.white)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
+                cameraManager.toggleFlash(0) /*flash off*/
+                if (activeMode == R.id.video_btn) {
+                    cameraManager.camera?.cameraControl?.enableTorch(false) // Enable torch for video
+                }
+            }
+        }
+    }
+
+    private fun setZoom() {
+        if (isZoom1x) {
+            binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
+            binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
+            cameraManager.zoom1x2x(1f)
+        } else {
+            binding.x2ZoomTv.setTextColorAndBackgroundTint(R.color.black, R.color.white)
+            binding.x1ZoomTv.setTextColorAndBackgroundTint(R.color.white, R.color.transparent)
+            cameraManager.zoom1x2x(2f)
+        }
+    }
+
     private fun switchMode(newMode: Int) {
         if (activeMode == newMode) return // already active → do nothing
         activeMode = newMode
 
         when (newMode) {
             R.id.share_btn -> {
+                isZoom1x = true
                 binding.shareBtn.setTextColorRes(
                     R.color.blue,
                     R.color.white,
@@ -765,9 +810,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 cameraManager.stopVideoRecording()/// stop recording if started
                 binding.videoStopBtn.gone()
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+                updateFlash()
             }
 
             R.id.photo_btn -> {
+                isZoom1x = true
                 binding.photoBtn.setTextColorRes(
                     R.color.blue,
                     R.color.white,
@@ -783,10 +831,13 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 cameraManager.stopVideoRecording()///stop recording if started
                 binding.videoStopBtn.gone()
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+                updateFlash()
 
             }
 
             R.id.video_btn -> {
+                isZoom1x = true
                 binding.videoBtn.setTextColorRes(
                     R.color.blue,
                     R.color.white,
@@ -799,12 +850,17 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 binding.videoRecordBtn.visible()
                 cameraManager.setVideoRecord(true)
                 saveBoolean(this, KEY_SHARE_IMAGE, false)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+                updateFlash()
             }
         }
+        setZoom()
     }
 
-    private fun setupCameraTouch()=binding.apply{
+    private fun setupCameraTouch() = binding.apply {
         cameraManager.setupTouchControls { x, y ->
+            Log.d("TAG", "setupCameraTouch: ${binding.detailTopMenuView.isVisible}")
+
             if (binding.detailTopMenuView.isVisible) {
                 binding.detailTopMenuView.visibility = View.GONE
                 binding.defaultTopMenuView.visibility = View.VISIBLE
@@ -815,21 +871,30 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                     R.color.white,
                     R.color.white
                 )
-            }
-            else
-            {
-                when(getString(this@CameraActivity,KEY_TOUCH_SETTING,getString(R.string.focus)))
-                {
-                    getString(R.string.focus)->{
+            } else {
+                when (getString(
+                    this@CameraActivity,
+                    KEY_TOUCH_SETTING,
+                    getString(R.string.focus)
+                )) {
+                    getString(R.string.focus) -> {
                         val point = cameraManager.previewView.meteringPointFactory.createPoint(x, y)
                         val action = FocusMeteringAction.Builder(point)
                             .setAutoCancelDuration(3, TimeUnit.SECONDS)
                             .build()
                         cameraManager.camera?.cameraControl?.startFocusAndMetering(action)
                     }
-                    getString(R.string.photo_capture)->{
-                        if (binding.videoRecordBtn.isGone && binding.videoStopBtn.isGone)
-                        {
+
+                    getString(R.string.photo_capture) -> {
+                        Log.d(
+                            "TAG",
+                            "setupCameraTouch: binding.videoRecordBtn.isGone ${binding.videoRecordBtn.isGone}"
+                        )
+                        Log.d(
+                            "TAG",
+                            "setupCameraTouch: binding.videoStopBtn.isGone ${binding.videoStopBtn.isGone}"
+                        )
+                        if (binding.videoRecordBtn.isGone && binding.videoStopBtn.isGone) {
                             /// only allow touch capture when in photo mode not in record
 
                             if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
@@ -841,7 +906,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                                     selectedStampPosition
                                 ) { uri ->
                                     uri?.let {
-                                        val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
+                                        val intent = Intent(
+                                            this@CameraActivity,
+                                            PreviewImageActivity::class.java
+                                        )
                                         intent.putExtra("image_uri", it.toString())
                                         if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
                                             shareImage(it)
@@ -849,7 +917,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                                     }
                                 }
                             } else {
-                                cameraManager.takePhotoWithStamp(stampContainer, selectedStampPosition) { uri ->
+                                cameraManager.takePhotoWithStamp(
+                                    stampContainer,
+                                    selectedStampPosition
+                                ) { uri ->
                                     if (uri != null) {
                                         if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
                                             shareImage(uri)
@@ -965,13 +1036,16 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             val getScaleValue = root.context.getFontSizeFactor(selectedTemplate)
             val baseTextSize =
-                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp).toFloat()
+                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp)
+                    .toFloat()
             tvCenterTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSize * getScaleValue)
 
             val baseTextSizeFortvEnv =
                 root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._9sdp).toFloat()
-            tvEnvironment.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSizeFortvEnv * getScaleValue)
-
+            tvEnvironment.setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                baseTextSizeFortvEnv * getScaleValue
+            )
 
 
         }
@@ -1041,8 +1115,6 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             rvRight.adapter = templateAdapterRight
 
 
-
-
             val typeface = ResourcesCompat.getFont(
                 root.context, stampFontList[getInt(
                     root.context,
@@ -1056,7 +1128,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             val getScaleValue = root.context.getFontSizeFactor(selectedTemplate)
             val baseTextSize =
-                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp).toFloat()
+                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp)
+                    .toFloat()
             tvCenterTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSize * getScaleValue)
 
 
@@ -1113,7 +1186,6 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             rvRight.adapter = templateAdapterRight
 
 
-
             val typeface = ResourcesCompat.getFont(
                 root.context, stampFontList[getInt(
                     root.context,
@@ -1127,7 +1199,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             val getScaleValue = root.context.getFontSizeFactor(selectedTemplate)
             val baseTextSize =
-                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp).toFloat()
+                root.context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._13sdp)
+                    .toFloat()
             tvCenterTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSize * getScaleValue)
 
         }
@@ -1184,18 +1257,43 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             defaultTopMenuView.visible()
 
 //            stop recording
+            enableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
             cameraManager.stopVideoRecording()
             cameraManager.stopVideoRecordingWithStamp()
+
+            saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+            updateFlash()
             recordingTimer.stop()
             videoStopBtn.gone()
             videoTimmerTV.gone()
-            videoRecordBtn.visible()
+//            videoRecordBtn.visible()
         }
 
     }
 
     override fun onQualityChanged(newQuality: ImageQuality) {
         cameraManager.startCamera(newQuality)
+    }
+
+
+    private var backPressedTime = 0L
+    private val exitInterval = 2000L // 2 seconds
+
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (backPressedTime + exitInterval > System.currentTimeMillis()) {
+                finish()
+                finishAffinity()
+            } else {
+                Toast.makeText(
+                    this@CameraActivity,
+                    getString(R.string.tap_again_to_exit),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            backPressedTime = System.currentTimeMillis()
+
+        }
     }
 
 }

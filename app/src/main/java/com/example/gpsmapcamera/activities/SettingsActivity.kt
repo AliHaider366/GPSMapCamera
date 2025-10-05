@@ -20,6 +20,7 @@ import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.PrefManager.saveString
 import com.example.gpsmapcamera.utils.isSingleTouch
 import com.example.gpsmapcamera.utils.launchActivity
+import com.example.gpsmapcamera.utils.rateUs
 import com.example.gpsmapcamera.utils.shareApp
 import com.example.gpsmapcamera.utils.showDropdownMenu
 import com.example.gpsmapcamera.utils.toLanguageName
@@ -66,17 +67,11 @@ class SettingsActivity : BaseActivity() {
 //            SettingsModel.FeaturesItem(getString(R.string.front_rear_camera_stamp), R.drawable.setting_front_rear_ic),
             SettingsModel.Heading(getString(R.string.about)), // Heading item
             SettingsModel.AboutItem(getString(R.string.rate_us), R.drawable.setting_rate_us_ic),
-            SettingsModel.AboutItem(getString(R.string.share), R.drawable.setting_share_ic),
+            SettingsModel.AboutItem(getString(R.string.share), R.drawable.ic_share_setting),
             SettingsModel.AboutItem(
                 getString(R.string.privacy_policy),
                 R.drawable.setting_privacy_policy_ic
-            ),
-            SettingsModel.Heading(
-                getString(
-                    R.string.version
-                ) + BuildConfig.VERSION_NAME
-
-            ), // Version item
+            )
         )
     }
 
@@ -96,7 +91,11 @@ class SettingsActivity : BaseActivity() {
     }
 
     private fun init() = binding.apply {
-
+        tvVersion.text = buildString {
+            append(getString(R.string.version))
+            append(" ")
+            append(BuildConfig.VERSION_NAME)
+        }
         setupRecyclerView()
     }
 
@@ -167,7 +166,11 @@ class SettingsActivity : BaseActivity() {
 
             getString(R.string.share) -> {
                 shareApp(BuildConfig.APPLICATION_ID)
+            }
 
+
+            getString(R.string.rate_us) -> {
+                rateUs()
             }
 
 

@@ -9,11 +9,10 @@ import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.visible
 
 class StartMenu4Adapter(private val itemsList: List<Pair<String, Int>>,val onSelected: (Int,String)->Unit) : RecyclerView.Adapter<StartMenu4Adapter.ImageViewHolder>() {
-
+    private var selectedPos=-1
     inner class ImageViewHolder(private val binding: StartMenu4ItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        private var selectedPos=-1
-        fun bind(item: Pair<String, Int>) {
+        fun bind(item: Pair<String, Int>, position: Int) {
             Glide.with(binding.imageView.context)
                 .load(item.second)
                 .into(binding.imageView)
@@ -38,7 +37,7 @@ class StartMenu4Adapter(private val itemsList: List<Pair<String, Int>>,val onSel
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bind(itemsList[position])
+        holder.bind(itemsList[position], position)
     }
 
     override fun getItemCount(): Int = itemsList.size

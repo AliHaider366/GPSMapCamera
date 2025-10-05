@@ -16,12 +16,14 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.annotation.RequiresPermission
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
@@ -199,6 +201,8 @@ class CameraManager(
         // Stop custom video recorder if active
         videoRecorder?.stopRecording()
         videoRecorder = null
+
+        camera?.cameraControl?.enableTorch(false)
     }
 
     fun startVideoRecording(
@@ -803,6 +807,7 @@ class CameraManager(
         handler.post(countdownRunnable)
     }
 
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun startVideoRecordingWithStamp(
         stampContainer: FrameLayout,
         stampPosition: StampCameraPosition = StampCameraPosition.TOP,
@@ -832,6 +837,11 @@ class CameraManager(
             val width = previewView.width.takeIf { it > 0 } ?: 1280
             val height = previewView.height.takeIf { it > 0 } ?: 720
 
+            // Enable torch if flash is enabled (1 = ON, 2 = AUTO)
+            if (flashEnabled == 1 || flashEnabled == 2) {
+                camera?.cameraControl?.enableTorch(true)
+            }
+
             videoRecorder = VideoRecorder(
                 previewView = previewView,
                 stampContainer = stampContainer,
@@ -855,6 +865,8 @@ class CameraManager(
     fun stopVideoRecordingWithStamp() {
         videoRecorder?.stopRecording()
         videoRecorder = null
+
+        camera?.cameraControl?.enableTorch(false)
     }
 
 }

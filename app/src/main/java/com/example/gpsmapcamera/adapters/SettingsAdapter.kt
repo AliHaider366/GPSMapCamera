@@ -117,19 +117,6 @@ class SettingsAdapter(
             binding.apply {
                 val context=root.context
                 headingName.text=item.heading
-
-                if (position==userList.lastIndex)
-                {
-                    headingName.gravity=Gravity.CENTER
-                    headingName.setCompoundDrawableTintAndTextColor(
-                       textColorRes =  R.color.grey_g3
-                    )
-                    headingName.setTypeface(null, Typeface.NORMAL) // normal
-                    headingName.setTextSize(
-                        TypedValue.COMPLEX_UNIT_PX,
-                        context.resources.getDimension(com.intuit.sdp.R.dimen._12sdp)
-                    )
-                }
             }
         }
     }

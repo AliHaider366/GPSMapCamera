@@ -21,7 +21,7 @@ class LanguageActivity : BaseActivity() {
 
 
 
-    private var selectedLangCode = "en-US"
+    private var selectedLangCode = ""
 
     private lateinit var languageAdapter: LanguageAdapter
 
@@ -70,12 +70,11 @@ class LanguageActivity : BaseActivity() {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        selectedLangCode = PrefManager.getString(this, Constants.SELECTED_LANGUAGE, "en-US")
+        selectedLangCode = PrefManager.getString(this, Constants.SELECTED_LANGUAGE, "")
         init()
         clickListeners()
     }
@@ -96,6 +95,9 @@ class LanguageActivity : BaseActivity() {
     }
 
     private fun init()=binding.apply {
+
+        binding.btnApply.isEnabled=false
+        binding.btnApply.alpha=0.5f
         setupRecyclerView()
     }
 
@@ -115,13 +117,13 @@ class LanguageActivity : BaseActivity() {
             layoutManager = GridLayoutManager(this@LanguageActivity, 2)
         }
 
-        val selectedItem = lanList.find { it.code.equals(selectedLangCode, ignoreCase = true) }
+//        val selectedItem = lanList.find { it.code.equals(selectedLangCode, ignoreCase = true) }
         languageAdapter.submitList(lanList)
 
-        Log.d("TAG", "setupRecyclerView: $selectedItem")
-        selectedItem?.let {
-            languageAdapter.updateSelection(it)
-        }
+//        Log.d("TAG", "setupRecyclerView: $selectedItem")
+//        selectedItem?.let {
+//            languageAdapter.updateSelection(it)
+//        }
 
     }
 

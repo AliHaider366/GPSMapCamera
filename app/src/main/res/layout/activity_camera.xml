@@ -3,45 +3,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:background="@color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-  >
+    android:background="@color/black">
 
     <!-- This holds the camera preview  -->
-        <FrameLayout
-            android:id="@+id/previewContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@color/black"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <androidx.camera.view.PreviewView
-                android:id="@+id/previewView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:adjustViewBounds="true"
-                android:background="#000"
-                app:implementationMode="performance"
-            app:scaleType="fillCenter" />
-            <!-- app:implementationMode="compatible"-->
+    <FrameLayout
+        android:id="@+id/previewContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-            <com.example.gpsmapcamera.cameraHelper.GridOverlayView
-                android:id="@+id/gridOverlay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                />
-        </FrameLayout>
-
-        <com.example.gpsmapcamera.cameraHelper.LevelView
-            android:id="@+id/cameraLevel"
+        <androidx.camera.view.PreviewView
+            android:id="@+id/previewView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/transparent"/>
+            android:adjustViewBounds="true"
+            android:background="#000"
+            app:implementationMode="performance"
+            app:scaleType="fillCenter" />
+        <!-- app:implementationMode="compatible"-->
+
+        <com.example.gpsmapcamera.cameraHelper.GridOverlayView
+            android:id="@+id/gridOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <com.example.gpsmapcamera.cameraHelper.LevelView
+        android:id="@+id/cameraLevel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
 
 
     <FrameLayout
@@ -49,9 +48,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/_10sdp"
-        app:layout_constraintTop_toTopOf="@+id/previewContainer"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toTopOf="@+id/previewContainer" />
 
 
     <!--video record timmer textview-->
@@ -59,19 +58,19 @@
         android:id="@+id/videoTimmerTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:text="00:00:00"
-        android:visibility="gone"
         android:background="@drawable/bg_radius_20"
         android:backgroundTint="@color/red_r2"
         android:paddingHorizontal="@dimen/_10sdp"
         android:paddingVertical="@dimen/_5sdp"
-        app:layout_constraintVertical_bias="0.05"
+        android:text="00:00:00"
+        android:textColor="@color/white"
         android:textSize="@dimen/_14sdp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/zoom_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/defaultTopMenuView" />
+        app:layout_constraintTop_toBottomOf="@+id/defaultTopMenuView"
+        app:layout_constraintVertical_bias="0.05" />
 
 
     <!--timmer textview-->
@@ -79,9 +78,9 @@
         android:id="@+id/timmerTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:textColor="@color/blue"
         android:textSize="@dimen/_30sdp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/zoom_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -125,211 +124,195 @@
 
 
     <!--defaut top menu-->
+    <LinearLayout
+        android:id="@+id/defaultTopMenuView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dim_black"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/_8sdp"
+        android:weightSum="5"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/more_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_weight="1"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/more_ic" />
+
+        <ImageView
+            android:id="@+id/text_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_weight="1"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/text_ic"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/flash_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_weight="1"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/flash_on_ic" />
+
+        <ImageView
+            android:id="@+id/pick_galley_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_weight="1"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/galley_ic_stroke" />
+
+        <ImageView
+            android:id="@+id/file_name_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_weight="1"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/file_name_ic" />
+
+        <ImageView
+            android:id="@+id/setting_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_weight="1"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/setting_ic" />
+
+    </LinearLayout>
+
+
+    <!--detail top menu-->
+    <LinearLayout
+        android:id="@+id/detailTopMenuView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:orientation="vertical"
+        android:paddingVertical="@dimen/_5sdp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
-            android:id="@+id/defaultTopMenuView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:weightSum="5"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/dim_black"
             android:paddingVertical="@dimen/_8sdp"
-           >
+            android:weightSum="4">
 
-            <ImageView
-                android:id="@+id/more_btn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_28sdp"
-                android:padding="@dimen/_5sdp"
+            <TextView
+                android:id="@+id/ratio_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/more_ic"
-                />
+                android:drawableTop="@drawable/ratio16_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/ratio"
+                android:textColor="@color/blue"
+                android:textSize="@dimen/_10sdp" />
 
-            <ImageView
-                android:id="@+id/text_btn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_28sdp"
-                android:padding="@dimen/_5sdp"
+            <TextView
+                android:id="@+id/grid_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:visibility="gone"
-                android:src="@drawable/text_ic"
-                />
+                android:drawableTop="@drawable/grid_3_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/grid"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp" />
 
-            <ImageView
-                android:id="@+id/flash_btn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_28sdp"
-                android:padding="@dimen/_5sdp"
+            <TextView
+                android:id="@+id/timer_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/flash_on_ic"
-                 />
+                android:drawableTop="@drawable/timer_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/timer_off"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp" />
 
-            <ImageView
-                android:id="@+id/pick_galley_btn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_28sdp"
-                android:padding="@dimen/_5sdp"
+            <TextView
+                android:id="@+id/mirror_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/galley_ic_stroke"
-                 />
+                android:drawableTop="@drawable/mirror_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/mirror"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp" />
 
-            <ImageView
-                android:id="@+id/file_name_btn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_28sdp"
-                android:padding="@dimen/_5sdp"
-                android:layout_weight="1"
-                android:src="@drawable/file_name_ic"
-                 />
-
-            <ImageView
-                android:id="@+id/setting_btn"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_28sdp"
-                android:padding="@dimen/_5sdp"
-                android:layout_weight="1"
-                android:src="@drawable/setting_ic"
-               />
 
         </LinearLayout>
 
-
-        <!--detail top menu-->
         <LinearLayout
-            android:id="@+id/detailTopMenuView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/black"
-            android:paddingVertical="@dimen/_5sdp"
-            >
-            <LinearLayout
+            android:orientation="horizontal"
+            android:paddingVertical="@dimen/_8sdp"
+            android:weightSum="4">
+
+            <TextView
+                android:id="@+id/volume_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="4"
-                android:paddingVertical="@dimen/_8sdp"
-                >
+                android:layout_weight="1"
+                android:drawableTop="@drawable/volume_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/volume"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp" />
 
-                <TextView
-                    android:id="@+id/ratio_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/ratio16_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/ratio"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/blue"
-                    android:textSize="@dimen/_10sdp"
-                    />
-
-                <TextView
-                    android:id="@+id/grid_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/grid_3_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/grid"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    />
-
-                <TextView
-                    android:id="@+id/timer_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/timer_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/timer_off"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    />
-                <TextView
-                    android:id="@+id/mirror_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/mirror_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/mirror"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    />
-
-
-            </LinearLayout>
-
-            <LinearLayout
+            <TextView
+                android:id="@+id/brightness_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:weightSum="4"
-                android:paddingVertical="@dimen/_8sdp"
-                >
+                android:layout_weight="1"
+                android:drawableTop="@drawable/brightness_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/white"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp" />
 
-                <TextView
-                    android:id="@+id/volume_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/volume_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/volume"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    />
+            <TextView
+                android:id="@+id/cam_level_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/level_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/camera_level"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp" />
 
-                <TextView
-                    android:id="@+id/brightness_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/brightness_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/white"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    />
-
-                <TextView
-                    android:id="@+id/cam_level_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/level_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/camera_level"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    />
-                <TextView
-                    android:id="@+id/focus_btn"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/focus_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/focus"
-                    android:gravity="center"
-                    android:layout_weight="1"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    />
+            <TextView
+                android:id="@+id/focus_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawableTop="@drawable/focus_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:text="@string/focus"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp" />
 
 
-            </LinearLayout>
         </LinearLayout>
-
+    </LinearLayout>
 
 
     <!--bottom controls-->
@@ -337,9 +320,9 @@
         android:id="@+id/zoom_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_10sdp"
         android:orientation="horizontal"
         android:weightSum="2"
-        android:layout_marginBottom="@dimen/_10sdp"
         app:layout_constraintBottom_toTopOf="@+id/bottomControlsView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -348,12 +331,12 @@
             android:id="@+id/x1_zoom_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:paddingVertical="@dimen/_3sdp"
-            android:text="@string/_1x"
             android:layout_marginEnd="@dimen/_5sdp"
             android:background="@drawable/bg_radius_20"
             android:backgroundTint="@color/white"
+            android:paddingHorizontal="@dimen/_5sdp"
+            android:paddingVertical="@dimen/_3sdp"
+            android:text="@string/_1x"
             android:textColor="@color/black"
             android:textSize="@dimen/_12sdp" />
 
@@ -361,10 +344,10 @@
             android:id="@+id/x2_zoom_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:paddingVertical="@dimen/_3sdp"
             android:background="@drawable/bg_radius_20"
             android:backgroundTint="@color/transparent"
+            android:paddingHorizontal="@dimen/_5sdp"
+            android:paddingVertical="@dimen/_3sdp"
             android:text="@string/_2x"
             android:textColor="@color/white"
             android:textSize="@dimen/_12sdp" />
@@ -372,10 +355,10 @@
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/bottomControlsView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent">
+        android:id="@+id/bottomControlsView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottomMenuBtnsView"
@@ -448,87 +431,89 @@
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/bottomBtnsView"
-                android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottomBtnsView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/dim_black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/capture_btn"
+                android:layout_width="@dimen/_90sdp"
+                android:layout_height="0dp"
+                android:src="@drawable/capture_btn_ic"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="w,1:1.2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/galley_goto_btn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/dim_black"
+                android:drawableTop="@drawable/gallery_fill_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:text="@string/gallery"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/capture_btn"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/capture_btn" />
+
+            <TextView
+                android:id="@+id/template_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/tempate_ic"
+                android:drawablePadding="@dimen/_5sdp"
+                android:text="@string/templates"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-                <ImageView
-                    android:id="@+id/capture_btn"
-                    android:layout_width="@dimen/_90sdp"
-                    android:layout_height="0dp"
-                    android:visibility="visible"
-                    android:src="@drawable/capture_btn_ic"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintDimensionRatio="w,1:1.2"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/capture_btn"
+                app:layout_constraintTop_toTopOf="@+id/capture_btn" />
+            <!--video record btn-->
+            <ImageView
+                android:id="@+id/video_record_btn"
+                android:layout_width="@dimen/_90sdp"
+                android:layout_height="0dp"
+                android:src="@drawable/capture_in_video_ic"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/capture_btn"
+                app:layout_constraintEnd_toEndOf="@+id/capture_btn"
+                app:layout_constraintStart_toStartOf="@+id/capture_btn"
+                app:layout_constraintTop_toTopOf="@+id/capture_btn" />
 
-                <TextView
-                    android:id="@+id/galley_goto_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/gallery_fill_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/gallery"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/capture_btn"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />
-
-                <TextView
-                    android:id="@+id/template_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/tempate_ic"
-                    android:drawablePadding="@dimen/_5sdp"
-                    android:text="@string/templates"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/_10sdp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/capture_btn"
-                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />
-                <!--video record btn-->
-                <ImageView
-                    android:id="@+id/video_record_btn"
-                    android:layout_width="@dimen/_90sdp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/capture_in_video_ic"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/capture_btn"
-                    app:layout_constraintEnd_toEndOf="@+id/capture_btn"
-                    app:layout_constraintStart_toStartOf="@+id/capture_btn"
-                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />
-                <ImageView
-                    android:id="@+id/video_stop_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:src="@drawable/video_start_btn"
-                    android:visibility="gone"
-                    android:translationY="@dimen/_4sdp"
-                    app:layout_constraintBottom_toBottomOf="@+id/capture_btn"
-                    app:layout_constraintEnd_toEndOf="@+id/capture_btn"
-                    app:layout_constraintStart_toStartOf="@+id/capture_btn"
-                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />
-                <!--video record btn-->
-              <!--  <ImageView
-                    android:id="@+id/video_stop_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:src="@drawable/video_stop_btn"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/capture_btn"
-                    app:layout_constraintTop_toTopOf="@+id/capture_btn" />-->
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
+            <ImageView
+                android:id="@+id/video_stop_btn"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/video_start_btn"
+                android:translationY="@dimen/_4sdp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/capture_btn"
+                app:layout_constraintEnd_toEndOf="@+id/capture_btn"
+                app:layout_constraintStart_toStartOf="@+id/capture_btn"
+                app:layout_constraintTop_toTopOf="@+id/capture_btn" />
+            <!--video record btn-->
+            <!--  <ImageView
+                  android:id="@+id/video_stop_btn"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:visibility="gone"
+                  android:src="@drawable/video_stop_btn"
+                  app:layout_constraintBottom_toBottomOf="parent"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintStart_toEndOf="@+id/capture_btn"
+                  app:layout_constraintTop_toTopOf="@+id/capture_btn" />-->
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

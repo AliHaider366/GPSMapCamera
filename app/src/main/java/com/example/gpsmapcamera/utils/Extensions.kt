@@ -76,6 +76,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.adapters.DropdownMenuAdapter
 import com.example.gpsmapcamera.models.AddressLineModel
@@ -1230,5 +1231,26 @@ fun isSingleTouch(): Boolean {
     }
 }
 
+fun Context.rateUs() = try {
+    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${{BuildConfig.APPLICATION_ID}}")))
+} catch (_: Exception) {
+    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")))
+}
+
+fun View.disableClick() {
+    isEnabled = false
+    isClickable = false
+    alpha = 0.5f // optional visual feedback
+}
+
+fun View.enableClick() {
+    isEnabled = true
+    isClickable = true
+    alpha = 1f // restore normal look
+}
+
+
+fun disableClicks(vararg views: View) = views.forEach { it.disableClick() }
+fun enableClicks(vararg views: View) = views.forEach { it.enableClick() }
 
 
