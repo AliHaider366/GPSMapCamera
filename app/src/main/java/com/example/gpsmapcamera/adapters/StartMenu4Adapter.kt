@@ -9,7 +9,7 @@ import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.visible
 
 class StartMenu4Adapter(private val itemsList: List<Pair<String, Int>>,val onSelected: (Int,String)->Unit) : RecyclerView.Adapter<StartMenu4Adapter.ImageViewHolder>() {
-    private var selectedPos=-1
+    private var selectedPos=0
     inner class ImageViewHolder(private val binding: StartMenu4ItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Pair<String, Int>, position: Int) {
