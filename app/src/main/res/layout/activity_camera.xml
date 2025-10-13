@@ -270,7 +270,7 @@
                 android:drawableTop="@drawable/volume_ic"
                 android:drawablePadding="@dimen/_5sdp"
                 android:gravity="center"
-                android:text="@string/volume"
+                android:text="@string/volume_on"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_10sdp" />
 
@@ -316,55 +316,59 @@
 
 
     <!--bottom controls-->
-    <LinearLayout
-        android:id="@+id/zoom_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/_10sdp"
-        android:orientation="horizontal"
-        android:weightSum="2"
-        app:layout_constraintBottom_toTopOf="@+id/bottomControlsView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
-            android:id="@+id/x1_zoom_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/_5sdp"
-            android:background="@drawable/bg_radius_20"
-            android:backgroundTint="@color/white"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:paddingVertical="@dimen/_3sdp"
-            android:text="@string/_1x"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_12sdp" />
-
-        <TextView
-            android:id="@+id/x2_zoom_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_radius_20"
-            android:backgroundTint="@color/transparent"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:paddingVertical="@dimen/_3sdp"
-            android:text="@string/_2x"
-            android:textColor="@color/white"
-            android:textSize="@dimen/_12sdp" />
-
-    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottomControlsView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/dim_black"
         app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/zoom_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_6sdp"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            app:layout_constraintBottom_toTopOf="@+id/bottomMenuBtnsView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/x1_zoom_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/_5sdp"
+                android:background="@drawable/bg_radius_20"
+                android:backgroundTint="@color/white"
+                android:paddingHorizontal="@dimen/_5sdp"
+                android:paddingVertical="@dimen/_3sdp"
+                android:text="@string/_1x"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_12sdp" />
+
+            <TextView
+                android:id="@+id/x2_zoom_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_radius_20"
+                android:backgroundTint="@color/transparent"
+                android:paddingHorizontal="@dimen/_5sdp"
+                android:paddingVertical="@dimen/_3sdp"
+                android:text="@string/_2x"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_12sdp" />
+
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottomMenuBtnsView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/dim_black"
             android:paddingHorizontal="@dimen/_5sdp"
             app:layout_constraintBottom_toTopOf="@+id/bottomBtnsView">
 
@@ -435,7 +439,6 @@
             android:id="@+id/bottomBtnsView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/dim_black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">

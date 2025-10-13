@@ -35,7 +35,7 @@ class FileNameActivity : BaseActivity() {
         val defaultItems = mutableListOf(
             FieldItem(0, getString(R.string.date_and_time), Date().formatForFile(), day = Date().getCurrentDay(), isDropCheck = true, isChecked = true),
             FieldItem(1, getString(R.string.sequence_number), "", isDropCheck = false),
-            FieldItem(2, getString(R.string.custom_name_1), "", isDropCheck = false),
+            FieldItem(2, getString(R.string.custom_name_1), getString(R.string.app_name), isDropCheck = false, isChecked = true),
             FieldItem(3, getString(R.string.custom_name_2), "", isDropCheck = false),
             FieldItem(4, getString(R.string.custom_name_3), "", isDropCheck = false),
             FieldItem(5, getString(R.string.full_address), "", address = appViewModel.address, isDropCheck = true),

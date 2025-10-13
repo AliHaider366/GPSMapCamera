@@ -33,6 +33,7 @@ import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
@@ -114,6 +115,16 @@ fun EditText.addTextChanged(onTextChanged: ((String) -> Unit)? = null) {
             }
         }
         onTextChanged?.invoke(this.text.toString())
+    }
+}
+
+fun View.setDelayedClickListener(delayMillis: Long = 150L, onClick: (View) -> Unit) {
+    setOnClickListener {
+        isEnabled = false
+        Handler(Looper.getMainLooper()).postDelayed({
+            isEnabled = true
+            onClick(this)
+        }, delayMillis)
     }
 }
 

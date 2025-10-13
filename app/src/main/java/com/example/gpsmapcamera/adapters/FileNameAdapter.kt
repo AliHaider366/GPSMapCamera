@@ -198,7 +198,7 @@ class FileNameAdapter(
                         dropdownTvTitle.text= context.getString(R.string.add_custom_name)
 
                         setupTextItem(checkbox,dropdownEdittext,item,
-                            getBoolean(context,KEY_CUSTOM_NAME_1_CHECK), getString(context,KEY_CUSTOM_NAME_1_VALUE)
+                            getBoolean(context,KEY_CUSTOM_NAME_1_CHECK,true), getString(context,KEY_CUSTOM_NAME_1_VALUE,context.getString(R.string.app_name))
                         )
 
                         dropdownEdittext.inputType=EditorInfo.TYPE_CLASS_TEXT
@@ -449,7 +449,7 @@ class FileNameAdapter(
                 }
                 checkbox.setOnCheckedChangeListener(null)
 
-                checkbox.setOnClickListener{
+            /*    checkbox.setOnClickListener{
                     checkbox.isChecked= checkbox.isChecked
                     item.isChecked = checkbox.isChecked
 //                    val date = Date().formatForFile()
@@ -523,6 +523,106 @@ class FileNameAdapter(
                             saveBoolean(context,KEY_NOTE_CHECK,checkbox.isChecked)
                         }
                     }
+                }*/
+
+                checkbox.setOnClickListener {
+
+                    // Temporarily store the new checked state
+                    val newState = !item.isChecked
+
+                    when (item.index) {
+
+                        1 -> {
+                            if (dropdownEdittext.text.isNotEmpty()) {
+                                item.isChecked = newState
+                                checkbox.isChecked = newState
+                                saveBoolean(context, KEY_SEQUENCE_NUMBER_CHECK, newState)
+                                saveString(context, KEY_SEQUENCE_NUMBER_VALUE, dropdownEdittext.text.toString())
+                            } else {
+                                context.showToast(context.getString(R.string.please_enter_sequence_number))
+                                checkbox.isChecked = false
+                                return@setOnClickListener
+                            }
+                        }
+
+                        2 -> {
+                            if (dropdownEdittext.text.isNotEmpty()) {
+                                item.isChecked = newState
+                                checkbox.isChecked = newState
+                                saveBoolean(context, KEY_CUSTOM_NAME_1_CHECK, newState)
+                                saveString(context, KEY_CUSTOM_NAME_1_VALUE, dropdownEdittext.text.toString())
+                            } else {
+                                context.showToast(context.getString(R.string.please_enter_custom_name))
+                                checkbox.isChecked = false
+                                return@setOnClickListener
+                            }
+                        }
+
+                        3 -> {
+                            if (customName2DropdownEdittext.text.isNotEmpty()) {
+                                item.isChecked = newState
+                                checkbox.isChecked = newState
+                                saveBoolean(context, KEY_CUSTOM_NAME_2_CHECK, newState)
+                                saveString(context, KEY_CUSTOM_NAME_2_VALUE, customName2DropdownEdittext.text.toString())
+                            } else {
+                                context.showToast(context.getString(R.string.please_enter_custom_name))
+                                checkbox.isChecked = false
+                                return@setOnClickListener
+                            }
+                        }
+
+                        4 -> {
+                            if (customName3DropdownEdittext.text.isNotEmpty()) {
+                                item.isChecked = newState
+                                checkbox.isChecked = newState
+                                saveBoolean(context, KEY_CUSTOM_NAME_3_CHECK, newState)
+                                saveString(context, KEY_CUSTOM_NAME_3_VALUE, customName3DropdownEdittext.text.toString())
+                            } else {
+                                context.showToast(context.getString(R.string.please_enter_custom_name))
+                                checkbox.isChecked = false
+                                return@setOnClickListener
+                            }
+                        }
+
+                        5 -> {
+                            item.isChecked = newState
+                            checkbox.isChecked = newState
+                            saveBoolean(context, KEY_ADDRESS_CHECK, newState)
+                        }
+
+                        6 -> {
+                            item.isChecked = newState
+                            checkbox.isChecked = newState
+                            saveBoolean(context, KEY_LAT_LONG_CHECK, newState)
+                        }
+
+                        7 -> {
+                            item.isChecked = newState
+                            checkbox.isChecked = newState
+                            saveBoolean(context, KEY_PLUS_CODE_CHECK, newState)
+                        }
+
+                        8 -> {
+                            item.isChecked = newState
+                            checkbox.isChecked = newState
+                            saveBoolean(context, KEY_TIME_ZONE_CHECK, newState)
+                        }
+
+                        9 -> {
+
+                            if (noteEdittext.text.isNotEmpty()) {
+                                item.isChecked = newState
+                                checkbox.isChecked = newState
+                                saveBoolean(context, KEY_NOTE_CHECK, newState)
+                            } else {
+                                context.showToast(context.getString(R.string.please_enter_note))
+                                checkbox.isChecked = false
+                                return@setOnClickListener
+                            }
+                        }
+                    }
+
+                    updateTopText(context)
                 }
 
                 reorderBtn.setOnTouchListener { _, event ->
@@ -551,6 +651,7 @@ class FileNameAdapter(
         item.value=editTextValue
         item.isChecked = checkBoxState
     }
+
     fun setupDropCheckItem(
         checkbox: CheckBox?=null,
         checkbox1: CheckBox?=null,

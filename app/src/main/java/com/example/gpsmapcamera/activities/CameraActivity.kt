@@ -20,6 +20,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import android.content.Context
 import android.util.Log
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
@@ -96,6 +97,7 @@ import com.example.gpsmapcamera.utils.LocaleHelper
 import com.example.gpsmapcamera.utils.disableClicks
 import com.example.gpsmapcamera.utils.enableClicks
 import com.example.gpsmapcamera.utils.invisible
+import com.example.gpsmapcamera.utils.setDelayedClickListener
 import com.example.gpsmapcamera.utils.setTintColor
 import java.util.Locale
 
@@ -279,7 +281,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
 
         if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
-            switchMode(R.id.share_btn)
+            switchMode(R.id.share_btn,false)
         }
         if (getBoolean(this@CameraActivity, KEY_CAMERA_LEVEL)) {
             camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
@@ -364,6 +366,13 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 flashBtn.setImage(R.drawable.flash_auto_ic)
                 flashBtn.setTintColor(R.color.blue)
                 cameraManager.toggleFlash(2) /*flash auto*/
+
+            }
+
+            3 ->{
+                flashBtn.setImage(R.drawable.flash_torch_ic)
+                flashBtn.setTintColor(R.color.blue)
+                cameraManager.toggleFlash(3)    /*flash torch*/
 
             }
         }
@@ -572,10 +581,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
                 saveBoolean(this@CameraActivity, KEY_CAPTURE_SOUND, false)
                 cameraManager.captureSound(false)
+                volumeBtn.text = getString(R.string.volume_off)
             } else {
                 volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
                 saveBoolean(this@CameraActivity, KEY_CAPTURE_SOUND, true)
                 cameraManager.captureSound(true)
+                volumeBtn.text = getString(R.string.volume_on)
             }
         }
 
@@ -705,16 +716,16 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             setZoom()
         }
 
-        shareBtn.setOnClickListener {
+        shareBtn.setDelayedClickListener {
             switchMode(R.id.share_btn)
 
         }
 
-        photoBtn.setOnClickListener {
+        photoBtn.setDelayedClickListener {
             switchMode(R.id.photo_btn)
         }
 
-        videoBtn.setOnClickListener {
+        videoBtn.setDelayedClickListener {
             if (isPermissionGranted(Manifest.permission.RECORD_AUDIO)) {
                 switchMode(R.id.video_btn)
             } else {
@@ -745,33 +756,52 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         when (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)) {
             0 -> {
+                 if (activeMode == R.id.video_btn) {
+                     flashBtn.setImage(R.drawable.flash_torch_ic)
+                     flashBtn.setTintColor(R.color.blue)
+                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
+                     cameraManager.toggleFlash(3)
+                     return
+            }
                 flashBtn.setImage(R.drawable.flash_on_ic)
                 flashBtn.setTintColor(R.color.blue)
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 1)
                 cameraManager.toggleFlash(1)  /*flash on*/
-                if (activeMode == R.id.video_btn) {
+               /* if (activeMode == R.id.video_btn) {
                     cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
-                }
+                }*/
             }
 
             1 -> {
+
                 flashBtn.setImage(R.drawable.flash_auto_ic)
                 flashBtn.setTintColor(R.color.blue)
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
                 cameraManager.toggleFlash(2) /*flash auto*/
-                if (activeMode == R.id.video_btn) {
+               /* if (activeMode == R.id.video_btn) {
                     cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
-                }
+                }*/
+
             }
 
             2 -> {
+
+                flashBtn.setImage(R.drawable.flash_torch_ic)
+                flashBtn.setTintColor(R.color.blue)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
+                cameraManager.toggleFlash(3)
+
+            }
+
+            3 ->{
+
                 flashBtn.setImage(R.drawable.flash_off_ic)
                 flashBtn.setTintColor(R.color.white)
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
                 cameraManager.toggleFlash(0) /*flash off*/
-                if (activeMode == R.id.video_btn) {
-                    cameraManager.camera?.cameraControl?.enableTorch(false) // Enable torch for video
-                }
+                /*  if (activeMode == R.id.video_btn) {
+                      cameraManager.camera?.cameraControl?.enableTorch(false) // Enable torch for video
+                  }*/
             }
         }
     }
@@ -788,7 +818,27 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
-    private fun switchMode(newMode: Int) {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        return when (keyCode) {
+            KeyEvent.KEYCODE_VOLUME_UP -> {
+
+                return true
+            }
+            KeyEvent.KEYCODE_VOLUME_DOWN -> {
+               /* if (volumeButtonForCapture) {
+                    cameraManager.takePhoto {
+                        Toast.makeText(this, "Saved: $it", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    cameraManager.zoomOut()
+                }*/
+                return true
+            }
+            else -> super.onKeyDown(keyCode, event)
+        }
+    }
+
+    private fun switchMode(newMode: Int,resetFlash:Boolean=true) {
         if (activeMode == newMode) return // already active → do nothing
         activeMode = newMode
 
@@ -810,8 +860,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 cameraManager.stopVideoRecording()/// stop recording if started
                 binding.videoStopBtn.gone()
-                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
-                updateFlash()
+                if (resetFlash)
+                {
+                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
+                    updateFlash()
+                }
             }
 
             R.id.photo_btn -> {
@@ -831,7 +884,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 cameraManager.stopVideoRecording()///stop recording if started
                 binding.videoStopBtn.gone()
-                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
                 updateFlash()
 
             }
@@ -850,7 +903,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 binding.videoRecordBtn.visible()
                 cameraManager.setVideoRecord(true)
                 saveBoolean(this, KEY_SHARE_IMAGE, false)
-                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
                 updateFlash()
             }
         }
@@ -1261,8 +1314,25 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             cameraManager.stopVideoRecording()
             cameraManager.stopVideoRecordingWithStamp()
 
-            saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
-            updateFlash()
+//            saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+//            updateFlash()
+            if (activeMode == R.id.video_btn) {
+                flashBtn.setImage(R.drawable.flash_off_ic)
+                flashBtn.setTintColor(R.color.white)
+                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
+                cameraManager.toggleFlash(0) /*flash off*/
+
+            }
+            else{
+                if (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)==3)
+                {   /*turn off the flash*/
+                    flashBtn.setImage(R.drawable.flash_off_ic)
+                    flashBtn.setTintColor(R.color.white)
+                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
+                    cameraManager.toggleFlash(0) /*flash off*/
+                }
+            }
+
             recordingTimer.stop()
             videoStopBtn.gone()
             videoTimmerTV.gone()

@@ -210,5 +210,8 @@
     <string name="grid_4_4" translatable="false">Grid 4*4</string>
     <string name="grid_phi" translatable="false">Grid PHI</string>
     <string name="tap_again_to_exit">Tap again to exit</string>
+    <string name="volume_on">Volume On</string>
+    <string name="volume_off">Volume Off</string>
+    <string name="please_enter_note">Please Enter Note</string>
 
 </resources>

@@ -174,7 +174,8 @@ class CameraManager(
     }
 
     fun toggleFlash(isFlashEnabled:Int) {
-        flashEnabled = isFlashEnabled
+
+ /*       flashEnabled = isFlashEnabled
         if (imageCapture != null)
         {
 //            imageCapture?.setFlashMode(if (flashEnabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF)
@@ -186,7 +187,44 @@ class CameraManager(
             })
 
         }
-        else startCamera()
+        else startCamera()*/
+
+        flashEnabled = isFlashEnabled
+
+        if (imageCapture == null) {
+            startCamera()
+            return
+        }
+
+        val cameraControl = camera?.cameraControl
+
+        when (flashEnabled) {
+            0 -> { // OFF
+                imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
+                cameraControl?.enableTorch(false)
+            }
+
+            1 -> { // ON (used for capture only)
+                imageCapture?.flashMode = ImageCapture.FLASH_MODE_ON
+                cameraControl?.enableTorch(false)
+            }
+
+            2 -> { // AUTO
+                imageCapture?.flashMode = ImageCapture.FLASH_MODE_AUTO
+                cameraControl?.enableTorch(false)
+            }
+
+            3 -> { // TORCH (flash always ON)
+                imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF // avoid conflict
+                cameraControl?.enableTorch(true)
+            }
+
+            else -> {
+                imageCapture?.flashMode = ImageCapture.FLASH_MODE_OFF
+                cameraControl?.enableTorch(false)
+            }
+        }
+
     }
 
     fun captureSound(soundEnabled:Boolean)
