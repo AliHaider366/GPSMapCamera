@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.gpsmapcamera.activities.StartMenuActivity
 import com.example.gpsmapcamera.databinding.FragmentStartMenu2Binding
 import com.example.gpsmapcamera.utils.setSelectionState
 
@@ -37,15 +38,24 @@ class StartMenuFragment2 : Fragment() {
     private fun init()=binding.apply {
 
         /* by default selection*/
-        wideView.setSelectionState(  selectedCheckBox = checkboxWide,
-            standardView to checkboxStandard)
+//        wideView.setSelectionState(  selectedCheckBox = checkboxWide,
+//            standardView to checkboxStandard)
+
+        (requireActivity() as StartMenuActivity).binding.continueBtn.isEnabled = false
+        (requireActivity() as StartMenuActivity).binding.continueBtn.alpha = 0.5f
 
         wideView.setOnClickListener{
+
+            (requireActivity() as StartMenuActivity).binding.continueBtn.isEnabled = true
+            (requireActivity() as StartMenuActivity).binding.continueBtn.alpha = 1f
             wideView.setSelectionState(  selectedCheckBox = checkboxWide,
                 standardView to checkboxStandard)
         }
 
         standardView.setOnClickListener{
+
+            (requireActivity() as StartMenuActivity).binding.continueBtn.isEnabled = true
+            (requireActivity() as StartMenuActivity).binding.continueBtn.alpha = 1f
             standardView.setSelectionState(  selectedCheckBox = checkboxStandard,
                 wideView to checkboxWide)
         }

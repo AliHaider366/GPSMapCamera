@@ -213,5 +213,6 @@
     <string name="volume_on">Volume On</string>
     <string name="volume_off">Volume Off</string>
     <string name="please_enter_note">Please Enter Note</string>
+    <string name="please_enter_text_first">Please enter text first</string>
 
 </resources>

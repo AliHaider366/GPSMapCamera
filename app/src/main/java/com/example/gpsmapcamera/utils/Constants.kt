@@ -72,5 +72,6 @@ object Constants {
 
 
     const val SELECTED_LANGUAGE = "SELECTED_LANGUAGE"
+    const val SHOW_LANGUAGE_ANIM = "SHOW_LANGUAGE_ANIM"
     const val FROM_SPLASH = "FROM_SPLASH"
 }

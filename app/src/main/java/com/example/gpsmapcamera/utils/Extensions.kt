@@ -506,7 +506,7 @@ fun Context.shareImage(imageUri: Uri, message: String = "Check out this photo I 
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "image/*"
         putExtra(Intent.EXTRA_STREAM, imageUri)
-        putExtra(Intent.EXTRA_TEXT, message)
+        putExtra(Intent.EXTRA_TEXT, "(Share your spot — send a GPS Camera Map photo.) Shared via GPS Camera Map & Geo Tagging App.")
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
@@ -521,7 +521,7 @@ fun Context.shareApp(appName: String = "my app") {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_SUBJECT, appName)
-        putExtra(Intent.EXTRA_TEXT, shareText)
+        putExtra(Intent.EXTRA_TEXT, "(Share your spot — send a GPS Camera Map photo.) Shared via GPS Camera Map & Geo Tagging App.")
     }
     startActivity(Intent.createChooser(intent, "Share via"))
 }

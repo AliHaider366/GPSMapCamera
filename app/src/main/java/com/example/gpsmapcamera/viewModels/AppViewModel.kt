@@ -42,9 +42,13 @@ import com.example.gpsmapcamera.utils.PrefManager.KEY_FOLDER_NAME
 import com.example.gpsmapcamera.utils.StampPreferences
 import com.example.gpsmapcamera.utils.formatForFile
 import com.example.gpsmapcamera.utils.formatPlusCodeByPosition
+import com.example.gpsmapcamera.utils.getCurrentAddress
 import com.example.gpsmapcamera.utils.getCurrentDay
+import com.example.gpsmapcamera.utils.getCurrentLatLong
+import com.example.gpsmapcamera.utils.getCurrentPlusCode
 import com.example.gpsmapcamera.utils.getIcon
 import com.example.gpsmapcamera.utils.isMicrophonePermissionGranted
+import com.example.gpsmapcamera.utils.toDMSPair
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.Job
@@ -61,13 +65,13 @@ import kotlin.math.sqrt
 
 class AppViewModel(application: Application) : AndroidViewModel(application), SensorEventListener {
 
-    var fileSavePath=SAVED_DEFAULT_FILE_PATH
+    var fileSavePath = SAVED_DEFAULT_FILE_PATH
         private set
-    var saveFileName= SAVED_FILE_NAME
+    var saveFileName = SAVED_FILE_NAME
         private set
 
 
-    var plusCode= ""
+    var plusCode = ""
         private set
 
     var latLong = 0.0 to 0.0
@@ -75,30 +79,29 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
     var latLongDMS = "0" to "0"
         private set
 
-    var address= AddressLineModel()
+    var address = AddressLineModel()
         private set
 
 
-
-/*    fun getLocation(){
+    fun getLocationFile() {
         viewModelScope.launch {
             plusCode = context.getCurrentPlusCode()
-            address= context.getCurrentAddress()
-            latLong=context.getCurrentLatLong()
-            latLongDMS=latLong.toDMSPair()
+            address = context.getCurrentAddress()
+            latLong = context.getCurrentLatLong()
+            latLongDMS = latLong.toDMSPair()
         }
-    }*/
+    }
 
     fun setFileName(name: String) {
         saveFileName = name
-        PrefManager.saveString(context,KEY_FILE_NAME,name)       ///save file name in pref
-    }
-    fun setFileSavedPath(path: String,folderName: String) {
-        fileSavePath = path
-        PrefManager.saveString(context,KEY_FILE_PATH,path)      /// save file path in pref
-        PrefManager.saveString(context,KEY_FOLDER_NAME,folderName)    /// save folder name in pref
+        PrefManager.saveString(context, KEY_FILE_NAME, name)       ///save file name in pref
     }
 
+    fun setFileSavedPath(path: String, folderName: String) {
+        fileSavePath = path
+        PrefManager.saveString(context, KEY_FILE_PATH, path)      /// save file path in pref
+        PrefManager.saveString(context, KEY_FOLDER_NAME, folderName)    /// save folder name in pref
+    }
 
 
     fun parseSavedParts(pattern: List<FilePart>, savedFileName: String): List<String> {
@@ -117,6 +120,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
                         parts += "" // fallback if malformed
                     }
                 }
+
                 else -> {
                     if (i < tokens.size) {
                         parts += tokens[i]
@@ -134,8 +138,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
     fun fileNameFromPattern(
     ): String {
 
-        val patternString= PrefManager.getString(context, KEY_FILENAME_PATTERN)
-        val savedFileName= PrefManager.getString(context,KEY_FILE_NAME)
+        val patternString = PrefManager.getString(context, KEY_FILENAME_PATTERN)
+        val savedFileName = PrefManager.getString(context, KEY_FILE_NAME)
 
         if (patternString.isNullOrBlank() || savedFileName.isNullOrBlank()) {
             // return default name if no saved pattern or file
@@ -150,8 +154,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
         val dynamicValues = mutableMapOf<FilePart, String>()
 
         if (pattern.contains(FilePart.DATETIME)) {
-            dynamicValues[FilePart.DATETIME] =  if(PrefManager.getBoolean(context, KEY_24HOURS_CHECK)) Date().formatForFile(true)
-            else Date().formatForFile()
+            dynamicValues[FilePart.DATETIME] =
+                if (PrefManager.getBoolean(context, KEY_24HOURS_CHECK)) Date().formatForFile(true)
+                else Date().formatForFile()
 
         }
 
@@ -177,7 +182,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
         }
 
         if (pattern.contains(FilePart.LATLONG)) {
-            dynamicValues[FilePart.LATLONG] = if(PrefManager.getBoolean(context, KEY_DMS_CHECK)) "${latLongDMS.first},${latLongDMS.second}"
+            dynamicValues[FilePart.LATLONG] = if (PrefManager.getBoolean(
+                    context,
+                    KEY_DMS_CHECK
+                )
+            ) "${latLongDMS.first},${latLongDMS.second}"
             else "${latLong.first},${latLong.second}"
         }
 
@@ -196,13 +205,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
 
         return finalParts.joinToString("_") + ".jpg"
     }
-
-
-
-
-
-
-
 
 
     // Separate LiveData for each template
@@ -280,7 +282,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
         application.getSystemService(Context.SENSOR_SERVICE) as SensorManager
     private val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(application)
-    private val geocoder = Geocoder(application, Locale.getDefault())
+    private val geocoder = Geocoder(application, Locale.ENGLISH)
 
     // Weather API
     private val retrofit: Retrofit = Retrofit.Builder()
@@ -303,12 +305,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
     private var currentMagneticStrength: Double = 0.0
     private var currentSoundLevel: Double = 0.0
     private var currentLocation: android.location.Location? = null
-    private var currentWeather: WeatherResponse? =
-        null // Assume WeatherResponse is your weather API model
+    private var currentWeather: WeatherResponse? = null // Assume WeatherResponse is your weather API model
 
     // Coroutine for throttling updates
     private var updateJob: Job? = null
-
 
 
     private val context = getApplication<Application>()
@@ -321,11 +321,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
         loadConfigsForTemplate(Constants.REPORTING_TEMPLATE, _reportingStampConfigs)
 
 
-        saveFileName= PrefManager.getString(context,KEY_FILE_NAME,SAVED_FILE_NAME)
-        fileSavePath= PrefManager.getString(context,KEY_FILE_PATH,SAVED_DEFAULT_FILE_PATH)
+        saveFileName = PrefManager.getString(context, KEY_FILE_NAME, SAVED_FILE_NAME)
+        fileSavePath = PrefManager.getString(context, KEY_FILE_PATH, SAVED_DEFAULT_FILE_PATH)
+
 
         // Start dynamic data collection
         startDynamicUpdates()
+        getLocationFile()
+
     }
 
     fun getLocation(): Location? {
@@ -336,9 +339,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
 
 
     fun getLocationAndFetch(callback: (Location?) -> Unit) {
-        if (currentLocation!=null){
+        if (currentLocation != null) {
             callback(currentLocation!!)
-        }else{
+        } else {
             locationCallback = callback
         }
     }
@@ -435,7 +438,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
     }
 
 
-
     private fun startDynamicUpdates() {
         // Check location permission
         if (ContextCompat.checkSelfPermission(
@@ -473,15 +475,37 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                currentLocation = location
+
+            viewModelScope.launch {
+
+
+                val (lat, lon) = context.getCurrentLatLong()
+
+                currentLocation = android.location.Location("provider").apply {
+                    latitude = lat
+                    longitude = lon
+                }
+
                 currentLocation?.let { it ->
 
-                    locationCallback?.invoke(location) // notify waiting getLocation()
+                    locationCallback?.invoke(it) // notify waiting getLocation()
                     locationCallback = null
                     fetchWeatherData(it.latitude, it.longitude)
                 }
+
+
             }
+
+
+            /*            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                            currentLocation = location
+                            currentLocation?.let { it ->
+
+                                locationCallback?.invoke(location) // notify waiting getLocation()
+                                locationCallback = null
+                                fetchWeatherData(it.latitude, it.longitude)
+                            }
+                        }*/
         }
     }
 
@@ -602,7 +626,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
 
                     address.getAddressLine(0)?.let {
                         fullAddressModel.locality = it
-                    }?:run {
+                    } ?: run {
                         if (/*showCity && */!address.subAdminArea.isNullOrEmpty()) {
 //                        Log.d("TAG", "updateDynamicValues:  locality ${address.locality}")
                             fullAddressModel.locality = address.subAdminArea

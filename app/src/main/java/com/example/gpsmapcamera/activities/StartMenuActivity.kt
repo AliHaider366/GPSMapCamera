@@ -20,7 +20,7 @@ import com.example.gpsmapcamera.utils.launchActivity
 
 class StartMenuActivity : BaseActivity() {
 
-    private val binding by lazy {
+    val binding by lazy {
         ActivityStartMenuBinding.inflate(layoutInflater)
     }
 

@@ -904,7 +904,7 @@ class CameraManager(
         videoRecorder?.stopRecording()
         videoRecorder = null
 
-        camera?.cameraControl?.enableTorch(false)
+//        camera?.cameraControl?.enableTorch(false)
     }
 
 }

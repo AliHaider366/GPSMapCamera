@@ -270,7 +270,7 @@
                 android:drawableTop="@drawable/volume_ic"
                 android:drawablePadding="@dimen/_5sdp"
                 android:gravity="center"
-                android:text="@string/volume_on"
+                android:text="@string/volume_off"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_10sdp" />
 

@@ -130,7 +130,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             }
         }
 
-    private var selectedStampPosition = StampCameraPosition.TOP
+    private var selectedStampPosition = StampCameraPosition.BOTTOM
     private var selectedTemplate = Constants.CLASSIC_TEMPLATE
 
 
@@ -417,6 +417,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         if (getBoolean(this@CameraActivity, KEY_CAPTURE_SOUND)) {
             volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             cameraManager.captureSound(true)
+            volumeBtn.text = getString(R.string.volume_on)
+        }else{
+            volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
+            cameraManager.captureSound(false)
+            volumeBtn.text = getString(R.string.volume_off)
         }
 
 //        if (getCameraLevel(this@CameraActivity))
@@ -702,8 +707,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             videoStopBtn.gone()
             videoTimmerTV.gone()
             videoRecordBtn.visible()
-            saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
-            updateFlash()
+//            saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+//            updateFlash()
         }
 
         x1ZoomTv.setOnClickListener {
@@ -1003,7 +1008,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 Constants.SELECTED_STAMP_POSITION + selectedTemplate,
                 0
             ) == 0
-        ) StampCameraPosition.TOP else StampCameraPosition.BOTTOM
+        ) StampCameraPosition.BOTTOM else StampCameraPosition.TOP
 
         // Observe the appropriate LiveData based on the selected template
         val stampConfigs = when (selectedTemplate) {
@@ -1302,7 +1307,6 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
     }
 
-
     override fun onPause() {
         super.onPause()
         binding.apply {
@@ -1310,7 +1314,18 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             defaultTopMenuView.visible()
 
 //            stop recording
-            enableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
+            enableClicks(
+                shareBtn,
+                photoBtn,
+                videoBtn,
+                galleyGotoBtn,
+                templateBtn,
+                moreBtn,
+                flashBtn,
+                pickGalleyBtn,
+                fileNameBtn,
+                settingBtn
+            )
             cameraManager.stopVideoRecording()
             cameraManager.stopVideoRecordingWithStamp()
 
@@ -1322,10 +1337,17 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
                 cameraManager.toggleFlash(0) /*flash off*/
 
-            }
-            else{
-                if (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)==3)
-                {   /*turn off the flash*/
+                recordingTimer.stop()
+                videoStopBtn.gone()
+                videoTimmerTV.gone()
+                videoRecordBtn.visible()
+            } else {
+                if (getInt(
+                        this@CameraActivity,
+                        KEY_CAMERA_FLASH,
+                        0
+                    ) == 3
+                ) {   /*turn off the flash*/
                     flashBtn.setImage(R.drawable.flash_off_ic)
                     flashBtn.setTintColor(R.color.white)
                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
@@ -1333,13 +1355,47 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
             }
 
-            recordingTimer.stop()
-            videoStopBtn.gone()
-            videoTimmerTV.gone()
-//            videoRecordBtn.visible()
-        }
 
+        }
     }
+
+//    override fun onPause() {
+//        super.onPause()
+//        binding.apply {
+//            detailTopMenuView.gone()
+//            defaultTopMenuView.visible()
+//
+////            stop recording
+//            enableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
+//            cameraManager.stopVideoRecording()
+//            cameraManager.stopVideoRecordingWithStamp()
+//
+////            saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
+////            updateFlash()
+//            if (activeMode == R.id.video_btn) {
+//                flashBtn.setImage(R.drawable.flash_off_ic)
+//                flashBtn.setTintColor(R.color.white)
+//                saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
+//                cameraManager.toggleFlash(0) *//*flash off*//*
+//
+//            }
+//            else{
+//                if (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)==3)
+//                {   *//*turn off the flash*//*
+//                    flashBtn.setImage(R.drawable.flash_off_ic)
+//                    flashBtn.setTintColor(R.color.white)
+//                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)
+//                    cameraManager.toggleFlash(0) *//*flash off*//*
+//                }
+//            }
+//
+//            recordingTimer.stop()
+//            videoStopBtn.gone()
+//            videoTimmerTV.gone()
+////            videoRecordBtn.visible()
+//        }
+//
+//    }
 
     override fun onQualityChanged(newQuality: ImageQuality) {
         cameraManager.startCamera(newQuality)

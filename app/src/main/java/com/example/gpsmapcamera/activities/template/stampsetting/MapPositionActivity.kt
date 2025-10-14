@@ -41,8 +41,8 @@ class MapPositionActivity : BaseActivity() {
 
     private val stampPositionList by lazy {
         arrayListOf<String>(
-            getString(R.string.top),
             getString(R.string.bottom),
+            getString(R.string.top),
 
         )
     }

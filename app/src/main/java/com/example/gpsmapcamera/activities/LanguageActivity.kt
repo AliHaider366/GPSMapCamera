@@ -10,7 +10,11 @@ import com.example.gpsmapcamera.databinding.ActivityLanguageBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.LocaleHelper.setLocale
 import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.PrefManager.getBoolean
+import com.example.gpsmapcamera.utils.PrefManager.setBoolean
+import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.launchActivity
+import com.example.gpsmapcamera.utils.visible
 import com.example.mycam.models.Language
 
 class LanguageActivity : BaseActivity() {
@@ -96,14 +100,23 @@ class LanguageActivity : BaseActivity() {
 
     private fun init()=binding.apply {
 
-        binding.btnApply.isEnabled=false
-        binding.btnApply.alpha=0.5f
+        btnApply.isEnabled=false
+        btnApply.alpha=0.5f
         setupRecyclerView()
+
+
+        if (getBoolean(this@LanguageActivity, Constants.SHOW_LANGUAGE_ANIM, true)) {
+            lottieView.visible()
+        } else {
+            lottieView.gone()
+        }
     }
 
     private fun setupRecyclerView() {
         languageAdapter = LanguageAdapter(
             onLanguageSelected = { language ->
+                setBoolean(this@LanguageActivity, Constants.SHOW_LANGUAGE_ANIM, false)
+                binding.lottieView.gone()
                 binding.btnApply.isEnabled=true
                 binding.btnApply.alpha=1f
                 languageAdapter.updateSelection(language)

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.gpsmapcamera.activities.StartMenuActivity
 import com.example.gpsmapcamera.databinding.FragmentStartMenu3Binding
 import com.example.gpsmapcamera.utils.setSelectionState
 
@@ -34,26 +35,44 @@ class StartMenuFragment3 : Fragment() {
         init()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+
+        (requireActivity() as StartMenuActivity).binding.continueBtn.isEnabled = false
+        (requireActivity() as StartMenuActivity).binding.continueBtn.alpha = 0.5f
+    }
+
     private fun init()=binding.apply {
 
         /* by default selection*/
-        gpsView.setSelectionState(  selectedCheckBox = checkboxGPS,
+/*        gpsView.setSelectionState(  selectedCheckBox = checkboxGPS,
             manualEntryView to checkboxManualEntry,
-            donotTagView to checkboxDonotTag)
+            donotTagView to checkboxDonotTag)*/
+
 
         gpsView.setOnClickListener{
+
+            (requireActivity() as StartMenuActivity).binding.continueBtn.isEnabled = true
+            (requireActivity() as StartMenuActivity).binding.continueBtn.alpha = 1f
             gpsView.setSelectionState(  selectedCheckBox = checkboxGPS,
                 manualEntryView to checkboxManualEntry,
                 donotTagView to checkboxDonotTag)
         }
 
         manualEntryView.setOnClickListener{
+
+            (requireActivity() as StartMenuActivity).binding.continueBtn.isEnabled = true
+            (requireActivity() as StartMenuActivity).binding.continueBtn.alpha = 1f
             manualEntryView.setSelectionState(  selectedCheckBox = checkboxManualEntry,
                 gpsView to checkboxGPS,
                 donotTagView to checkboxDonotTag)
         }
 
         donotTagView.setOnClickListener{
+
+            (requireActivity() as StartMenuActivity).binding.continueBtn.isEnabled = true
+            (requireActivity() as StartMenuActivity).binding.continueBtn.alpha = 1f
             donotTagView.setSelectionState(  selectedCheckBox = checkboxDonotTag,
                 gpsView to checkboxGPS,
                 manualEntryView to checkboxManualEntry)
