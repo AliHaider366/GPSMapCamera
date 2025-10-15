@@ -4,7 +4,7 @@
         <!-- Customize your dark theme here. -->
          <item name="colorPrimary">@color/blue</item>
         <item name="android:statusBarColor">@color/grey_g2</item>
-
+        <item name="android:windowLightStatusBar">true</item>
 
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:windowTranslucentStatus">false</item>
