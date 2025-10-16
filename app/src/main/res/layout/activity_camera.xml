@@ -66,7 +66,6 @@
         android:textColor="@color/white"
         android:textSize="@dimen/_14sdp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="@+id/zoom_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/defaultTopMenuView"
@@ -81,7 +80,6 @@
         android:textColor="@color/blue"
         android:textSize="@dimen/_30sdp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/zoom_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/defaultTopMenuView" />

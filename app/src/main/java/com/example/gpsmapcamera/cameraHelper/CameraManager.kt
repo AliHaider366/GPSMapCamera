@@ -88,7 +88,7 @@ class CameraManager(
     private var qrImageAnalysis: ImageAnalysis? = null
     private var isQRCodeEnabled = false
     private var isVideoRecordEnabled = false
-    private var videoRecorder: VideoRecorder? = null
+    private var videoRecorder: FastVideoRecorder? = null
 
     private val cameraProviderFuture by lazy {
         ProcessCameraProvider.getInstance(context)
@@ -880,7 +880,7 @@ class CameraManager(
                 camera?.cameraControl?.enableTorch(true)
             }
 
-            videoRecorder = VideoRecorder(
+            videoRecorder = FastVideoRecorder(
                 previewView = previewView,
                 stampContainer = stampContainer,
                 stampPosition = stampPosition,

@@ -35,12 +35,24 @@ class VideoEncoder(
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun startRecording() {
         // Configure video encoder
-        val videoFormat = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, width, height)
+
+        val alignedWidth = (width + 15) / 16 * 16
+        val alignedHeight = (height + 15) / 16 * 16
+
+        val videoFormat = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, alignedWidth, alignedHeight)
         videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
         videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
         videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
         videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
+        videoFormat.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline)
+        videoFormat.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3)
 
+        /*val videoFormat = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, width, height)
+        videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+        videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
+        videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
+        videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
+*/
         videoCodec = MediaCodec.createEncoderByType(VIDEO_MIME_TYPE)
         videoCodec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         inputSurface = videoCodec.createInputSurface()
