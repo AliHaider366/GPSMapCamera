@@ -147,8 +147,9 @@ class StampAdapter(
         }
     }
 
-    fun updateDynamics(newDynamics: DynamicStampValues) {
+    fun updateDynamics(newDynamics: DynamicStampValues,passedTemplate: String = Constants.CLASSIC_TEMPLATE) {
         currentDynamics = newDynamics
+        template = passedTemplate
         notifyDataSetChanged()
     }
 }

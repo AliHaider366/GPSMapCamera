@@ -27,6 +27,7 @@ import com.example.gpsmapcamera.utils.getSelectedMapDrawable
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.invisible
 import com.example.gpsmapcamera.utils.launchActivity
+import com.example.gpsmapcamera.utils.observeOnce
 import com.example.gpsmapcamera.utils.reportingTagsDefault
 import com.example.gpsmapcamera.utils.setUpMapPositionForAdvancedTemplate
 import com.example.gpsmapcamera.utils.setUpMapPositionForClassicTemplate
@@ -359,7 +360,7 @@ class AllTemplateActivity : BaseActivity() {
         }
 
         // Observe dynamic values (shared across all templates)
-        appViewModel.dynamicValues.observe(this) { newDynamics ->
+        appViewModel.dynamicValues.observeOnce(this) { newDynamics ->
             classicAdapterBottom.updateDynamics(newDynamics)
             classicAdapterCenter.updateDynamics(newDynamics)
             classicAdapterRight.updateDynamics(newDynamics)

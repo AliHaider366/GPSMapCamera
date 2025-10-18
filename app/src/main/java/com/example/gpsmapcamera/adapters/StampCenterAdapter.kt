@@ -1,5 +1,6 @@
 package com.example.gpsmapcamera.adapters
 
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.recentNotesDefault
 import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.updateAddressWithVisibility
+import com.example.gpsmapcamera.utils.visible
 
 
 class StampCenterAdapter(
@@ -30,6 +32,7 @@ class StampCenterAdapter(
 
     private var configs: ArrayList<StampConfig> = arrayListOf()
 
+    private var lastKnownAddress: String? = null
 
     private var currentDynamics = DynamicStampValues()
 
@@ -55,10 +58,28 @@ class StampCenterAdapter(
 
             titleTv.typeface = typeface
 
-
+/*
             if (config.name == StampItemName.FULL_ADDRESS) {
+                Log.d("TAG", "bind: StampItemName.FULL_ADDRESS ${currentDynamics.fullAddress}")
                 val address = currentDynamics.fullAddress
                 titleTv.text = address.updateAddressWithVisibility(binding.root.context, template)
+                Log.d("TAG", "titleTv.text  ${titleTv.text}")
+
+            }*/
+            if (config.name == StampItemName.FULL_ADDRESS) {
+                val address = currentDynamics.fullAddress
+                val formatted = address.updateAddressWithVisibility(binding.root.context, template)
+
+                if (formatted.isNotBlank()) {
+                    lastKnownAddress = formatted
+                    titleTv.text = formatted
+                } else if (!lastKnownAddress.isNullOrBlank()) {
+                    // Use last known address to prevent flicker/disappearance
+                    titleTv.text = lastKnownAddress
+                } else {
+                    titleTv.text = ""
+                }
+                Log.d("TAG", "titleTv.text  ${titleTv.text}")
             } else if (config.name == StampItemName.DATE_TIME || config.name == StampItemName.TIME_ZONE) {
                 val time = currentDynamics.dateTime
                 titleTv.text = buildString {
@@ -138,9 +159,14 @@ class StampCenterAdapter(
         val config = configs[position]
         // Skip TIME_ZONE row, because it's merged into DATE_TIME
         if (config.name == StampItemName.TIME_ZONE) {
-            holder.binding.root.layoutParams.height = 0
+            // Hide TIME_ZONE item safely
             holder.binding.root.gone()
+            holder.binding.root.layoutParams.height = 0
             return
+        } else {
+            // Reset for reused views (important!)
+            holder.binding.root.visible()
+            holder.binding.root.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
         }
         holder.bind(config)
         // Set icon, etc.
@@ -156,9 +182,11 @@ class StampCenterAdapter(
         }
     }
 
-    fun updateDynamics(newDynamics: DynamicStampValues) {
+    fun updateDynamics(newDynamics: DynamicStampValues,passedTemplate: String = Constants.CLASSIC_TEMPLATE) {
         currentDynamics = newDynamics
-        notifyDataSetChanged()
+        template = passedTemplate
+        notifyDataSetChanged() // not full data set
     }
+
 }
 

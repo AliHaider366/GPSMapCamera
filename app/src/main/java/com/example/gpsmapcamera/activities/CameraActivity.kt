@@ -4,26 +4,24 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
+import android.view.KeyEvent
 import android.view.View
 import android.widget.SeekBar
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.FocusMeteringAction
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import android.content.Context
-import android.util.Log
-import android.view.KeyEvent
-import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.template.AllTemplateActivity
@@ -36,11 +34,11 @@ import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampReportingTemplateLayoutBinding
 import com.example.gpsmapcamera.enums.ImageQuality
+import com.example.gpsmapcamera.interfaces.CameraSettingsListener
 import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.models.StampConfig
 import com.example.gpsmapcamera.models.StampItemName
 import com.example.gpsmapcamera.models.StampPosition
-import com.example.gpsmapcamera.interfaces.CameraSettingsListener
 import com.example.gpsmapcamera.objects.CameraSettingsNotifier
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
@@ -65,9 +63,12 @@ import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.PrefManager.saveInt
 import com.example.gpsmapcamera.utils.StampPreferences
 import com.example.gpsmapcamera.utils.checkAndRequestGps
+import com.example.gpsmapcamera.utils.disableClicks
+import com.example.gpsmapcamera.utils.enableClicks
 import com.example.gpsmapcamera.utils.getFontSizeFactor
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
+import com.example.gpsmapcamera.utils.invisible
 import com.example.gpsmapcamera.utils.isPermissionGranted
 import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.loadStaticMap
@@ -79,11 +80,13 @@ import com.example.gpsmapcamera.utils.registerPermissionLauncher
 import com.example.gpsmapcamera.utils.reportingTagsDefault
 import com.example.gpsmapcamera.utils.requestPermission
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
+import com.example.gpsmapcamera.utils.setDelayedClickListener
 import com.example.gpsmapcamera.utils.setDrawable
 import com.example.gpsmapcamera.utils.setImage
 import com.example.gpsmapcamera.utils.setStampPosition
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setTextColorRes
+import com.example.gpsmapcamera.utils.setTintColor
 import com.example.gpsmapcamera.utils.setUpMapPositionForAdvancedTemplate
 import com.example.gpsmapcamera.utils.setUpMapPositionForClassicTemplate
 import com.example.gpsmapcamera.utils.setUpMapPositionForReportingTemplate
@@ -92,14 +95,6 @@ import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 import java.util.concurrent.TimeUnit
-import androidx.core.view.isGone
-import com.example.gpsmapcamera.utils.LocaleHelper
-import com.example.gpsmapcamera.utils.disableClicks
-import com.example.gpsmapcamera.utils.enableClicks
-import com.example.gpsmapcamera.utils.invisible
-import com.example.gpsmapcamera.utils.setDelayedClickListener
-import com.example.gpsmapcamera.utils.setTintColor
-import java.util.Locale
 
 class CameraActivity : BaseActivity(), CameraSettingsListener {
     private val binding by lazy {
@@ -331,7 +326,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
 
-        when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)) {
+        when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 4)) {
             16 -> {
                 ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
                 cameraManager.setAspectRatio(AspectRatio.RATIO_16_9)
@@ -474,7 +469,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         ratioBtn.setOnClickListener {
-            when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)) {
+            when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 4)) {
                 4 -> {
                     saveInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)
                     ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
@@ -1026,6 +1021,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             val rightItems =
                 allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
 
+            Log.d("TAG", "setUpTemplate: $centerItems")
+
             templateAdapterBottom.submitList(bottomItems as ArrayList)
             templateAdapterCenter.submitList(centerItems as ArrayList)
             templateAdapterRight.submitList(rightItems as ArrayList)
@@ -1056,9 +1053,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         appViewModel.dynamicValues.observe(this) { newDynamics ->
-            templateAdapterBottom.updateDynamics(newDynamics)
-            templateAdapterCenter.updateDynamics(newDynamics)
-            templateAdapterRight.updateDynamics(newDynamics)
+            Log.d("TAG", "setUpTemplate: newDynamics $newDynamics")
+            templateAdapterBottom.updateDynamics(newDynamics, selectedTemplate)
+            templateAdapterCenter.updateDynamics(newDynamics, selectedTemplate)
+            templateAdapterRight.updateDynamics(newDynamics, selectedTemplate)
 
             reportingTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
             advanceTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress

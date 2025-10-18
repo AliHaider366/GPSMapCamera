@@ -7,7 +7,6 @@ import android.view.Surface
 import androidx.annotation.RequiresPermission
 import java.io.File
 import java.nio.ByteBuffer
-import kotlin.concurrent.thread
 
 class VideoEncoder(
     private val width: Int,
@@ -23,7 +22,7 @@ class VideoEncoder(
     private var audioTrackIndex = -1
     private var muxerStarted = false
     private var recording = false
-    private val muxerLock = Any() // Synchronization lock for muxer state
+    private val muxerLock = Any()
 
     lateinit var inputSurface: Surface
         private set
@@ -34,59 +33,229 @@ class VideoEncoder(
 
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun startRecording() {
-        // Configure video encoder
+        try {
+            // 1) Align width/height to macroblock (16) boundaries to avoid many OMX rejections
+            val alignedWidth = (width + 15) / 16 * 16
+            val alignedHeight = (height + 15) / 16 * 16
+            Log.d(TAG, "Requested size ${width}x${height}, aligned to ${alignedWidth}x${alignedHeight}")
 
-        val alignedWidth = (width + 15) / 16 * 16
-        val alignedHeight = (height + 15) / 16 * 16
+            // 2) Build format (we'll adjust color format & profile later if codec supports)
+            val videoFormat = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, alignedWidth, alignedHeight)
+            videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
+            videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
+            videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
+            // Do NOT set color format or profile yet until we pick codec and inspect capabilities
 
-        val videoFormat = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, alignedWidth, alignedHeight)
-        videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-        videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
-        videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
-        videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
-        videoFormat.setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline)
-        videoFormat.setInteger(MediaFormat.KEY_LEVEL, MediaCodecInfo.CodecProfileLevel.AVCLevel3)
+            // 3) Choose codec: prefer Qualcomm hardware encoders, avoid HiSi (hisi)
+            val chosenCodecName = chooseVideoEncoder(VIDEO_MIME_TYPE)
+            Log.d(TAG, "Chosen video encoder: $chosenCodecName")
 
-        /*val videoFormat = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, width, height)
-        videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-        videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
-        videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
-        videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
-*/
-        videoCodec = MediaCodec.createEncoderByType(VIDEO_MIME_TYPE)
-        videoCodec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-        inputSurface = videoCodec.createInputSurface()
-        videoCodec.start()
+            videoCodec = if (chosenCodecName != null) {
+                MediaCodec.createByCodecName(chosenCodecName)
+            } else {
+                // Fallback to system default encoder by type
+                MediaCodec.createEncoderByType(VIDEO_MIME_TYPE)
+            }
 
-        // Configure audio encoder
-        val audioFormat = MediaFormat.createAudioFormat(AUDIO_MIME_TYPE, SAMPLE_RATE, CHANNEL_COUNT)
-        audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
-        audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, AUDIO_BIT_RATE)
-        audioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, AUDIO_BUFFER_SIZE)
+            // 4) Inspect codec capabilities and set color format/profile accordingly
+            try {
+                val codecInfo = videoCodec.codecInfo
+                val caps = codecInfo.getCapabilitiesForType(VIDEO_MIME_TYPE)
 
-        audioCodec = MediaCodec.createEncoderByType(AUDIO_MIME_TYPE)
-        audioCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                // Prefer COLOR_FormatSurface if advertised
+                val supportedColorFormat = pickSuitableColorFormat(caps.colorFormats)
+                Log.d(TAG, "Supported color format chosen: $supportedColorFormat")
+                videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, supportedColorFormat)
 
-        // Initialize AudioRecord
-        val minBufferSize = AudioRecord.getMinBufferSize(
-            SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
+                // If codec advertises profile levels, choose a safe profile/level (Baseline / Level 3) if available
+                val chosenProfileLevel = pickSuitableProfileLevel(caps.profileLevels)
+                chosenProfileLevel?.let {
+                    videoFormat.setInteger(MediaFormat.KEY_PROFILE, it.profile)
+                    videoFormat.setInteger(MediaFormat.KEY_LEVEL, it.level)
+                    Log.d(TAG, "Set profile=${it.profile} level=${it.level}")
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Could not read codec capabilities: ${e.message}")
+                // Leave format minimal (we already set bitrate/frame rate)
+            }
+
+            // 5) Configure codec
+            videoCodec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+
+            // 6) Create input surface and start
+            inputSurface = videoCodec.createInputSurface()
+            videoCodec.start()
+
+            // ---- audio encoder setup (unchanged) ----
+            val audioFormat = MediaFormat.createAudioFormat(AUDIO_MIME_TYPE, SAMPLE_RATE, CHANNEL_COUNT)
+            audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
+            audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, AUDIO_BIT_RATE)
+            audioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, AUDIO_BUFFER_SIZE)
+
+            audioCodec = MediaCodec.createEncoderByType(AUDIO_MIME_TYPE)
+            audioCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+
+            val minBufferSize = AudioRecord.getMinBufferSize(
+                SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
+            )
+            audioRecorder = AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                SAMPLE_RATE,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                minBufferSize * 2
+            )
+            audioCodec.start()
+            audioRecorder?.startRecording()
+
+            muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+
+            recording = true
+            videoDrainThread = Thread { drainVideoEncoder() }.apply { start() }
+            audioThread = Thread { drainAudioEncoder() }.apply { start() }
+
+            Log.d(TAG, "Recording started (video:$chosenCodecName)")
+        } catch (e: Exception) {
+            Log.e(TAG, "startRecording failed: ${e.message}", e)
+            // If configuration failed and we selected hardware codec, try fallback to a more compatible codec
+            tryFallbackSoftEncoderOrNotify(e)
+        }
+    }
+
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+    private fun tryFallbackSoftEncoderOrNotify(originalError: Exception) {
+        try {
+            // Try fallback to Google's software encoder if present
+            val softName = findCodecByNamePrefix("OMX.google") ?: findCodecByNamePrefix("c2.android")
+            if (softName != null) {
+                Log.w(TAG, "Falling back to software encoder: $softName")
+                videoCodec = MediaCodec.createByCodecName(softName)
+
+                val alignedWidth = (width + 15) / 16 * 16
+                val alignedHeight = (height + 15) / 16 * 16
+                val videoFormat = MediaFormat.createVideoFormat(VIDEO_MIME_TYPE, alignedWidth, alignedHeight)
+                videoFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+                videoFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
+                videoFormat.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate)
+                videoFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
+
+                videoCodec.configure(videoFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                inputSurface = videoCodec.createInputSurface()
+                videoCodec.start()
+
+                // proceed with audio & muxer same as before
+                val audioFormat = MediaFormat.createAudioFormat(AUDIO_MIME_TYPE, SAMPLE_RATE, CHANNEL_COUNT)
+                audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
+                audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, AUDIO_BIT_RATE)
+                audioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, AUDIO_BUFFER_SIZE)
+
+                audioCodec = MediaCodec.createEncoderByType(AUDIO_MIME_TYPE)
+                audioCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+
+                val minBufferSize = AudioRecord.getMinBufferSize(
+                    SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT
+                )
+                audioRecorder = AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    SAMPLE_RATE,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufferSize * 2
+                )
+                audioCodec.start()
+                audioRecorder?.startRecording()
+
+                muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+
+                recording = true
+                videoDrainThread = Thread { drainVideoEncoder() }.apply { start() }
+                audioThread = Thread { drainAudioEncoder() }.apply { start() }
+
+                Log.d(TAG, "Recording started with fallback soft encoder")
+                return
+            }
+        } catch (ex: Exception) {
+            Log.e(TAG, "Fallback soft encoder failed: ${ex.message}", ex)
+        }
+
+        // If we reach here, nothing helped; re-throw original or log error
+        Log.e(TAG, "Unable to start video recording after fallback. Original error: ${originalError.message}", originalError)
+        throw RuntimeException("VideoEncoder start failed: ${originalError.message}", originalError)
+    }
+
+    private fun pickSuitableColorFormat(colorFormats: IntArray): Int {
+        // Prefer COLOR_FormatSurface; if not available, pick a common flexible format
+        if (colorFormats.contains(MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)) {
+            return MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
+        }
+        // Fallbacks: try flexible YUV formats
+        val preferred = listOf(
+            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible,
+            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,
+            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar
         )
-        audioRecorder = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
-            SAMPLE_RATE,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT,
-            minBufferSize * 2
-        )
-        audioCodec.start()
-        audioRecorder?.startRecording()
+        for (pf in preferred) {
+            if (colorFormats.contains(pf)) return pf
+        }
+        // If nothing matches, just return COLOR_FormatSurface (will likely fail but leave caller to handle)
+        return MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface
+    }
 
-        // Initialize muxer
-        muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+    private fun pickSuitableProfileLevel(profileLevels: Array<MediaCodecInfo.CodecProfileLevel>): MediaCodecInfo.CodecProfileLevel? {
+        if (profileLevels.isEmpty()) return null
+        // Prefer baseline profile and levels <= AVCLevel3
+        val candidates = profileLevels.filter {
+            it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline ||
+                    it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileMain ||
+                    it.profile == MediaCodecInfo.CodecProfileLevel.AVCProfileHigh
+        }.sortedBy { it.level }
+        return candidates.firstOrNull()
+    }
 
-        recording = true
-        videoDrainThread = Thread { drainVideoEncoder() }.apply { start() }
-        audioThread = Thread { drainAudioEncoder() }.apply { start() }
+    private fun findCodecByNamePrefix(prefix: String): String? {
+        val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
+        for (info in codecList.codecInfos) {
+            if (!info.isEncoder) continue
+            if (info.name.startsWith(prefix, ignoreCase = true)) return info.name
+        }
+        return null
+    }
+
+    private fun chooseVideoEncoder(mime: String): String? {
+        val codecList = MediaCodecList(MediaCodecList.ALL_CODECS)
+        val candidates = mutableListOf<MediaCodecInfo>()
+        for (info in codecList.codecInfos) {
+            if (!info.isEncoder) continue
+            try {
+                val types = info.supportedTypes
+                if (types.any { it.equals(mime, ignoreCase = true) }) {
+                    candidates.add(info)
+                }
+            } catch (e: Exception) {
+                // ignore codec that throws
+            }
+        }
+
+        // Prefer Qualcomm hardware encoders (OMX.qcom / qcom / qualcomm) and avoid hisi
+        val ordered = candidates.sortedWith(compareByDescending<MediaCodecInfo> { info ->
+            val name = info.name.lowercase()
+            when {
+                name.contains("qcom") || name.contains("omx.qcom") || name.contains("qualcomm") -> 3
+                name.contains("google") || name.contains("omx.google") -> 1
+                name.contains("hisi") || name.contains("huawei") -> -10 // deprioritize hisi/huawei
+                else -> 0
+            }
+        })
+
+        // Pick first encoder that is not clearly HiSi
+        for (info in ordered) {
+            val name = info.name.lowercase()
+            if (name.contains("hisi") || name.contains("huawei")) continue
+            return info.name
+        }
+
+        // If nothing matches, return null to let system choose (createEncoderByType)
+        return null
     }
 
     fun stopRecording() {
@@ -179,7 +348,6 @@ class VideoEncoder(
         val audioBuffer = ByteArray(AUDIO_BUFFER_SIZE)
 
         while (recording) {
-            // Read audio data from AudioRecord
             val readSize = audioRecorder?.read(audioBuffer, 0, AUDIO_BUFFER_SIZE) ?: -1
             if (readSize > 0) {
                 val inputBufferIndex = audioCodec.dequeueInputBuffer(10_000)
@@ -197,7 +365,6 @@ class VideoEncoder(
                 }
             }
 
-            // Drain audio encoder
             synchronized(muxerLock) {
                 val outputIndex = audioCodec.dequeueOutputBuffer(bufferInfo, 10_000)
                 when {
