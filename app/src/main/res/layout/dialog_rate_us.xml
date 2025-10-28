@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/_16sdp"
     android:background="@drawable/bg_radius_20"
+    android:backgroundTint="@color/white"
     android:clipToPadding="false">
 
     <!-- Emoji or Icon -->

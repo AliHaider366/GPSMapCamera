@@ -20,6 +20,13 @@ class MainActivity : BaseActivity() {
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, backPressedCallback)
         setupRV()
+        clickListeners()
+    }
+
+    private fun clickListeners() = binding.run {
+        ivSettings.setOnClickListener {
+            launchActivity<SettingsActivity>()
+        }
     }
 
     private fun setupRV(){
