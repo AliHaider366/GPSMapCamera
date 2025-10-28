@@ -29,6 +29,12 @@
         android:theme="@style/Theme.GPSMapCamera"
         tools:targetApi="31">
         <activity
+            android:name=".activities.ExitActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.StartMenuActivity"
             android:exported="false" />
         <activity
@@ -130,7 +136,6 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
 
         <property
             android:name="android.adservices.AD_SERVICES_CONFIG"

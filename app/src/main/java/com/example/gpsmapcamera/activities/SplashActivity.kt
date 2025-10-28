@@ -36,7 +36,7 @@ class SplashActivity : BaseActivity() {
             else if (getBoolean(this, SECOND_SESSION, true))
             {
                 launchActivity<StartMenuActivity> {  }
-            } else launchActivity<CameraActivity> {  }
+            } else launchActivity<MainActivity> {  }
             finish()
         }, 5000) // 5000ms = 5 seconds
 

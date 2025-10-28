@@ -18,6 +18,7 @@ import com.example.gpsmapcamera.utils.PrefManager.KEY_IMAGE_QUALITY
 import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.PrefManager.saveString
+import com.example.gpsmapcamera.utils.RateUsDialog
 import com.example.gpsmapcamera.utils.isSingleTouch
 import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.rateUs
@@ -170,7 +171,8 @@ class SettingsActivity : BaseActivity() {
 
 
             getString(R.string.rate_us) -> {
-                rateUs()
+                RateUsDialog(this@SettingsActivity).show()
+//                rateUs()
             }
 
 
