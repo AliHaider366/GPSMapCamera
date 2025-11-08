@@ -5,8 +5,11 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Window
+import android.view.WindowManager
+import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.DialogRateUsBinding
 
 class RateUsDialog(private val context: Context) {
@@ -20,6 +23,14 @@ class RateUsDialog(private val context: Context) {
             binding = DialogRateUsBinding.inflate(LayoutInflater.from(context))
             setContentView(binding.root)
             window?.setBackgroundDrawableResource(android.R.color.transparent)
+            val lp = WindowManager.LayoutParams()
+            lp.copyFrom(window?.attributes)
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT
+            lp.height = WindowManager.LayoutParams.MATCH_PARENT
+
+            window?.attributes = lp
+            window?.setGravity(Gravity.CENTER)
+            window?.setDimAmount(0.7f)
             setCancelable(true)
         }
 
@@ -30,11 +41,11 @@ class RateUsDialog(private val context: Context) {
     private fun setupViews() = with(binding) {
         ratingBar.setOnRatingBarChangeListener { _, rating, _ ->
             tvFeedback.text = when (rating.toInt()) {
-                1 -> "Terrible"
-                2 -> "Bad"
-                3 -> "Okay"
-                4 -> "Good"
-                5 -> "Excellent"
+                1 -> context.getString(R.string.terrible)
+                2 -> context.getString(R.string.bad)
+                3 -> context.getString(R.string.okay)
+                4 -> context.getString(R.string.good)
+                5 -> context.getString(R.string.excellent)
                 else -> ""
             }
         }

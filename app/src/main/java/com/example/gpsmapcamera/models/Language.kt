@@ -1,4 +1,4 @@
-package com.example.mycam.models
+package com.example.gpsmapcamera.models
 
 data class Language(
     val code: String,

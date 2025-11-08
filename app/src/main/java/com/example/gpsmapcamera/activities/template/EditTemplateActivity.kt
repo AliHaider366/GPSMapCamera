@@ -2,6 +2,7 @@ package com.example.gpsmapcamera.activities.template
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.transition.TransitionManager
 import android.util.TypedValue
@@ -25,6 +26,7 @@ import com.example.gpsmapcamera.models.StampPosition
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.PrefManager.getInt
 import com.example.gpsmapcamera.utils.StampPreferences
 import com.example.gpsmapcamera.utils.getFontSizeFactor
 import com.example.gpsmapcamera.utils.gone
@@ -175,13 +177,21 @@ class EditTemplateActivity : BaseActivity() {
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
 
-            val typeface = ResourcesCompat.getFont(
-                root.context, stampFontList[PrefManager.getInt(
-                    root.context,
-                    Constants.SELECTED_STAMP_FONT + passedTemplate,
-                    0
-                )]
+
+            val selectedIndex = getInt(
+                root.context,
+                Constants.SELECTED_STAMP_FONT + passedTemplate,
+                0
             )
+
+            val fontRes = stampFontList.getOrNull(selectedIndex)
+            val typeface = if (fontRes != null) {
+                ResourcesCompat.getFont(root.context, fontRes)
+            } else {
+                Typeface.DEFAULT // system default font
+            }
+
+
             tvCenterTitle.typeface = typeface
             tvEnvironment.typeface = typeface
 
@@ -254,13 +264,20 @@ class EditTemplateActivity : BaseActivity() {
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
 
-            val typeface = ResourcesCompat.getFont(
-                root.context, stampFontList[PrefManager.getInt(
-                    root.context,
-                    Constants.SELECTED_STAMP_FONT + passedTemplate,
-                    0
-                )]
+
+            val selectedIndex = getInt(
+                root.context,
+                Constants.SELECTED_STAMP_FONT + passedTemplate,
+                0
             )
+
+            val fontRes = stampFontList.getOrNull(selectedIndex)
+            val typeface = if (fontRes != null) {
+                ResourcesCompat.getFont(root.context, fontRes)
+            } else {
+                Typeface.DEFAULT // system default font
+            }
+
             tvCenterTitle.typeface = typeface
 
             setUpMapPositionForAdvancedTemplate(this@run)
@@ -296,13 +313,20 @@ class EditTemplateActivity : BaseActivity() {
             rvCenter.adapter = templateAdapterCenter
             rvRight.adapter = templateAdapterRight
 
-            val typeface = ResourcesCompat.getFont(
-                root.context, stampFontList[PrefManager.getInt(
-                    root.context,
-                    Constants.SELECTED_STAMP_FONT + passedTemplate,
-                    0
-                )]
+
+            val selectedIndex = getInt(
+                root.context,
+                Constants.SELECTED_STAMP_FONT + passedTemplate,
+                0
             )
+
+            val fontRes = stampFontList.getOrNull(selectedIndex)
+            val typeface = if (fontRes != null) {
+                ResourcesCompat.getFont(root.context, fontRes)
+            } else {
+                Typeface.DEFAULT // system default font
+            }
+
             tvCenterTitle.typeface = typeface
 
             setUpMapPositionForClassicTemplate(this@run)

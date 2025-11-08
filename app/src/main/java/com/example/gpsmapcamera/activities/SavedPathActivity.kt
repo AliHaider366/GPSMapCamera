@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.R
@@ -13,7 +12,6 @@ import com.example.gpsmapcamera.adapters.FileSavedAdapter
 import com.example.gpsmapcamera.databinding.ActivitySavedPathBinding
 import com.example.gpsmapcamera.databinding.AddFolderDialogBinding
 import com.example.gpsmapcamera.utils.Constants.CUSTOM_SAVED_FILE_PATH_ROOT
-import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager.KEY_SELECTED_FOLDER_PATH
 import com.example.gpsmapcamera.utils.PrefManager.getFolderList
@@ -46,12 +44,7 @@ class SavedPathActivity : BaseActivity() {
     }
     private val rvAdapter by lazy {
         FileSavedAdapter(list, getInt(this,KEY_SELECTED_FOLDER_PATH,1)){ pos, folder->
-            when(pos)
-            {
-                1->  appViewModel.setFileSavedPath(SAVED_DEFAULT_FILE_PATH,folder)
-                else->  appViewModel.setFileSavedPath("$CUSTOM_SAVED_FILE_PATH_ROOT/$folder",folder)
-            }
-//            saveSelectedFolderPath(this,pos)
+            appViewModel.setFileSavedPath("$CUSTOM_SAVED_FILE_PATH_ROOT/$folder",folder)
             saveInt(this,KEY_SELECTED_FOLDER_PATH,pos)
         }
     }

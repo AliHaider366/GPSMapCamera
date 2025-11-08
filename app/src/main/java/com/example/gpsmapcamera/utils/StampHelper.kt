@@ -110,7 +110,8 @@ val plusCodeFormats = arrayListOf(
 
 
 val stampFontList by lazy {
-    arrayListOf(
+    arrayListOf<Int?>(
+        null,
         R.font.short_stack,
         R.font.skranji,
         R.font.single_day,
@@ -1069,26 +1070,39 @@ fun ConstraintLayout.setStampPosition(stampPosition: StampCameraPosition) {
     constraintSet.clone(this)
 
     if (stampPosition == StampCameraPosition.TOP) {
+        constraintSet.clear(R.id.watermarkContainer, ConstraintSet.BOTTOM)
         constraintSet.clear(R.id.stampContainer, ConstraintSet.BOTTOM)
         constraintSet.connect(
-            R.id.stampContainer,
+            R.id.watermarkContainer,
             ConstraintSet.TOP,
             R.id.previewContainer,
             ConstraintSet.TOP
         )
-        // keep marginTop = 10sdp
-        constraintSet.setMargin(
+        constraintSet.connect(
+            R.id.stampContainer,
+            ConstraintSet.TOP,
+            R.id.watermarkContainer,
+            ConstraintSet.BOTTOM
+        )
+        constraintSet.setGoneMargin(
             R.id.stampContainer,
             ConstraintSet.TOP,
             context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._10sdp)
         )
     } else {
+        constraintSet.clear(R.id.watermarkContainer, ConstraintSet.TOP)
         constraintSet.clear(R.id.stampContainer, ConstraintSet.TOP)
         constraintSet.connect(
             R.id.stampContainer,
             ConstraintSet.BOTTOM,
             R.id.previewContainer,
             ConstraintSet.BOTTOM
+        )
+        constraintSet.connect(
+            R.id.watermarkContainer,
+            ConstraintSet.BOTTOM,
+            R.id.stampContainer,
+            ConstraintSet.TOP
         )
         // remove top margin
         constraintSet.setMargin(

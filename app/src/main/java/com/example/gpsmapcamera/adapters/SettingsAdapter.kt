@@ -28,7 +28,7 @@ import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
 import com.example.gpsmapcamera.utils.setDrawable
-import com.example.mycam.models.SettingsModel
+import com.example.gpsmapcamera.models.SettingsModel
 
 class SettingsAdapter(
     val userList: MutableList<SettingsModel>,

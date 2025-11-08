@@ -1,5 +1,6 @@
 package com.example.gpsmapcamera.adapters
 
+import android.graphics.Typeface
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -48,13 +49,18 @@ class StampCenterAdapter(
             titleTv.setTextSize(TypedValue.COMPLEX_UNIT_PX, baseTextSize * getScaleValue)
 
 
-            val typeface = ResourcesCompat.getFont(
-                root.context, stampFontList[PrefManager.getInt(
-                    root.context,
-                    Constants.SELECTED_STAMP_FONT + template,
-                    0
-                )]
+            val selectedIndex = PrefManager.getInt(
+                root.context,
+                Constants.SELECTED_STAMP_FONT + template,
+                0
             )
+
+            val fontRes = stampFontList.getOrNull(selectedIndex)
+            val typeface = if (fontRes != null) {
+                ResourcesCompat.getFont(root.context, fontRes)
+            } else {
+                Typeface.DEFAULT // system default font
+            }
 
             titleTv.typeface = typeface
 

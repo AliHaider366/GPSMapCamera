@@ -27,6 +27,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.saved.SavedMediaActivity
 import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.adapters.StampAdapter
 import com.example.gpsmapcamera.adapters.StampCenterAdapter
@@ -453,9 +454,14 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     @SuppressLint("MissingPermission")
     private fun setClickListeners() = binding.apply {
 
-        galleyGotoBtn.setOnClickListener {
-            openLatestImageFromFolder("${appViewModel.fileSavePath}%")
+        ivStampCross.setOnClickListener {
+            ivStampCross.gone()
+            watermarkContainer.gone()
+        }
 
+        galleyGotoBtn.setOnClickListener {
+            launchActivity<SavedMediaActivity>()
+//            openLatestImageFromFolder("${appViewModel.fileSavePath}%")
         }
 
         switchCamBtn.setOnClickListener {
@@ -1359,13 +1365,19 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             rvRight.adapter = templateAdapterRight
 
 
-            val typeface = ResourcesCompat.getFont(
-                root.context, stampFontList[getInt(
-                    root.context,
-                    Constants.SELECTED_STAMP_FONT + selectedTemplate,
-                    0
-                )]
+            val selectedIndex = getInt(
+                root.context,
+                Constants.SELECTED_STAMP_FONT + Constants.REPORTING_TEMPLATE,
+                0
             )
+
+            val fontRes = stampFontList.getOrNull(selectedIndex)
+            val typeface = if (fontRes != null) {
+                ResourcesCompat.getFont(root.context, fontRes)
+            } else {
+                Typeface.DEFAULT // system default font
+            }
+
             tvCenterTitle.typeface = typeface
             tvEnvironment.typeface = typeface
 
@@ -1452,13 +1464,19 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             rvRight.adapter = templateAdapterRight
 
 
-            val typeface = ResourcesCompat.getFont(
-                root.context, stampFontList[getInt(
-                    root.context,
-                    Constants.SELECTED_STAMP_FONT + selectedTemplate,
-                    0
-                )]
+            val selectedIndex = getInt(
+                root.context,
+                Constants.SELECTED_STAMP_FONT + Constants.ADVANCE_TEMPLATE,
+                0
             )
+
+            val fontRes = stampFontList.getOrNull(selectedIndex)
+            val typeface = if (fontRes != null) {
+                ResourcesCompat.getFont(root.context, fontRes)
+            } else {
+                Typeface.DEFAULT // system default font
+            }
+
             tvCenterTitle.typeface = typeface
 
             setUpMapPositionForAdvancedTemplate(this@run)
@@ -1523,13 +1541,19 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             rvRight.adapter = templateAdapterRight
 
 
-            val typeface = ResourcesCompat.getFont(
-                root.context, stampFontList[getInt(
-                    root.context,
-                    Constants.SELECTED_STAMP_FONT + selectedTemplate,
-                    0
-                )]
+            val selectedIndex = getInt(
+                root.context,
+                Constants.SELECTED_STAMP_FONT + Constants.CLASSIC_TEMPLATE,
+                0
             )
+
+            val fontRes = stampFontList.getOrNull(selectedIndex)
+            val typeface = if (fontRes != null) {
+                ResourcesCompat.getFont(root.context, fontRes)
+            } else {
+                Typeface.DEFAULT // system default font
+            }
+
             tvCenterTitle.typeface = typeface
 
             setUpMapPositionForClassicTemplate(this@run)

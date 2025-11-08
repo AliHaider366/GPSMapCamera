@@ -2,6 +2,7 @@ package com.example.gpsmapcamera.activities.template
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.transition.TransitionManager
 import androidx.activity.OnBackPressedCallback
@@ -22,6 +23,7 @@ import com.example.gpsmapcamera.models.StampPosition
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.PrefManager.getInt
 import com.example.gpsmapcamera.utils.StampPreferences
 import com.example.gpsmapcamera.utils.getSelectedMapDrawable
 import com.example.gpsmapcamera.utils.gone
@@ -166,14 +168,23 @@ class AllTemplateActivity : BaseActivity() {
                 rvRight.adapter = classicAdapterRight
                 map.setBackgroundResource(getSelectedMapDrawable(Constants.CLASSIC_TEMPLATE))
 
-                val typeface = ResourcesCompat.getFont(
-                    root.context, stampFontList[PrefManager.getInt(
-                        root.context,
-                        Constants.SELECTED_STAMP_FONT + Constants.CLASSIC_TEMPLATE,
-                        0
-                    )]
+
+
+                val selectedIndex = PrefManager.getInt(
+                    root.context,
+                    Constants.SELECTED_STAMP_FONT + Constants.CLASSIC_TEMPLATE,
+                    0
                 )
+
+                val fontRes = stampFontList.getOrNull(selectedIndex)
+                val typeface = if (fontRes != null) {
+                    ResourcesCompat.getFont(root.context, fontRes)
+                } else {
+                    Typeface.DEFAULT // system default font
+                }
+
                 tvCenterTitle.typeface = typeface
+
 
 
 
@@ -229,13 +240,21 @@ class AllTemplateActivity : BaseActivity() {
 
                 map.setBackgroundResource(getSelectedMapDrawable(Constants.ADVANCE_TEMPLATE))
 
-                val typeface = ResourcesCompat.getFont(
-                    root.context, stampFontList[PrefManager.getInt(
-                        root.context,
-                        Constants.SELECTED_STAMP_FONT + Constants.ADVANCE_TEMPLATE,
-                        0
-                    )]
+
+                val selectedIndex = getInt(
+                    root.context,
+                    Constants.SELECTED_STAMP_FONT + Constants.ADVANCE_TEMPLATE,
+                    0
                 )
+
+                val fontRes = stampFontList.getOrNull(selectedIndex)
+                val typeface = if (fontRes != null) {
+                    ResourcesCompat.getFont(root.context, fontRes)
+                } else {
+                    Typeface.DEFAULT // system default font
+                }
+
+
                 tvCenterTitle.typeface = typeface
 
 
@@ -294,13 +313,20 @@ class AllTemplateActivity : BaseActivity() {
 
                 map.setBackgroundResource(getSelectedMapDrawable(Constants.REPORTING_TEMPLATE))
 
-                val typeface = ResourcesCompat.getFont(
-                    root.context, stampFontList[PrefManager.getInt(
-                        root.context,
-                        Constants.SELECTED_STAMP_FONT + Constants.REPORTING_TEMPLATE,
-                        0
-                    )]
+                val selectedIndex = getInt(
+                    root.context,
+                    Constants.SELECTED_STAMP_FONT + Constants.REPORTING_TEMPLATE,
+                    0
                 )
+
+                val fontRes = stampFontList.getOrNull(selectedIndex)
+                val typeface = if (fontRes != null) {
+                    ResourcesCompat.getFont(root.context, fontRes)
+                } else {
+                    Typeface.DEFAULT // system default font
+                }
+
+
                 tvCenterTitle.typeface = typeface
                 tvEnvironment.typeface = typeface
 

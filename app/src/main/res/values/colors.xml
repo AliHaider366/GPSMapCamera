@@ -12,6 +12,7 @@
     <color name="green_g1">#D1FAE5</color>
     <color name="green">#22C55E</color>
     <color name="yellow_y1">#FEF3C7</color>
+    <color name="yellow">#FACC15</color>
     <color name="grey_g1">#D1D5DB</color>
     <color name="grey_g2">#F3F4F6</color>
     <color name="grey_g3">#6B7280</color>
@@ -24,4 +25,6 @@
     <color name="textDescColor">#4B5563</color>
     <color name="textDescColor2">#6B7280</color>
     <color name="textMainColor">#1F2937</color>
+    <color name="dimBlack">#50000000</color>
+
 </resources>

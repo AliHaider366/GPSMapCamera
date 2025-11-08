@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tvFolderName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/_8sdp"
+        android:paddingHorizontal="@dimen/_14sdp"
+        android:paddingVertical="@dimen/_6sdp"
+        android:text="Default"
+        android:drawableStart="@drawable/ic_folder"
+        android:drawablePadding="@dimen/_5sdp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_11sdp"
+        android:background="@drawable/bg_folder_unselected" />
+</LinearLayout>

@@ -4,10 +4,12 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
+import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.databinding.ActivityAddPersonBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.showToast
 
 class AddPersonActivity : BaseActivity() {
 
@@ -34,6 +36,18 @@ class AddPersonActivity : BaseActivity() {
         backBtn.setOnClickListener {
             backPressedCallback.handleOnBackPressed()
         }
+        btnDone.setOnClickListener {
+            val text = etMain.text.toString()
+            if (text.isNotEmpty()){
+                PrefManager.setString(
+                    this@AddPersonActivity,
+                    Constants.SELECTED_PERSON_NAME + passedTemplate,
+                    text.toString()
+                )
+            }else{
+                showToast(getString(R.string.please_enter_text_first))
+            }
+        }
     }
 
     private fun initViews() = binding.run {
@@ -48,13 +62,13 @@ class AddPersonActivity : BaseActivity() {
             etMain.setText(personName)
 
 
-        etMain.doOnTextChanged { text, _, _, _ ->
-            PrefManager.setString(
-                this@AddPersonActivity,
-                Constants.SELECTED_PERSON_NAME + passedTemplate,
-                text.toString()
-            )
-        }
+//        etMain.doOnTextChanged { text, _, _, _ ->
+//            PrefManager.setString(
+//                this@AddPersonActivity,
+//                Constants.SELECTED_PERSON_NAME + passedTemplate,
+//                text.toString()
+//            )
+//        }
     }
 
 

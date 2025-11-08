@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.R
@@ -13,20 +12,18 @@ import com.example.gpsmapcamera.databinding.ActivitySettingsBinding
 import com.example.gpsmapcamera.enums.ImageQuality
 import com.example.gpsmapcamera.objects.CameraSettingsNotifier
 import com.example.gpsmapcamera.utils.Constants
-import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.FeedbackDialog
 import com.example.gpsmapcamera.utils.PrefManager.KEY_IMAGE_QUALITY
 import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_VOLUME_BTN_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.PrefManager.saveString
-import com.example.gpsmapcamera.utils.RateUsDialog
 import com.example.gpsmapcamera.utils.isSingleTouch
 import com.example.gpsmapcamera.utils.launchActivity
-import com.example.gpsmapcamera.utils.rateUs
 import com.example.gpsmapcamera.utils.shareApp
 import com.example.gpsmapcamera.utils.showDropdownMenu
 import com.example.gpsmapcamera.utils.toLanguageName
-import com.example.mycam.models.SettingsModel
+import com.example.gpsmapcamera.models.SettingsModel
 
 class SettingsActivity : BaseActivity() {
 
@@ -185,8 +182,9 @@ class SettingsActivity : BaseActivity() {
 
 
             getString(R.string.rate_us) -> {
-                RateUsDialog(this@SettingsActivity).show()
-//                rateUs()
+//                RateUsDialog(this@SettingsActivity).show()
+                FeedbackDialog(this@SettingsActivity).show()
+
             }
 
 

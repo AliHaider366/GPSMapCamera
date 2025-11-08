@@ -14,9 +14,8 @@ import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.ItemLanguageBinding
 import com.example.gpsmapcamera.utils.enableMarquee
 import com.example.gpsmapcamera.utils.setViewBackgroundDrawableRes
-import com.example.mycam.models.Language
+import com.example.gpsmapcamera.models.Language
 import com.murgupluoglu.flagkit.FlagKit
-import kotlin.math.log
 
 class LanguageAdapter(
     private val onLanguageSelected: (Language) -> Unit

@@ -5,7 +5,7 @@ import java.util.Date
 
 object Constants {
 
-    val SAVED_DEFAULT_FILE_PATH="DCIM/Camera"
+    val SAVED_DEFAULT_FILE_PATH="DCIM/${BuildConfig.APPLICATION_ID}/Default"
     val CUSTOM_SAVED_FILE_PATH_ROOT="DCIM/${BuildConfig.APPLICATION_ID}"
     val SAVED_FILE_NAME="${Date().formatForFile()}.jpg"
 
@@ -74,4 +74,9 @@ object Constants {
     const val SELECTED_LANGUAGE = "SELECTED_LANGUAGE"
     const val SHOW_LANGUAGE_ANIM = "SHOW_LANGUAGE_ANIM"
     const val FROM_SPLASH = "FROM_SPLASH"
+
+
+    const val PASSED_MEDIA = "PASSED_MEDIA"
+    const val IS_VIDEO = "IS_VIDEO"
+    const val DELETED_MEDIA_URI = "DELETED_MEDIA_URI"
 }

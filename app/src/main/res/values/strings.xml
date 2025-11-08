@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">GPS Camera - Map &amp; Geo Tagging</string>
+    <string name="gps_camera_non_translatable" translatable="false">GPS Camera</string>
     <string name="add_note">Add Note</string>
     <string name="add_custom_name">Add Custom Name</string>
     <string name="date_and_time">Date and time</string>
@@ -250,5 +251,29 @@
     <string name="your_feedback_helps_us_improve">Your feedback helps us improve!</string>
     <string name="rate_on_play_store">Rate on Play Store</string>
     <string name="maybe_later">Maybe Later</string>
+    <string name="add_quick_tags_to_your_images">Add Quick tags to your Images</string>
+    <string name="stamp_your_photo_with_location_and_time_zone">Stamp your photo with location and time zone</string>
+    <string name="we_d_love_to_know_how_we_can_improve">We\'d love to know how we can improve</string>
+    <string name="your_feedback_is_valuable_to_us">Your feedback is valuable to us</string>
+    <string name="tell_us_what_we_can_do_better">Tell us what we can do better...</string>
+    <string name="submit">Submit</string>
+    <string name="cancel">Cancel</string>
+    <string name="terrible">Terrible</string>
+    <string name="bad">Bad</string>
+    <string name="good">Good</string>
+    <string name="okay">Okay</string>
+    <string name="excellent">Excellent</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="choose_an_email_client">Choose an email client</string>
+    <string name="please_enter_feedback">Please enter feedback</string>
+    <string name="done">Done</string>
+    <string name="saved_media">Saved Media</string>
+    <string name="no_saved_media_yet">No saved media yet</string>
+    <string name="your_saved_media_will_appear_here">Your saved media will appear here</string>
+    <string name="delete_saved_media">Delete Saved Media</string>
+    <string name="are_you_sure_you_want_to_delete">Are you sure you want to delete ?</string>
+    <string name="delete">Delete</string>
+    <string name="preview">Preview</string>
+    <string name="saved">Saved</string>
 
 </resources>

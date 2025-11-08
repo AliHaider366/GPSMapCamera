@@ -53,14 +53,64 @@
         android:background="@android:color/transparent" />
 
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/watermarkContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/previewContainer">
+
+        <LinearLayout
+            android:id="@+id/stampLyt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@color/cardview_dark_background"
+            android:orientation="vertical"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:drawableStart="@drawable/ic_app_logo_stamp"
+                android:drawablePadding="@dimen/_5sdp"
+                android:gravity="center"
+                android:paddingVertical="@dimen/_5sdp"
+                android:paddingStart="@dimen/_2sdp"
+                android:paddingEnd="@dimen/_10sdp"
+                android:text="@string/gps_camera_non_translatable"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_10sdp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/ivLogo"
+                app:layout_constraintStart_toEndOf="@+id/mapContainer"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ivStampCross"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:padding="@dimen/_5sdp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_stamp_cross"
+            app:layout_constraintBottom_toTopOf="@+id/stampLyt"
+            app:layout_constraintEnd_toEndOf="@id/stampLyt"
+            app:layout_constraintStart_toEndOf="@id/stampLyt"
+            app:layout_constraintTop_toTopOf="@+id/stampLyt" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     <FrameLayout
         android:id="@+id/stampContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_10sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/previewContainer" />
+        app:layout_constraintTop_toBottomOf="@+id/watermarkContainer" />
 
 
     <!--video record timmer textview-->
@@ -507,7 +557,7 @@
                 android:layout_height="wrap_content"
                 android:drawableTop="@drawable/gallery_fill_ic"
                 android:drawablePadding="@dimen/_5sdp"
-                android:text="@string/gallery"
+                android:text="@string/saved"
                 android:textColor="@color/white"
                 android:textSize="@dimen/_10sdp"
                 app:layout_constraintBottom_toBottomOf="parent"

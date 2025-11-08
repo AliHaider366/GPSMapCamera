@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.example.gpsmapcamera.models.FieldItem
-import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
-import com.example.gpsmapcamera.utils.Constants.SAVED_FILE_NAME
 import org.json.JSONArray
 
 

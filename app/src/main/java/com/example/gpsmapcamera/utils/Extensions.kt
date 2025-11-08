@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
@@ -103,6 +104,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.coroutines.resume
+
+
+val CONTACT_US_MAIL = "we.appsofficial@gmail.com"
 
 
 fun EditText.addTextChanged(onTextChanged: ((String) -> Unit)? = null) {
@@ -507,7 +511,10 @@ fun Context.shareImage(imageUri: Uri, message: String = "Check out this photo I 
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "image/*"
         putExtra(Intent.EXTRA_STREAM, imageUri)
-        putExtra(Intent.EXTRA_TEXT, "(Share your spot — send a GPS Camera Map photo.) Shared via GPS Camera Map & Geo Tagging App.")
+        putExtra(
+            Intent.EXTRA_TEXT,
+            "(Share your spot — send a GPS Camera Map photo.) Shared via GPS Camera Map & Geo Tagging App."
+        )
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
@@ -522,7 +529,10 @@ fun Context.shareApp(appName: String = "my app") {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_SUBJECT, appName)
-        putExtra(Intent.EXTRA_TEXT, "(Share your spot — send a GPS Camera Map photo.) Shared via GPS Camera Map & Geo Tagging App.")
+        putExtra(
+            Intent.EXTRA_TEXT,
+            "(Share your spot — send a GPS Camera Map photo.) Shared via GPS Camera Map & Geo Tagging App."
+        )
     }
     startActivity(Intent.createChooser(intent, "Share via"))
 }
@@ -1183,7 +1193,6 @@ fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observ
 }
 
 
-
 fun FrameLayout.loadStaticMap(
     context: Context,
     location: Location,
@@ -1277,9 +1286,19 @@ fun isSingleTouch(): Boolean {
 }
 
 fun Context.rateUs() = try {
-    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${{BuildConfig.APPLICATION_ID}}")))
+    startActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("market://details?id=${{ BuildConfig.APPLICATION_ID }}")
+        )
+    )
 } catch (_: Exception) {
-    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")))
+    startActivity(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
+        )
+    )
 }
 
 fun View.disableClick() {
@@ -1298,4 +1317,48 @@ fun View.enableClick() {
 fun disableClicks(vararg views: View) = views.forEach { it.disableClick() }
 fun enableClicks(vararg views: View) = views.forEach { it.enableClick() }
 
+
+fun Context.openEmailApp(finalMessage: String) {
+    try {
+        val appVersion = BuildConfig.VERSION_NAME
+
+        // Get device ID (Android ID)
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
+        // Combine subject
+        val subject = "App Version: $appVersion | Device ID: $deviceId"
+
+
+
+        // Encode subject & body properly
+        val uriText = "mailto:$CONTACT_US_MAIL" +
+                "?subject=" + Uri.encode(subject) +
+                "&body=" + Uri.encode(finalMessage)
+        // Create mailto URI
+        val uri = Uri.parse(uriText)
+
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = uri
+        }
+        intent.setPackage("com.google.android.gm")
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            intent.setPackage(null)
+            startActivity(
+                Intent.createChooser(
+                    intent, getString(R.string.choose_an_email_client)
+                )
+            )
+        }
+    } catch (e: Exception) {
+        Toast.makeText(
+            this@openEmailApp,
+            getString(R.string.something_went_wrong),
+            Toast.LENGTH_SHORT
+        )
+            .show()
+    }
+
+}
 

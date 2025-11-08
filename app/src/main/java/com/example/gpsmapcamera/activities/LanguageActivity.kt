@@ -2,8 +2,6 @@ package com.example.gpsmapcamera.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gpsmapcamera.adapters.LanguageAdapter
 import com.example.gpsmapcamera.databinding.ActivityLanguageBinding
@@ -15,7 +13,7 @@ import com.example.gpsmapcamera.utils.PrefManager.setBoolean
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.visible
-import com.example.mycam.models.Language
+import com.example.gpsmapcamera.models.Language
 
 class LanguageActivity : BaseActivity() {
 
@@ -34,23 +32,6 @@ class LanguageActivity : BaseActivity() {
         intent.getBooleanExtra(Constants.FROM_SPLASH, false)
     }
 
-/*
-    private val lanList=listOf(
-        Language("en_us", "English (US)", "English", "US"),
-        Language("en_uk", "English (UK)", "English", "GB"),
-        Language("ca", "Canada", "English", "CA"),
-        Language("ph", "Philippines", "Tagalog", "PH"),
-        Language("fr", "French", "Français", "FR"),
-        Language("es", "Spanish", "Español", "ES"),
-        Language("de", "German", "Deutsch", "DE"),
-        Language("zh", "Chinese", "中文", "CN"),
-        Language("hi", "Hindi", "हिन्दी", "IN"),
-        Language("pt_pt", "Portugal", "Português", "PT"),
-        Language("pt_br", "Portuguese", "Português", "BR"),
-        Language("ru", "Russian", "Русский", "RU")
-    )
-*/
-
     private val lanList by lazy {
         ArrayList<Language>().apply {
             add(Language("en-US", "English (US)", "English", "US"))
@@ -68,11 +49,18 @@ class LanguageActivity : BaseActivity() {
             add(Language("de", "Deutsch", "German", "DE"))
             add(Language("fr-CA", "Canada", "French (Canada)", "CA"))
             add(Language("en-GB", "English (UK)", "English", "GB"))
-            add(Language("ko", "Korean", "Korean", "KR"))
-            add(Language("nl", "Dutch", "Dutch", "NL"))
+            add(Language("ko", "한국어", "Korean", "KR"))
+            add(Language("nl", "Nederlands", "Dutch", "NL"))
+
+            // New additions
+            add(Language("ja", "日本語", "Japanese", "JP"))
+            add(Language("tr", "Türkçe", "Turkish", "TR"))
+            add(Language("th", "ไทย", "Thai", "TH"))
+            add(Language("vi", "Tiếng Việt", "Vietnamese", "VN"))
+            add(Language("it", "Italiano", "Italian", "IT"))
+            add(Language("fa", "فارسی", "Persian", "IR"))
         }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

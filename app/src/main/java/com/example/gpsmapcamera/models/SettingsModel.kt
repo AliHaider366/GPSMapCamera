@@ -1,4 +1,4 @@
-package com.example.mycam.models
+package com.example.gpsmapcamera.models
 
 sealed class SettingsModel{
     data class Heading(val heading: String) : SettingsModel()

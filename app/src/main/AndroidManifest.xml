@@ -35,6 +35,15 @@
             android:name=".activities.AddManualLocationActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.saved.MediaPreviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.saved.SavedMediaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ThirdSessionActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.ExitActivity"
             android:exported="false" />
         <activity
