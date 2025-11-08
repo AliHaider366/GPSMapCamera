@@ -117,6 +117,12 @@ class CameraManager(
         startCamera() // restart with updated config
     }
 
+    fun resetDetectedQR()
+    {
+        qrCodeAnalyzer?.resetDetectedValues()
+    }
+
+
     fun setMirror(enabled: Boolean) {
         isMirrorEnabled = enabled
     }

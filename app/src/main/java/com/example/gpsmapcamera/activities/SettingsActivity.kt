@@ -16,6 +16,7 @@ import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.KEY_IMAGE_QUALITY
 import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
+import com.example.gpsmapcamera.utils.PrefManager.KEY_VOLUME_BTN_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.PrefManager.saveString
 import com.example.gpsmapcamera.utils.RateUsDialog
@@ -53,17 +54,21 @@ class SettingsActivity : BaseActivity() {
                 getString(this@SettingsActivity, KEY_IMAGE_QUALITY, getString(R.string.high)),
                 R.drawable.setting_up_down_ic
             ),
-//            SettingsModel.GeneralItem(getString(R.string.volume_button), R.drawable.setting_volume_ic,"Capture photo",R.drawable.setting_up_down_ic),
+            SettingsModel.GeneralItem(
+                getString(R.string.volume_button),
+                R.drawable.setting_volume_ic,
+                getString(this@SettingsActivity, KEY_VOLUME_BTN_SETTING, getString(R.string.volume)),
+                R.drawable.setting_up_down_ic),
             SettingsModel.GeneralItem(
                 getString(R.string.touch_settings),
                 R.drawable.setting_touch_ic,
                 getString(this@SettingsActivity, KEY_TOUCH_SETTING, getString(R.string.focus)),
                 R.drawable.setting_up_down_ic
             ),
-//            SettingsModel.Heading(getString(R.string.features)), // Heading item
+            SettingsModel.Heading(getString(R.string.features)), // Heading item
 //            SettingsModel.FeaturesItem(getString(R.string.watermark), R.drawable.setting_watermark_ic),
 //            SettingsModel.FeaturesItem(getString(R.string.save_original_photos), R.drawable.setting_save_original_ic),
-//            SettingsModel.FeaturesItem(getString(R.string.qr_detection), R.drawable.setting_qr_ic),
+            SettingsModel.FeaturesItem(getString(R.string.qr_detection), R.drawable.setting_qr_ic),
 //            SettingsModel.FeaturesItem(getString(R.string.location_share_mode), R.drawable.setting_location_share_ic),
 //            SettingsModel.FeaturesItem(getString(R.string.front_rear_camera_stamp), R.drawable.setting_front_rear_ic),
             SettingsModel.Heading(getString(R.string.about)), // Heading item
@@ -116,6 +121,7 @@ class SettingsActivity : BaseActivity() {
         val imageQuality =
             listOf(getString(R.string.low), getString(R.string.medium), getString(R.string.high))
         val touchSetting = listOf(getString(R.string.focus), getString(R.string.photo_capture))
+        val volumeSetting = listOf(getString(R.string.capture_photo),getString(R.string.volume), getString(R.string.zoom))
 
         when (title) {
             getString(R.string.image_quality) -> {
@@ -144,6 +150,14 @@ class SettingsActivity : BaseActivity() {
                 textView.showDropdownMenu(touchSetting) { selected ->
 
                     saveString(this@SettingsActivity, KEY_TOUCH_SETTING, selected)
+                }
+
+            }
+
+            getString(R.string.volume_button) -> {
+                textView.showDropdownMenu(volumeSetting) { selected ->
+
+                    saveString(this@SettingsActivity, KEY_VOLUME_BTN_SETTING, selected)
                 }
 
             }

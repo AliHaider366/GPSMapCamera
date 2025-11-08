@@ -44,7 +44,7 @@
             android:textSize="@dimen/_12sdp"
             android:paddingHorizontal="@dimen/_10sdp"
             app:layout_constraintBottom_toBottomOf="@+id/icon"
-            app:layout_constraintEnd_toStartOf="@+id/selectedOptionName"
+            app:layout_constraintEnd_toStartOf="@+id/switchBtn"
             app:layout_constraintStart_toEndOf="@+id/icon"
             app:layout_constraintTop_toTopOf="@+id/icon"
             app:layout_constraintVertical_chainStyle="packed"
@@ -52,7 +52,7 @@
 
         <!-- Native Name -->
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/selectedOptionName"
+            android:id="@+id/switchBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:thumb="@drawable/custom_switch_thumb"

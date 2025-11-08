@@ -4,11 +4,13 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
@@ -21,6 +23,7 @@ import androidx.camera.core.FocusMeteringAction
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.example.gpsmapcamera.R
@@ -29,10 +32,12 @@ import com.example.gpsmapcamera.adapters.StampAdapter
 import com.example.gpsmapcamera.adapters.StampCenterAdapter
 import com.example.gpsmapcamera.cameraHelper.CameraManager
 import com.example.gpsmapcamera.cameraHelper.RecordingTimer
+import com.example.gpsmapcamera.cameraHelper.TextEditorDialog
 import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampReportingTemplateLayoutBinding
+import com.example.gpsmapcamera.databinding.ViewDraggableTextOverlayBinding
 import com.example.gpsmapcamera.enums.ImageQuality
 import com.example.gpsmapcamera.interfaces.CameraSettingsListener
 import com.example.gpsmapcamera.models.StampCameraPosition
@@ -53,8 +58,10 @@ import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_TIMER
 import com.example.gpsmapcamera.utils.PrefManager.KEY_CAMERA_TIMER_VALUE
 import com.example.gpsmapcamera.utils.PrefManager.KEY_CAPTURE_SOUND
 import com.example.gpsmapcamera.utils.PrefManager.KEY_IMAGE_QUALITY
+import com.example.gpsmapcamera.utils.PrefManager.KEY_QR_DETECT_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_SHARE_IMAGE
 import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
+import com.example.gpsmapcamera.utils.PrefManager.KEY_VOLUME_BTN_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_WHITE_BALANCE
 import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.PrefManager.getInt
@@ -62,6 +69,7 @@ import com.example.gpsmapcamera.utils.PrefManager.getString
 import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.PrefManager.saveInt
 import com.example.gpsmapcamera.utils.StampPreferences
+import com.example.gpsmapcamera.utils.applyTextStyle
 import com.example.gpsmapcamera.utils.checkAndRequestGps
 import com.example.gpsmapcamera.utils.disableClicks
 import com.example.gpsmapcamera.utils.enableClicks
@@ -83,6 +91,7 @@ import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
 import com.example.gpsmapcamera.utils.setDelayedClickListener
 import com.example.gpsmapcamera.utils.setDrawable
 import com.example.gpsmapcamera.utils.setImage
+import com.example.gpsmapcamera.utils.setOverlayTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setStampPosition
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setTextColorRes
@@ -95,6 +104,8 @@ import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.stampFontList
 import com.example.gpsmapcamera.utils.visible
 import java.util.concurrent.TimeUnit
+import kotlin.math.atan2
+import kotlin.math.sqrt
 
 class CameraActivity : BaseActivity(), CameraSettingsListener {
     private val binding by lazy {
@@ -137,6 +148,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     private lateinit var micPermissionLauncher: ActivityResultLauncher<String>
     var brightnessValue = 0
     var isZoom1x = true
+    private var currentlySelectedOverlay: View? = null
 
     val requestCode = 1001
     private val PERMISSIONS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -226,8 +238,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                             )
                         )
                     }
-                    setupCameraTouch()
 
+                    setupCameraTouch()
                     setInitialStates()
                 },
                 onDenied = { permanentlyDenied ->
@@ -274,6 +286,14 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
     private fun setInitialStates() = binding.apply {
 
+        cameraManager.setQRCodeDetectionEnabled(getBoolean(binding.root.context, KEY_QR_DETECT_SETTING)){
+            qrScanedView.visible()
+            scanedQRTv.text=it
+            qrScanCancleBtn.setOnClickListener{
+                cameraManager.resetDetectedQR()
+                qrScanedView.gone()
+            }
+        }
 
         if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
             switchMode(R.id.share_btn,false)
@@ -451,7 +471,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         textBtn.setOnClickListener {
-
+            val dialog = TextEditorDialog(this@CameraActivity)
+            dialog.setOnTextSavedListener { text,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity ->
+                addDraggableTextOverlay(text,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity)
+            }
+            dialog.show()
         }
 
         flashBtn.setOnClickListener {
@@ -674,7 +698,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             videoRecordBtn.gone()
 
             disableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
-
+            defaultTopMenuView.gone()
             cameraManager.startVideoRecordingWithStamp(
                 stampContainer = stampContainer,
                 stampPosition = selectedStampPosition,
@@ -695,6 +719,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         videoStopBtn.setOnClickListener {
+            defaultTopMenuView.visible()
             enableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
             cameraManager.stopVideoRecordingWithStamp()
             recordingTimer.stop()
@@ -752,6 +777,194 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
+    private fun showOverlayControls(overlayView: View) {
+        // Hide controls of previously selected overlay
+        hideAllOverlayControls()
+
+        // Show controls of the selected overlay
+        val childBinding = ViewDraggableTextOverlayBinding.bind(overlayView)
+        with(childBinding) {
+            btnDelete.visible()
+            btnFlip.visible()
+            btnEdit.visible()
+            btnScaleRotate.visible()
+        }
+
+        currentlySelectedOverlay = overlayView
+    }
+    private fun hideAllOverlayControls() {
+        val container = binding.overlayContainer
+        for (i in 0 until container.childCount) {
+            val child = container.getChildAt(i)
+            val childBinding = ViewDraggableTextOverlayBinding.bind(child)
+            with(childBinding) {
+                btnDelete.gone()
+                btnFlip.gone()
+                btnEdit.gone()
+                btnScaleRotate.gone()
+            }
+        }
+    }
+
+    private fun addDraggableTextOverlay(text: String,textColor:Int,
+                                        bgColor:Int, typeface: Typeface?,
+                                        isBold: Boolean,
+                                        isItalic: Boolean,
+                                        isUnderline: Boolean,
+                                        gravity: Int) {
+        val container = binding.overlayContainer
+        val overlayBinding = ViewDraggableTextOverlayBinding.inflate(layoutInflater, container, false)
+        val view = overlayBinding.root
+
+
+        overlayBinding.apply {
+            val tv=overlayText
+
+            tv.text = text
+            tv.setOverlayTextColorAndBackgroundTint(textColor,bgColor)
+            tv.applyTextStyle(typeface, isBold, isItalic, isUnderline, gravity)
+
+//
+            // Drag handling
+            var dX = 0f
+            var dY = 0f
+            var isDragging = false
+            view.setOnTouchListener { v, event ->
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        dX = v.x - event.rawX
+                        dY = v.y - event.rawY
+                        isDragging = false
+                        // Show controls when overlay is tapped
+                        showOverlayControls(v)
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        val deltaX = event.rawX - (v.x - dX)
+                        val deltaY = event.rawY - (v.y - dY)
+                        val moveThreshold = 10f // pixels
+
+                        if (kotlin.math.abs(deltaX) > moveThreshold || kotlin.math.abs(deltaY) > moveThreshold) {
+                            isDragging = true
+                        }
+
+                        if (isDragging) {
+                            v.x = event.rawX + dX
+                            v.y = event.rawY + dY
+                        }
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        // If it was just a tap (not a drag), keep controls visible
+                        if (!isDragging) {
+                            showOverlayControls(v)
+                        }
+                    }
+                }
+                true
+            }
+
+            // Delete
+            btnDelete.setOnClickListener { container.removeView(view) }
+
+            // Flip (mirror horizontally)
+            var flipped = false
+            btnFlip.setOnClickListener {
+                flipped = !flipped
+                tv.scaleX = if (flipped) -1f else 1f
+            }
+
+            // Edit -> reopen text dialog seeded with current text
+            btnEdit.setOnClickListener {
+                // Extract current values from TextView
+                val currentText = tv.text?.toString()
+                val currentTextColor = tv.currentTextColor
+                val currentBgColor = ViewCompat.getBackgroundTintList(tv)?.defaultColor
+                    ?: android.graphics.Color.TRANSPARENT
+                val currentTypeface = tv.typeface
+
+                // Extract current style information
+                val currentGravity = tv.gravity
+                val hasUnderline = (tv.paintFlags and android.graphics.Paint.UNDERLINE_TEXT_FLAG) != 0
+                val typefaceStyle = currentTypeface?.style ?: Typeface.NORMAL
+                val isBold = (typefaceStyle and Typeface.BOLD) != 0
+                val isItalic = (typefaceStyle and Typeface.ITALIC) != 0
+                val BaseTypeface = currentTypeface?.let { Typeface.create(it, Typeface.NORMAL) }
+
+                val editDialog = TextEditorDialog(this@CameraActivity, currentText, currentTextColor, currentBgColor, BaseTypeface,
+                    isBold, isItalic, hasUnderline, currentGravity)
+                editDialog.setOnTextSavedListener { newText,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity ->
+                    tv.text = newText
+                    tv.setOverlayTextColorAndBackgroundTint(textColor,bgColor)
+                    tv.applyTextStyle(typeface, isBold, isItalic, isUnderline, gravity)
+
+                }
+                editDialog.show()
+            }
+
+
+            // --- Scale & Rotate Entire Container ---
+            var startDist = 0f
+            var startScale = 1f
+            var startRotation = 0f
+            var centerX = 0f
+            var centerY = 0f
+            var startAngle = 0f        // ← add this line
+
+            btnScaleRotate.setOnTouchListener { _, ev ->
+                when (ev.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        // Record starting values
+                        startScale = view.scaleX
+                        startRotation = view.rotation
+
+                        // Compute center of the overlay
+                        centerX = view.x + view.width / 2f
+                        centerY = view.y + view.height / 2f
+
+                        // Compute the finger's starting angle relative to the view center
+                        val dx = ev.rawX - centerX
+                        val dy = ev.rawY - centerY
+                        startDist = sqrt(dx * dx + dy * dy)
+                        startAngle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+                    }
+
+                    MotionEvent.ACTION_MOVE -> {
+                        val dx = ev.rawX - centerX
+                        val dy = ev.rawY - centerY
+
+                        // Compute new distance and angle
+                        val newDist = sqrt(dx * dx + dy * dy)
+                        val newAngle = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())).toFloat()
+
+                        // --- Scale ---
+                        val scaleFactor = (newDist / startDist).coerceIn(0.3f, 5f)
+                        view.scaleX = startScale * scaleFactor
+                        view.scaleY = startScale * scaleFactor
+
+                        // --- Rotate relative to where the finger started ---
+                        val deltaAngle = newAngle - startAngle
+                        view.rotation = startRotation + deltaAngle
+                    }
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        // Reset any temp variables if needed
+                    }
+                }
+                true
+            }
+
+
+
+            container.addView(view)
+            showOverlayControls(view)
+
+            // Center it initially
+            view.post {
+                view.x = (container.width - view.width) / 2f
+                view.y = (container.height - view.height) / 3f
+            }
+        }
+
+    }
     private fun updateFlash() = binding.run {
 
         when (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)) {
@@ -822,6 +1035,20 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         return when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> {
 
+                when(getString(this@CameraActivity, KEY_VOLUME_BTN_SETTING,getString(R.string.volume)))
+                {
+                    getString(R.string.capture_photo)->{
+
+                        capturePhoto()
+                    }
+                    getString(R.string.volume)->{
+
+                    }
+                    getString(R.string.zoom)->
+                    {
+                        cameraManager.zoomIn()
+                    }
+                }
                 return true
             }
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
@@ -832,6 +1059,20 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 } else {
                     cameraManager.zoomOut()
                 }*/
+                when(getString(this@CameraActivity, KEY_VOLUME_BTN_SETTING,getString(R.string.volume)))
+                {
+                    getString(R.string.capture_photo)->{
+                        capturePhoto()
+                    }
+                    getString(R.string.volume)->{
+
+                    }
+                    getString(R.string.zoom)->
+                    {
+                        cameraManager.zoomOut()
+
+                    }
+                }
                 return true
             }
             else -> super.onKeyDown(keyCode, event)
@@ -910,9 +1151,50 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         setZoom()
     }
 
+    private fun capturePhoto()=binding.apply {
+        if (videoRecordBtn.isGone && videoStopBtn.isGone) {
+            /// only allow touch capture when in photo mode not in record
+
+            if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
+
+                cameraManager.takePhotoWithTimer(
+                    getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
+                    timmerTV,
+                    stampContainer,// pass your overlay container
+                    selectedStampPosition
+                ) { uri ->
+                    uri?.let {
+                        val intent = Intent(
+                            this@CameraActivity,
+                            PreviewImageActivity::class.java
+                        )
+                        intent.putExtra("image_uri", it.toString())
+                        if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                            shareImage(it)
+                        }
+                    }
+                }
+            } else {
+                cameraManager.takePhotoWithStamp(
+                    stampContainer,
+                    selectedStampPosition
+                ) { uri ->
+                    if (uri != null) {
+                        if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
+                            shareImage(uri)
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
     private fun setupCameraTouch() = binding.apply {
         cameraManager.setupTouchControls { x, y ->
             Log.d("TAG", "setupCameraTouch: ${binding.detailTopMenuView.isVisible}")
+            hideAllOverlayControls()
+            currentlySelectedOverlay = null
 
             if (binding.detailTopMenuView.isVisible) {
                 binding.detailTopMenuView.visibility = View.GONE
@@ -939,10 +1221,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                     }
 
                     getString(R.string.photo_capture) -> {
-                        Log.d(
-                            "TAG",
-                            "setupCameraTouch: binding.videoRecordBtn.isGone ${binding.videoRecordBtn.isGone}"
-                        )
+
                         Log.d(
                             "TAG",
                             "setupCameraTouch: binding.videoStopBtn.isGone ${binding.videoStopBtn.isGone}"
@@ -990,6 +1269,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             }
         }
+
+
     }
 
     private fun setUpTemplate() {
@@ -1397,6 +1678,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
     override fun onQualityChanged(newQuality: ImageQuality) {
         cameraManager.startCamera(newQuality)
+    }
+
+    override fun onQRDetectChanged(enabled: Boolean) {
+        cameraManager.setQRCodeDetectionEnabled(enabled){
+            showToast(it)
+        }
     }
 
 

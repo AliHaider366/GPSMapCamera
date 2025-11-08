@@ -2,8 +2,10 @@ package com.example.gpsmapcamera.adapters
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Typeface
+import android.net.Uri
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
@@ -13,10 +15,17 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.LanguageActivity
 import com.example.gpsmapcamera.databinding.SettingAboutItemBinding
 import com.example.gpsmapcamera.databinding.SettingFeatureItemBinding
 import com.example.gpsmapcamera.databinding.SettingGeneralItemBinding
 import com.example.gpsmapcamera.databinding.SettingHeadingItemBinding
+import com.example.gpsmapcamera.objects.CameraSettingsNotifier
+import com.example.gpsmapcamera.utils.PrefManager.KEY_DAY_CHECK
+import com.example.gpsmapcamera.utils.PrefManager.KEY_QR_DETECT_SETTING
+import com.example.gpsmapcamera.utils.PrefManager.getBoolean
+import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
+import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
 import com.example.gpsmapcamera.utils.setDrawable
 import com.example.mycam.models.SettingsModel
@@ -152,16 +161,35 @@ class SettingsAdapter(
         }
     }
 
-    class FeatureViewHolder(private val binding: SettingFeatureItemBinding) :
+   inner class FeatureViewHolder(private val binding: SettingFeatureItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: SettingsModel.FeaturesItem) {
 
             binding.apply {
+                val context=binding.root.context
                 Glide.with(binding.root.context)
                     .load(item.icon)
                     .into(icon)
                 itemName.text=item.title
+
+                switchBtn.isChecked= when(item.title)
+                {
+                    context.getString(R.string.qr_detection)-> getBoolean(binding.root.context, KEY_QR_DETECT_SETTING)
+                    else -> false
+                }
+
+                switchBtn.setOnCheckedChangeListener { _, isChecked ->
+                    onItemClick(item.title)
+
+                    when (item.title) {
+                        context.getString(R.string.qr_detection) -> {
+                            saveBoolean(context, KEY_QR_DETECT_SETTING, isChecked)
+                            CameraSettingsNotifier.notifyQRDetectionChanged(isChecked)
+                        }
+                    }
+                }
+
 
             }
 

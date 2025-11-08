@@ -4,4 +4,5 @@ import com.example.gpsmapcamera.enums.ImageQuality
 
 interface CameraSettingsListener {
     fun onQualityChanged(newQuality: ImageQuality)
+    fun onQRDetectChanged(enabled: Boolean)
 }

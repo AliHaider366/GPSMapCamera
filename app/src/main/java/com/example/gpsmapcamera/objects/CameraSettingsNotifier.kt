@@ -9,4 +9,9 @@ object CameraSettingsNotifier {
     fun notifyQualityChanged(newQuality: ImageQuality) {
         listener?.onQualityChanged(newQuality)
     }
+
+    fun notifyQRDetectionChanged(isEnabled:Boolean)
+    {
+     listener?.onQRDetectChanged(isEnabled)
+    }
 }

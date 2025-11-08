@@ -20,6 +20,7 @@ class QRCodeAnalyzer(
     private val scannedValues = mutableSetOf<String>()
     private var lastScannedTime = 0L
     private val throttleDuration = 2000L // 2 seconds
+    private var lastScannedValue: String? = null
 
 
     init {
@@ -48,16 +49,30 @@ class QRCodeAnalyzer(
                     val currentTime = System.currentTimeMillis()
                     if (currentTime - lastScannedTime >= throttleDuration) {        ////Limit detection frequency (throttle)" means to reduce how often QR codes are processed
 
-                        for (barcode in barcodes) {     ///"Ignore repeated values entirely
+                       /* for (barcode in barcodes) {     ///"Ignore repeated values entirely
                             barcode.rawValue?.let { value ->
                                 if (!scannedValues.contains(value)) {
                                     scannedValues.add(value)
-                                    Log.d("QRCodeAnalyzer", "QR Code: $value")
+//                                    Log.d("QRCodeAnalyzer", "QR Code: $value")
                                     onQRCodeScanned(value)
                                 }
                             }
+                        }*/
+
+                        // Take only the first detected QR code (if any)
+                        val firstBarcode = barcodes.firstOrNull { it.rawValue != null }
+
+                        firstBarcode?.rawValue?.let { value ->
+                            // Ignore if it's the same as last scanned
+                            if (value != lastScannedValue) {
+                                lastScannedValue = value
+                                lastScannedTime = currentTime
+                                onQRCodeScanned(value)
+                                Log.d("QRCodeAnalyzer", "QR Code scanned: $value")
+                            }
                         }
                     }
+
 
                 }
                 .addOnFailureListener {
@@ -77,5 +92,7 @@ class QRCodeAnalyzer(
 
     fun resetDetectedValues() {
         scannedValues.clear()
+        lastScannedValue = null
+
     }
 }

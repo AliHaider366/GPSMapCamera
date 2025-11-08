@@ -25,6 +25,7 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Shader
+import android.graphics.Typeface
 import android.graphics.YuvImage
 import android.graphics.drawable.ColorDrawable
 import android.location.Geocoder
@@ -635,7 +636,35 @@ fun TextView.enableMarquee() {
 fun TextView.setTextColorRes(colorResId: Int) {
     this.setTextColor(ContextCompat.getColor(context, colorResId))
 }
+fun TextView.applyTextStyle(
+    typeface: Typeface?,
+    isBold: Boolean,
+    isItalic: Boolean,
+    isUnderline: Boolean,
+    gravity: Int
+) {
+    typeface?.let {
+        val style = when {
+            isBold && isItalic -> Typeface.BOLD_ITALIC
+            isBold -> Typeface.BOLD
+            isItalic -> Typeface.ITALIC
+            else -> Typeface.NORMAL
+        }
+        // Get the base typeface without style
+        val baseTypeface = Typeface.create(it, Typeface.NORMAL)
+        setTypeface(baseTypeface, style)
+    }
 
+    // Apply underline
+    paintFlags = if (isUnderline) {
+        paintFlags or Paint.UNDERLINE_TEXT_FLAG
+    } else {
+        paintFlags and Paint.UNDERLINE_TEXT_FLAG.inv()
+    }
+
+    // Apply gravity/alignment
+    this.gravity = gravity
+}
 fun TextView.setTextColorRes(
     @ColorRes activeColor: Int,
     @ColorRes inactiveColor: Int? = null,
@@ -671,6 +700,11 @@ fun TextView.setTextColorAndBackgroundTint(textColorRes: Int, backgroundTintRes:
         this,
         ColorStateList.valueOf(ContextCompat.getColor(context, backgroundTintRes))
     )
+}
+
+fun TextView.setOverlayTextColorAndBackgroundTint(textColor: Int, backgroundColor: Int) {
+    setTextColor(textColor)
+    ViewCompat.setBackgroundTintList(this, ColorStateList.valueOf(backgroundColor))
 }
 
 fun EditText.addAfterTextChanged(onChanged: (String) -> Unit): TextWatcher {
