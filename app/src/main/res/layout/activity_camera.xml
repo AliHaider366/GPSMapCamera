@@ -139,7 +139,7 @@
         android:background="@color/dim_black"
         android:orientation="horizontal"
         android:paddingVertical="@dimen/_8sdp"
-        android:weightSum="5"
+        android:weightSum="6"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
