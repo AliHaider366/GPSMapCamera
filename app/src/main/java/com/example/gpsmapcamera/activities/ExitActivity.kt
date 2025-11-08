@@ -3,9 +3,13 @@ package com.example.gpsmapcamera.activities
 import android.os.Bundle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.saved.SavedMediaActivity
+import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.adapters.ExitAdapter
 import com.example.gpsmapcamera.databinding.ActivityExitBinding
 import com.example.gpsmapcamera.models.ExitModel
+import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.launchActivity
 
 class ExitActivity : BaseActivity() {
 
@@ -20,7 +24,17 @@ class ExitActivity : BaseActivity() {
         setContentView(binding.root)
 
         setupRV()
+        clickListeners()
+    }
 
+    private fun clickListeners() = binding.run {
+        tvContinue.setOnClickListener {
+            finish()
+        }
+        tvExitApp.setOnClickListener {
+            finish()
+            finishAffinity()
+        }
     }
 
     private fun setupRV(){
@@ -48,7 +62,26 @@ class ExitActivity : BaseActivity() {
         )
 
         val adapter = ExitAdapter(homeList) { item, position ->
+            when(item.title){
+                getString(R.string.camera)->{
+                    launchActivity<CameraActivity>(){}
+                }
+                getString(R.string.video)->{
+                    launchActivity<CameraActivity>(){
+                        putExtra(Constants.FROM_HOME_VIDEO_SELECTED, true)
+                    }
+                }
+                getString(R.string.quick_share)->{
+                    launchActivity<CameraActivity>(){
+                        putExtra(Constants.FROM_HOME_QUICK_SHARE_SELECTED, true)
+                    }
+                }
 
+                getString(R.string.templates)->{
+                    launchActivity<AllTemplateActivity>()
+                }
+            }
+            finish()
         }
 
         binding.mainRv.layoutManager = GridLayoutManager(this@ExitActivity, 2)

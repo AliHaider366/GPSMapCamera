@@ -4,9 +4,12 @@ import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.saved.SavedMediaActivity
+import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.adapters.HomeAdapter
 import com.example.gpsmapcamera.databinding.ActivityMainBinding
 import com.example.gpsmapcamera.models.HomeModel
+import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.launchActivity
 
 class MainActivity : BaseActivity() {
@@ -69,7 +72,28 @@ class MainActivity : BaseActivity() {
         )
 
         val adapter = HomeAdapter(homeList) { item, position ->
-
+            when(item.title){
+                getString(R.string.camera)->{
+                    launchActivity<CameraActivity>(){
+                    }
+                }
+                getString(R.string.video)->{
+                    launchActivity<CameraActivity>(){
+                        putExtra(Constants.FROM_HOME_VIDEO_SELECTED, true)
+                    }
+                }
+                getString(R.string.quick_share)->{
+                    launchActivity<CameraActivity>(){
+                        putExtra(Constants.FROM_HOME_QUICK_SHARE_SELECTED, true)
+                    }
+                }
+                getString(R.string.saved_data)->{
+                    launchActivity<SavedMediaActivity>()
+                }
+                getString(R.string.templates)->{
+                    launchActivity<AllTemplateActivity>()
+                }
+            }
         }
 
         binding.mainRv.layoutManager = GridLayoutManager(this@MainActivity, 2).apply {

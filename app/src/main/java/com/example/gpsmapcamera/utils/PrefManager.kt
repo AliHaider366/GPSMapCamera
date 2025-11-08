@@ -64,6 +64,7 @@ object PrefManager {
     const val KEY_FIELD_ORDER  = "fields_order"
     const val KEY_FOLDER_LIST = "key_folder_list"
     const val SECOND_SESSION = "SECOND_SESSION"
+    const val THIRD_SESSION = "THIRD_SESSION"
 
 
     private fun getPrefs(context: Context): SharedPreferences {

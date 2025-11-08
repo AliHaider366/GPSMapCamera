@@ -36,6 +36,7 @@
             android:layout_height="@dimen/_45sdp"
             android:layout_marginEnd="@dimen/_5sdp"
             android:padding="@dimen/_5sdp"
+            android:visibility="gone"
             android:src="@drawable/ic_home_premium"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/ivSettings"

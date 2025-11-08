@@ -78,7 +78,7 @@ class LanguageActivity : BaseActivity() {
             if (fromSplash) {
                 launchActivity<OnBoardingActivity> { }
             }else{
-                launchActivity<CameraActivity> {
+                launchActivity<MainActivity> {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 }
             }

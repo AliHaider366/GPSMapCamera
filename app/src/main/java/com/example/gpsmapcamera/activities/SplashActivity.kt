@@ -14,6 +14,7 @@ import com.example.gpsmapcamera.databinding.ActivitySplashBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
 import com.example.gpsmapcamera.utils.PrefManager.SECOND_SESSION
+import com.example.gpsmapcamera.utils.PrefManager.THIRD_SESSION
 import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.launchActivity
 
@@ -36,7 +37,11 @@ class SplashActivity : BaseActivity() {
             else if (getBoolean(this, SECOND_SESSION, true))
             {
                 launchActivity<StartMenuActivity> {  }
-            } else launchActivity<ThirdSessionActivity> {  }
+            }
+            else if (getBoolean(this, THIRD_SESSION, true))
+            {
+                launchActivity<ThirdSessionActivity> {  }
+            } else launchActivity<MainActivity> {  }
             finish()
         }, 5000) // 5000ms = 5 seconds
 

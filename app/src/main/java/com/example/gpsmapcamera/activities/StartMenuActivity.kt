@@ -45,7 +45,7 @@ class StartMenuActivity : BaseActivity() {
                 binding.viewPager.currentItem = nextItem
             } else {
                 saveBoolean(this@StartMenuActivity, SECOND_SESSION ,false)
-                launchActivity<CameraActivity> {  }
+                launchActivity<MainActivity> {  }
             }
         }
     }

@@ -9,6 +9,8 @@ import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.adapters.OnBoardingAdapter
 import com.example.gpsmapcamera.databinding.ActivityOnBoardingBinding
 import com.example.gpsmapcamera.databinding.ActivityThirdSessionBinding
+import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.PrefManager.THIRD_SESSION
 import com.example.gpsmapcamera.utils.launchActivity
 
 class ThirdSessionActivity : BaseActivity() {
@@ -33,7 +35,8 @@ class ThirdSessionActivity : BaseActivity() {
             if (nextItem < adapter.itemCount) {
                 binding.viewPager.currentItem = nextItem
             } else {
-                launchActivity<CameraActivity> {  }
+                PrefManager.saveBoolean(this@ThirdSessionActivity, THIRD_SESSION, false)
+                launchActivity<MainActivity> {  }
             }
         }
     }

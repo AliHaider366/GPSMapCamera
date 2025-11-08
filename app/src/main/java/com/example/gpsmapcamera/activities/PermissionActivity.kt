@@ -164,7 +164,7 @@ class PermissionActivity : BaseActivity() {
             }
             btnContinue.setOnClickListener {
                 saveBoolean(this@PermissionActivity,KEY_FIRST_TIME,false)
-                launchActivity<CameraActivity> {  }
+                launchActivity<MainActivity> {  }
             }
         }
     }
