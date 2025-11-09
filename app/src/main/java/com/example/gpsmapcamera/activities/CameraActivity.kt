@@ -2,6 +2,9 @@ package com.example.gpsmapcamera.activities
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Typeface
@@ -307,22 +310,22 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
     private fun setInitialStates() = binding.apply {
 
-        cameraManager.setQRCodeDetectionEnabled(
-            getBoolean(
-                binding.root.context,
-                KEY_QR_DETECT_SETTING
-            )
-        ) {
+        scanedQRTv.setOnClickListener{          /// to copy scanned QR
+            val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            cm.setPrimaryClip(ClipData.newPlainText("hex", scanedQRTv.text?.toString() ?: ""))
+        }
+
+        cameraManager.setQRCodeDetectionEnabled(getBoolean(binding.root.context, KEY_QR_DETECT_SETTING)){
             qrScanedView.visible()
-            scanedQRTv.text = it
-            qrScanCancleBtn.setOnClickListener {
+            scanedQRTv.text=it
+            qrScanCancleBtn.setOnClickListener{
                 cameraManager.resetDetectedQR()
                 qrScanedView.gone()
             }
         }
 
         if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
-            switchMode(R.id.share_btn, false)
+            switchMode(R.id.share_btn,false)
         }
         if (getBoolean(this@CameraActivity, KEY_CAMERA_LEVEL)) {
             camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
@@ -410,7 +413,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             }
 
-            3 -> {
+            3 ->{
                 flashBtn.setImage(R.drawable.flash_torch_ic)
                 flashBtn.setTintColor(R.color.blue)
                 cameraManager.toggleFlash(3)    /*flash torch*/
@@ -459,7 +462,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             cameraManager.captureSound(true)
             volumeBtn.text = getString(R.string.volume_on)
-        } else {
+        }else{
             volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
             cameraManager.captureSound(false)
             volumeBtn.text = getString(R.string.volume_off)
@@ -500,19 +503,14 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             launchActivity<SavedPathActivity> { }
         }
 
+        locationBtn.setOnClickListener {
+            launchActivity<LocationActivity> {  }
+        }
+
         textBtn.setOnClickListener {
             val dialog = TextEditorDialog(this@CameraActivity)
-            dialog.setOnTextSavedListener { text, textColor, bgColor, typeface, isBold, isItalic, isUnderline, gravity ->
-                addDraggableTextOverlay(
-                    text,
-                    textColor,
-                    bgColor,
-                    typeface,
-                    isBold,
-                    isItalic,
-                    isUnderline,
-                    gravity
-                )
+            dialog.setOnTextSavedListener { text,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity ->
+                addDraggableTextOverlay(text,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity)
             }
             dialog.show()
         }
@@ -736,18 +734,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             videoTimmerTV.visible()
             videoRecordBtn.gone()
 
-            disableClicks(
-                shareBtn,
-                photoBtn,
-                videoBtn,
-                galleyGotoBtn,
-                templateBtn,
-                moreBtn,
-                flashBtn,
-                pickGalleyBtn,
-                fileNameBtn,
-                settingBtn
-            )
+            disableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
             defaultTopMenuView.gone()
             cameraManager.startVideoRecordingWithStamp(
                 stampContainer = stampContainer,
@@ -770,18 +757,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         videoStopBtn.setOnClickListener {
             defaultTopMenuView.visible()
-            enableClicks(
-                shareBtn,
-                photoBtn,
-                videoBtn,
-                galleyGotoBtn,
-                templateBtn,
-                moreBtn,
-                flashBtn,
-                pickGalleyBtn,
-                fileNameBtn,
-                settingBtn
-            )
+            enableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
             cameraManager.stopVideoRecordingWithStamp()
             recordingTimer.stop()
 
@@ -868,25 +844,22 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
-    private fun addDraggableTextOverlay(
-        text: String, textColor: Int,
-        bgColor: Int, typeface: Typeface?,
-        isBold: Boolean,
-        isItalic: Boolean,
-        isUnderline: Boolean,
-        gravity: Int
-    ) {
+    private fun addDraggableTextOverlay(text: String,textColor:Int,
+                                        bgColor:Int, typeface: Typeface?,
+                                        isBold: Boolean,
+                                        isItalic: Boolean,
+                                        isUnderline: Boolean,
+                                        gravity: Int) {
         val container = binding.overlayContainer
-        val overlayBinding =
-            ViewDraggableTextOverlayBinding.inflate(layoutInflater, container, false)
+        val overlayBinding = ViewDraggableTextOverlayBinding.inflate(layoutInflater, container, false)
         val view = overlayBinding.root
 
 
         overlayBinding.apply {
-            val tv = overlayText
+            val tv=overlayText
 
             tv.text = text
-            tv.setOverlayTextColorAndBackgroundTint(textColor, bgColor)
+            tv.setOverlayTextColorAndBackgroundTint(textColor,bgColor)
             tv.applyTextStyle(typeface, isBold, isItalic, isUnderline, gravity)
 
 //
@@ -950,27 +923,17 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 // Extract current style information
                 val currentGravity = tv.gravity
-                val hasUnderline =
-                    (tv.paintFlags and android.graphics.Paint.UNDERLINE_TEXT_FLAG) != 0
+                val hasUnderline = (tv.paintFlags and android.graphics.Paint.UNDERLINE_TEXT_FLAG) != 0
                 val typefaceStyle = currentTypeface?.style ?: Typeface.NORMAL
                 val isBold = (typefaceStyle and Typeface.BOLD) != 0
                 val isItalic = (typefaceStyle and Typeface.ITALIC) != 0
                 val BaseTypeface = currentTypeface?.let { Typeface.create(it, Typeface.NORMAL) }
 
-                val editDialog = TextEditorDialog(
-                    this@CameraActivity,
-                    currentText,
-                    currentTextColor,
-                    currentBgColor,
-                    BaseTypeface,
-                    isBold,
-                    isItalic,
-                    hasUnderline,
-                    currentGravity
-                )
-                editDialog.setOnTextSavedListener { newText, textColor, bgColor, typeface, isBold, isItalic, isUnderline, gravity ->
+                val editDialog = TextEditorDialog(this@CameraActivity, currentText, currentTextColor, currentBgColor, BaseTypeface,
+                    isBold, isItalic, hasUnderline, currentGravity)
+                editDialog.setOnTextSavedListener { newText,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity ->
                     tv.text = newText
-                    tv.setOverlayTextColorAndBackgroundTint(textColor, bgColor)
+                    tv.setOverlayTextColorAndBackgroundTint(textColor,bgColor)
                     tv.applyTextStyle(typeface, isBold, isItalic, isUnderline, gravity)
 
                 }
@@ -1047,20 +1010,20 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         when (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)) {
             0 -> {
-                if (activeMode == R.id.video_btn) {
-                    flashBtn.setImage(R.drawable.flash_torch_ic)
-                    flashBtn.setTintColor(R.color.blue)
-                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
-                    cameraManager.toggleFlash(3)
-                    return
-                }
+                 if (activeMode == R.id.video_btn) {
+                     flashBtn.setImage(R.drawable.flash_torch_ic)
+                     flashBtn.setTintColor(R.color.blue)
+                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
+                     cameraManager.toggleFlash(3)
+                     return
+            }
                 flashBtn.setImage(R.drawable.flash_on_ic)
                 flashBtn.setTintColor(R.color.blue)
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 1)
                 cameraManager.toggleFlash(1)  /*flash on*/
-                /* if (activeMode == R.id.video_btn) {
-                     cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
-                 }*/
+               /* if (activeMode == R.id.video_btn) {
+                    cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
+                }*/
             }
 
             1 -> {
@@ -1069,9 +1032,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 flashBtn.setTintColor(R.color.blue)
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
                 cameraManager.toggleFlash(2) /*flash auto*/
-                /* if (activeMode == R.id.video_btn) {
-                     cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
-                 }*/
+               /* if (activeMode == R.id.video_btn) {
+                    cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
+                }*/
 
             }
 
@@ -1084,7 +1047,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             }
 
-            3 -> {
+            3 ->{
 
                 flashBtn.setImage(R.drawable.flash_off_ic)
                 flashBtn.setTintColor(R.color.white)
@@ -1113,21 +1076,17 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         return when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> {
 
-                when (getString(
-                    this@CameraActivity,
-                    KEY_VOLUME_BTN_SETTING,
-                    getString(R.string.volume)
-                )) {
-                    getString(R.string.capture_photo) -> {
+                when(getString(this@CameraActivity, KEY_VOLUME_BTN_SETTING,getString(R.string.volume)))
+                {
+                    getString(R.string.capture_photo)->{
 
                         capturePhoto()
                     }
-
-                    getString(R.string.volume) -> {
+                    getString(R.string.volume)->{
 
                     }
-
-                    getString(R.string.zoom) -> {
+                    getString(R.string.zoom)->
+                    {
                         cameraManager.zoomIn()
                     }
                 }
@@ -1135,27 +1094,23 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             }
 
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
-                /* if (volumeButtonForCapture) {
-                     cameraManager.takePhoto {
-                         Toast.makeText(this, "Saved: $it", Toast.LENGTH_SHORT).show()
-                     }
-                 } else {
-                     cameraManager.zoomOut()
-                 }*/
-                when (getString(
-                    this@CameraActivity,
-                    KEY_VOLUME_BTN_SETTING,
-                    getString(R.string.volume)
-                )) {
-                    getString(R.string.capture_photo) -> {
+               /* if (volumeButtonForCapture) {
+                    cameraManager.takePhoto {
+                        Toast.makeText(this, "Saved: $it", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    cameraManager.zoomOut()
+                }*/
+                when(getString(this@CameraActivity, KEY_VOLUME_BTN_SETTING,getString(R.string.volume)))
+                {
+                    getString(R.string.capture_photo)->{
                         capturePhoto()
                     }
-
-                    getString(R.string.volume) -> {
+                    getString(R.string.volume)->{
 
                     }
-
-                    getString(R.string.zoom) -> {
+                    getString(R.string.zoom)->
+                    {
                         cameraManager.zoomOut()
 
                     }
@@ -1167,7 +1122,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
-    private fun switchMode(newMode: Int, resetFlash: Boolean = true) {
+    private fun switchMode(newMode: Int,resetFlash:Boolean=true) {
         if (activeMode == newMode) return // already active → do nothing
         activeMode = newMode
 
@@ -1189,7 +1144,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 cameraManager.stopVideoRecording()/// stop recording if started
                 binding.videoStopBtn.gone()
-                if (resetFlash) {
+                if (resetFlash)
+                {
                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
                     updateFlash()
                 }
@@ -1238,7 +1194,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         setZoom()
     }
 
-    private fun capturePhoto() = binding.apply {
+    private fun capturePhoto()=binding.apply {
         if (videoRecordBtn.isGone && videoStopBtn.isGone) {
             /// only allow touch capture when in photo mode not in record
 
@@ -1746,9 +1702,15 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     }
 
     override fun onQRDetectChanged(enabled: Boolean) {
-        cameraManager.setQRCodeDetectionEnabled(enabled) {
-            showToast(it)
+        cameraManager.setQRCodeDetectionEnabled(enabled){
+            binding.qrScanedView.visible()
+            binding.scanedQRTv.text=it
+            binding.qrScanCancleBtn.setOnClickListener{
+                cameraManager.resetDetectedQR()
+                binding.qrScanedView.gone()
+            }
         }
+
     }
 
     private val backPressedCallback = object : OnBackPressedCallback(true) {

@@ -36,7 +36,7 @@
             android:text="@string/location"
             android:paddingHorizontal="@dimen/_20sdp"
             android:textColor="@color/textMainColor"
-            android:textSize="20sp"
+            android:textSize="@dimen/_16sdp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -56,32 +56,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="@dimen/_15sdp">
 
             <!-- Current Location Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardCurrentLocation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="@color/white">
-
                 <LinearLayout
+                    android:id="@+id/cardCurrentLocation"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:backgroundTint="@color/white"
+                    android:background="@drawable/bg_radius_10"
+                    android:padding="@dimen/_10sdp">
 
-                    <ImageView
+                    <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/ivMapThumbnail"
                         android:layout_width="@dimen/_90sdp"
                         android:layout_height="match_parent"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="@dimen/_10sdp"
                         android:scaleType="centerCrop"
                         android:background="@drawable/bg_radius_5"
-                        android:contentDescription="Map thumbnail" />
+                        app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Medium"/>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -102,7 +96,7 @@
                                 android:layout_weight="1"
                                 android:text="@string/current_location"
                                 android:textColor="@color/textMainColor"
-                                android:textSize="16sp"
+                                android:textSize="@dimen/_12sdp"
                                 android:textStyle="bold" />
 
                             <CheckBox
@@ -118,41 +112,34 @@
                             android:id="@+id/tvAddressLine1"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Stavropol, Stavropol Russia"
                             android:textColor="@color/textDescColor"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/_10sdp" />
 
                         <TextView
                             android:id="@+id/tvAddressLine2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="House 40, Street 15, Stan Block"
                             android:textColor="@color/textDescColor"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/_10sdp" />
 
                         <TextView
                             android:id="@+id/tvCity"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Stavropol"
                             android:textColor="@color/textDescColor"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/_10sdp" />
 
                         <TextView
                             android:id="@+id/tvLatLong"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Lat 56.4821545 long 42.00144"
+                            android:layout_marginTop="@dimen/_2sdp"
                             android:textColor="@color/textDescColor2"
-                            android:textSize="12sp" />
+                            android:textSize="@dimen/_10sdp" />
 
                     </LinearLayout>
 
                 </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
 
             <!-- Manual Location Section -->
             <LinearLayout
@@ -160,7 +147,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginBottom="@dimen/_10sdp">
 
                 <TextView
                     android:id="@+id/tvManualLocationLabel"
@@ -169,15 +157,17 @@
                     android:layout_weight="1"
                     android:text="@string/manual_location"
                     android:textColor="@color/textMainColor"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/fabAddManualLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/_35sdp"
+                    android:layout_height="@dimen/_35sdp"
                     android:src="@drawable/add_ic"
-                    app:backgroundTint="@color/blue"
+                    app:contentPadding="@dimen/_9sdp"
+                    app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full"
+                    android:background="@color/blue"
                     app:tint="@color/white"
                     app:fabSize="normal" />
 

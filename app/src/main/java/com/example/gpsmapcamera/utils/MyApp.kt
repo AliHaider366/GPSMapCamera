@@ -12,9 +12,13 @@ class MyApp:Application() {
             .create(AppViewModel::class.java)
     }
 
+    lateinit var mapApiKey: String
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
+        mapApiKey = getMapsApiKey()
         // Force light mode
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
     }

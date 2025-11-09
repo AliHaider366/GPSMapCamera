@@ -18,6 +18,7 @@
     <color name="grey_g3">#6B7280</color>
     <color name="grey_g4">#E5E7EB</color>
     <color name="grey_g5">#9095A0</color>
+    <color name="grey_g6">#222222</color>
     <color name="text_dialog_color">#CC000000</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="rippleColor">#69D0D0D0</color>

@@ -275,5 +275,7 @@
     <string name="delete">Delete</string>
     <string name="preview">Preview</string>
     <string name="saved">Saved</string>
+    <string name="location_permission_not_granted">Location permission not granted</string>
+    <string name="unable_to_get_current_location">Unable to get current location</string>
 
 </resources>

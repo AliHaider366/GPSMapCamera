@@ -384,35 +384,48 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         >
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_gravity="center"
-            android:background="@drawable/bg_radius_20"
-            android:backgroundTint="@color/white"
             android:layout_marginVertical="@dimen/_5sdp"
             android:layout_marginHorizontal="@dimen/_10sdp"
-            android:paddingHorizontal="@dimen/_10sdp"
-            android:paddingVertical="@dimen/_5sdp"
             >
 
             <TextView
                 android:id="@+id/scanedQRTv"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginEnd="@dimen/_10sdp"
-                android:layout_weight="1"
-                android:text="" />
+                android:layout_marginHorizontal="@dimen/_8sdp"
+                android:background="@drawable/bg_radius_10"
+                android:backgroundTint="@color/grey_g6"
+                android:textColor="@color/white"
+                android:paddingVertical="@dimen/_5sdp"
+                android:paddingHorizontal="@dimen/_8sdp"
+                android:text=""
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/qrScanCancleBtn"
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_20sdp"
+                android:background="@color/black"
+                android:alpha="0.7"
                 android:padding="@dimen/_2sdp"
-                android:src="@drawable/back_ic" />
-        </LinearLayout>
+                android:src="@drawable/cross_ic"
+                android:translationX="-2dp"
+                android:translationY="@dimen/_10sdp"
+                app:contentPadding="@dimen/_3sdp"
+                app:layout_constraintBottom_toTopOf="@+id/scanedQRTv"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Full" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -475,7 +488,6 @@
                 android:layout_height="@dimen/_30sdp"
                 android:padding="@dimen/_5sdp"
                 android:src="@drawable/location_ic"
-                android:visibility="invisible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

@@ -11,6 +11,7 @@ import android.view.Window
 import android.widget.Toast
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.DialogColorPickerBinding
+import com.example.gpsmapcamera.utils.showToast
 import com.example.gpstest.ColorSliderView
 import com.example.gpstest.HSVColorPickerView
 
@@ -94,7 +95,6 @@ class ColorPickerDialog(
         btnCopy.setOnClickListener {
             val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.setPrimaryClip(ClipData.newPlainText("hex", hexInput.text?.toString() ?: ""))
-            Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
         }
 
         btnApply.setOnClickListener {

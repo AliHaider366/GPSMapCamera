@@ -1,10 +1,14 @@
 package com.example.gpsmapcamera.activities
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Toast
@@ -14,8 +18,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.ActivityAddManualLocationBinding
+import com.example.gpsmapcamera.models.ManualLocation
+import com.example.gpsmapcamera.utils.getCurrentLatLong
+import com.example.gpsmapcamera.utils.showDropdownMenu
+import com.example.gpsmapcamera.utils.showToast
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -34,18 +43,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-
 class AddManualLocationActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerDragListener {
 
     private lateinit var binding: ActivityAddManualLocationBinding
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var googleMap: GoogleMap? = null
     private var marker: Marker? = null
     private var radiusCircle: Circle? = null
     private var currentLatLng: LatLng? = null
     private var selectedRange = 50 // meters
 
-    private val rangeOptions = arrayOf("10", "20", "30", "40", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "1000")
+    private val rangeOptions = listOf("10", "20", "30", "40", "50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "1000")
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -66,8 +73,6 @@ class AddManualLocationActivity : AppCompatActivity(), OnMapReadyCallback, Googl
         binding = ActivityAddManualLocationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
         setupClickListeners()
         setupRangeDropdown()
         setupMap()
@@ -85,7 +90,7 @@ class AddManualLocationActivity : AppCompatActivity(), OnMapReadyCallback, Googl
     }
 
     private fun setupRangeDropdown() {
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, rangeOptions)
+       /* val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, rangeOptions)
         (binding.etRange as AutoCompleteTextView).setAdapter(adapter)
         binding.etRange.setText("50", false)
         binding.etRange.setOnItemClickListener { _, _, position, _ ->
@@ -96,6 +101,18 @@ class AddManualLocationActivity : AppCompatActivity(), OnMapReadyCallback, Googl
             // Update zoom to fit the new radius
             currentLatLng?.let { updateZoomToFitRadius(it) }
         }
+       */
+
+
+        binding.etRange.text="50"
+        binding.etRange.setOnClickListener {
+            binding.etRange.showDropdownMenu(rangeOptions) { selected ->
+                selectedRange = selected.toInt()
+                updateRadiusCircle()
+                currentLatLng?.let { updateZoomToFitRadius(it) }
+            }
+        }
+
     }
 
     private fun setupMap() {
@@ -171,27 +188,30 @@ class AddManualLocationActivity : AppCompatActivity(), OnMapReadyCallback, Googl
     }
 
     private fun getCurrentLocation() {
+
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
+            showToast(getString(R.string.location_permission_not_granted))
             return
         }
+        lifecycleScope.launch {
 
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                val latLng = LatLng(location.latitude, location.longitude)
+            val (lat, lon) = getCurrentLatLong()
+
+            if (lat != 0.0 && lon != 0.0) {
+                val latLng = LatLng(lat, lon)
                 updateMapLocation(latLng)
+
             } else {
-                // Use default location
                 val defaultLocation = LatLng(33.452626, 42.00144)
                 updateMapLocation(defaultLocation)
+
+                showToast(getString(R.string.unable_to_get_current_location))
+
             }
-        }.addOnFailureListener {
-            // Use default location on error
-            val defaultLocation = LatLng(33.452626, 42.00144)
-            updateMapLocation(defaultLocation)
         }
     }
 
@@ -360,8 +380,22 @@ class AddManualLocationActivity : AppCompatActivity(), OnMapReadyCallback, Googl
             return
         }
 
-        // TODO: Save location data (you can use SharedPreferences, Room database, etc.)
-        Toast.makeText(this, "Location saved successfully", Toast.LENGTH_SHORT).show()
+        // Create ManualLocation object
+        val manualLocation = ManualLocation(
+            title = title,
+            latitude = latitude,
+            longitude = longitude,
+            address = address ?: "",
+            city = city ?: "",
+            state = state ?: "",
+            country = country ?: "",
+            range = selectedRange
+        )
+
+        // Return result
+        val resultIntent = Intent()
+        resultIntent.putExtra("manual_location", manualLocation)
+        setResult(RESULT_OK, resultIntent)
         finish()
     }
 }

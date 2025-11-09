@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/_15sdp"
+   >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:backgroundTint="@color/white"
+        android:background="@drawable/bg_radius_10"
+        android:padding="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivMapThumbnail"
+            android:layout_width="@dimen/_90sdp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/bg_radius_5"
+            app:shapeAppearance="@style/ShapeAppearance.Material3.Corner.Medium"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Location Title"
+                    android:textColor="@color/textMainColor"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <CheckBox
+                    android:id="@+id/cbLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    app:buttonTint="@color/blue" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvAddressLine1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Address Line 1"
+                android:textColor="@color/textDescColor"
+                android:textSize="@dimen/_10sdp" />
+
+            <TextView
+                android:id="@+id/tvAddressLine2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Address Line 2"
+                android:textColor="@color/textDescColor"
+                android:textSize="@dimen/_10sdp" />
+
+            <TextView
+                android:id="@+id/tvCity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="City"
+                android:textColor="@color/textDescColor"
+                android:textSize="@dimen/_10sdp" />
+
+            <TextView
+                android:id="@+id/tvLatLong"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Lat 0.0 long 0.0"
+                android:textColor="@color/textDescColor2"
+                android:textSize="@dimen/_10sdp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

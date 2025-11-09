@@ -4,6 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.example.gpsmapcamera.models.FieldItem
+import com.example.gpsmapcamera.models.ManualLocation
+import com.example.gpsmapcamera.utils.Constants.SAVED_DEFAULT_FILE_PATH
+import com.example.gpsmapcamera.utils.Constants.SAVED_FILE_NAME
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.json.JSONArray
 
 
@@ -34,6 +39,8 @@ object PrefManager {
     const val KEY_TYPE_COLOR  = "type_color"
     const val KEY_TYPE_BG_COLOR  = "type_bg_color"
     const val KEY_TYPE_FONT  = "type_font"
+    const val KEY_MANUAL_LOCATION  = "manual_location"
+
     /*file name activity*/
     const val KEY_DAY_CHECK  = "day_check"
     const val KEY_24HOURS_CHECK  = "24hours_check"
@@ -140,11 +147,31 @@ object PrefManager {
     fun saveInt(context: Context, key: String, value: Int) {
         getPrefs(context).edit { putInt(key, value) }
     }
+
+    // Save list of ManualLocation
+    fun saveManualLocations(context: Context, locations: List<ManualLocation>) {
+        val gson = Gson()
+        val json = gson.toJson(locations)
+        saveString(context, KEY_MANUAL_LOCATION, json)
+    }
+
     // Getters
 
 
-
-
+    fun getManualLocations(context: Context): List<ManualLocation> {
+        val json = getString(context, KEY_MANUAL_LOCATION)
+        if (json.isEmpty()) {
+            return emptyList()
+        }
+        return try {
+            val gson = Gson()
+            val type = object : TypeToken<List<ManualLocation>>() {}.type
+            gson.fromJson(json, type) ?: emptyList()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
 
 
     fun getInt(context: Context, key: String, default: Int = 0): Int {

@@ -217,6 +217,16 @@ fun Pair<Double, Double>.toDMSPair(): Pair<String, String> {
     return Pair(latDMS, lonDMS)
 }
 
+fun Context.getMapsApiKey(): String {
+    return try {
+        val appInfo = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        appInfo.metaData.getString("com.google.android.geo.API_KEY", "")
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
+    }
+}
+
 @Suppress("MissingPermission")
 suspend fun Context.getCurrentLatLong(): Pair<Double, Double> {
 
@@ -247,39 +257,6 @@ suspend fun Context.getCurrentLatLong(): Pair<Double, Double> {
     // Otherwise request fresh GPS location
     return requestFreshLocation()
 }
-
-@Suppress("MissingPermission")
-suspend fun Context.getCurrentAddress(): AddressLineModel {
-    val (lat, lon) = getCurrentLatLong()
-
-    if (lat == 0.0 && lon == 0.0) {
-        return AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
-    }
-
-    return try {
-        val geocoder = Geocoder(this, Locale.getDefault())
-        val addresses = withContext(Dispatchers.IO) {
-            geocoder.getFromLocation(lat, lon, 1) // Get single address
-        }
-
-        if (!addresses.isNullOrEmpty()) {
-            val addr = addresses[0]
-
-            val street = addr.getAddressLine(0) ?: "Unknown"
-            val city = addr.locality ?: addr.subAdminArea ?: "Unknown"
-            val province = addr.adminArea ?: "Unknown"
-            val country = addr.countryName ?: "Unknown"
-
-            AddressLineModel(street, city, province, country)
-        } else {
-            AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
-    }
-}
-
 
 @Suppress("MissingPermission")
 suspend fun Context.requestFreshLocation(): Pair<Double, Double> {
@@ -320,6 +297,39 @@ suspend fun Context.requestFreshLocation(): Pair<Double, Double> {
         }
     } ?: (0.0 to 0.0) // fallback if timeout
 }
+
+@Suppress("MissingPermission")
+suspend fun Context.getCurrentAddress(): AddressLineModel {
+    val (lat, lon) = getCurrentLatLong()
+
+    if (lat == 0.0 && lon == 0.0) {
+        return AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
+    }
+
+    return try {
+        val geocoder = Geocoder(this, Locale.getDefault())
+        val addresses = withContext(Dispatchers.IO) {
+            geocoder.getFromLocation(lat, lon, 1) // Get single address
+        }
+
+        if (!addresses.isNullOrEmpty()) {
+            val addr = addresses[0]
+
+            val street = addr.getAddressLine(0) ?: "Unknown"
+            val city = addr.locality ?: addr.subAdminArea ?: "Unknown"
+            val province = addr.adminArea ?: "Unknown"
+            val country = addr.countryName ?: "Unknown"
+
+            AddressLineModel(street, city, province, country)
+        } else {
+            AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        AddressLineModel("Unknown", "Unknown", "Unknown", "Unknown")
+    }
+}
+
 
 @Suppress("MissingPermission")
 /*suspend fun Context.getCurrentPlusCode(): String =
