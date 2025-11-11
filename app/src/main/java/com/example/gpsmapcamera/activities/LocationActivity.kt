@@ -7,6 +7,7 @@ import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.gpsmapcamera.R
+import com.example.gpsmapcamera.activities.CameraActivity.Companion.isCurrentSelected
 import com.example.gpsmapcamera.adapters.ManualLocationAdapter
 import com.example.gpsmapcamera.databinding.ActivityLocationBinding
 import com.example.gpsmapcamera.models.ManualLocation
@@ -65,18 +67,37 @@ class LocationActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         loadSavedManualLocations()
-
         setupRecyclerView()
         setupClickListeners()
         checkLocationPermission()
+        initCheckBox()
+    }
+
+    private fun initCheckBox() {
+        if (isCurrentSelected){
+            binding.cbCurrentLocation.isChecked = true
+        }else{
+            val location = (applicationContext as MyApp).appViewModel.getLocation()
+            location?.let {
+                binding.cbCurrentLocation.isChecked = false
+                manualLocationAdapter.updateSelection(it)
+            }
+        }
     }
 
     private fun setupRecyclerView() {
         manualLocationAdapter = ManualLocationAdapter(manualLocations) { location, isSelected ->
             // Handle location selection
             if (isSelected) {
+                isCurrentSelected = false
                 // Uncheck current location if a manual location is selected
                 binding.cbCurrentLocation.isChecked = false
+                val updatedLocation = android.location.Location("provider").apply {
+                    latitude = location.latitude
+                    longitude = location.longitude
+                }
+                (applicationContext as MyApp).appViewModel.updateLocation(updatedLocation)
+                (applicationContext as MyApp).appViewModel.fetchWeatherData(updatedLocation.latitude, updatedLocation.longitude)
             }
         }
         binding.rvManualLocations.layoutManager = LinearLayoutManager(this)
@@ -95,8 +116,14 @@ class LocationActivity : AppCompatActivity() {
 
         binding.cbCurrentLocation.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
+                isCurrentSelected = true
                 // Uncheck any selected manual location
                 manualLocationAdapter.clearSelection()
+
+                currentLocation?.let {
+                    (applicationContext as MyApp).appViewModel.updateLocation(it)
+                    (applicationContext as MyApp).appViewModel.fetchWeatherData(it.latitude, it.longitude)
+                }
             }
         }
     }

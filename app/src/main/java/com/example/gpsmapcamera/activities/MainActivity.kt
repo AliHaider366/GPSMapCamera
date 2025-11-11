@@ -10,6 +10,7 @@ import com.example.gpsmapcamera.adapters.HomeAdapter
 import com.example.gpsmapcamera.databinding.ActivityMainBinding
 import com.example.gpsmapcamera.models.HomeModel
 import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.launchActivity
 
 class MainActivity : BaseActivity() {
@@ -24,6 +25,7 @@ class MainActivity : BaseActivity() {
         onBackPressedDispatcher.addCallback(this, backPressedCallback)
         setupRV()
         clickListeners()
+        (applicationContext as MyApp).appViewModel.getLocation()
     }
 
     private fun clickListeners() = binding.run {

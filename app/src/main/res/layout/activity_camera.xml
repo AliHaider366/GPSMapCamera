@@ -30,7 +30,6 @@
         <!-- app:implementationMode="compatible"-->
 
 
-
         <com.example.gpsmapcamera.cameraHelper.GridOverlayView
             android:id="@+id/gridOverlay"
             android:layout_width="match_parent"
@@ -43,7 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="false"
-            android:focusable="false"/>
+            android:focusable="false" />
     </FrameLayout>
 
     <com.example.gpsmapcamera.cameraHelper.LevelView
@@ -54,64 +53,74 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/watermarkContainer"
-        android:layout_width="wrap_content"
+        android:id="@+id/overlayRootContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/previewContainer">
+        app:layout_constraintBottom_toBottomOf="@id/previewContainer"
+        app:layout_constraintEnd_toEndOf="@id/previewContainer"
+        app:layout_constraintStart_toStartOf="@id/previewContainer"
+        app:layout_constraintTop_toTopOf="@id/previewContainer">
 
-        <LinearLayout
-            android:id="@+id/stampLyt"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/watermarkContainer"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:background="@color/cardview_dark_background"
-            android:orientation="vertical"
+            android:layout_height="0dp"
             android:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:drawableStart="@drawable/ic_app_logo_stamp"
-                android:drawablePadding="@dimen/_5sdp"
-                android:gravity="center"
-                android:paddingVertical="@dimen/_5sdp"
-                android:paddingStart="@dimen/_2sdp"
-                android:paddingEnd="@dimen/_10sdp"
-                android:text="@string/gps_camera_non_translatable"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_10sdp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@+id/ivLogo"
-                app:layout_constraintStart_toEndOf="@+id/mapContainer"
-                app:layout_constraintTop_toTopOf="parent" />
-        </LinearLayout>
+            <LinearLayout
+                android:id="@+id/stampLyt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@color/cardview_dark_background"
+                android:orientation="vertical"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/ivStampCross"
-            android:layout_width="@dimen/_20sdp"
-            android:layout_height="@dimen/_20sdp"
-            android:padding="@dimen/_5sdp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_stamp_cross"
-            app:layout_constraintBottom_toTopOf="@+id/stampLyt"
-            app:layout_constraintEnd_toEndOf="@id/stampLyt"
-            app:layout_constraintStart_toEndOf="@id/stampLyt"
-            app:layout_constraintTop_toTopOf="@+id/stampLyt" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:drawableStart="@drawable/ic_app_logo_stamp"
+                    android:drawablePadding="@dimen/_5sdp"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/_5sdp"
+                    android:paddingStart="@dimen/_2sdp"
+                    android:paddingEnd="@dimen/_10sdp"
+                    android:text="@string/gps_camera_non_translatable"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_10sdp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/ivLogo"
+                    app:layout_constraintStart_toEndOf="@+id/mapContainer"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivStampCross"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:padding="@dimen/_5sdp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_stamp_cross"
+                app:layout_constraintBottom_toTopOf="@+id/stampLyt"
+                app:layout_constraintEnd_toEndOf="@id/stampLyt"
+                app:layout_constraintStart_toEndOf="@id/stampLyt"
+                app:layout_constraintTop_toTopOf="@+id/stampLyt" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <FrameLayout
+            android:id="@+id/stampContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/watermarkContainer" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <FrameLayout
-        android:id="@+id/stampContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/watermarkContainer" />
-
 
     <!--video record timmer textview-->
     <TextView
@@ -382,16 +391,15 @@
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/bottomControlsView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        >
+        app:layout_constraintStart_toStartOf="parent">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_gravity="center"
-            android:layout_marginVertical="@dimen/_5sdp"
             android:layout_marginHorizontal="@dimen/_10sdp"
-            >
+            android:layout_marginVertical="@dimen/_5sdp"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/scanedQRTv"
@@ -401,10 +409,10 @@
                 android:layout_marginHorizontal="@dimen/_8sdp"
                 android:background="@drawable/bg_radius_10"
                 android:backgroundTint="@color/grey_g6"
-                android:textColor="@color/white"
-                android:paddingVertical="@dimen/_5sdp"
                 android:paddingHorizontal="@dimen/_8sdp"
+                android:paddingVertical="@dimen/_5sdp"
                 android:text=""
+                android:textColor="@color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -413,8 +421,8 @@
                 android:id="@+id/qrScanCancleBtn"
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_20sdp"
-                android:background="@color/black"
                 android:alpha="0.7"
+                android:background="@color/black"
                 android:padding="@dimen/_2sdp"
                 android:src="@drawable/cross_ic"
                 android:translationX="-2dp"
@@ -439,8 +447,8 @@
             android:id="@+id/zoom_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_5sdp"
             android:layout_marginTop="@dimen/_6sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
             android:orientation="horizontal"
             android:weightSum="2"
             app:layout_constraintBottom_toTopOf="@+id/bottomMenuBtnsView"

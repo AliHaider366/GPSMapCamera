@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:id="@+id/cardRoot"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_200sdp"
+    android:layout_margin="@dimen/_4sdp"
+    android:background="@drawable/bg_template_unselected"
+    android:clickable="true"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:focusable="true">
+
+    <FrameLayout
+        android:id="@+id/childContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</FrameLayout>

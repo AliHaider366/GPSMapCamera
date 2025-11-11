@@ -24,6 +24,7 @@ import com.example.gpsmapcamera.utils.shareApp
 import com.example.gpsmapcamera.utils.showDropdownMenu
 import com.example.gpsmapcamera.utils.toLanguageName
 import com.example.gpsmapcamera.models.SettingsModel
+import com.example.gpsmapcamera.utils.RateUsDialog
 
 class SettingsActivity : BaseActivity() {
 
@@ -32,7 +33,6 @@ class SettingsActivity : BaseActivity() {
     }
 
     private lateinit var settingAdapter: SettingsAdapter
-
 
     private val settingList by lazy {
         mutableListOf(
@@ -63,7 +63,7 @@ class SettingsActivity : BaseActivity() {
                 R.drawable.setting_up_down_ic
             ),
             SettingsModel.Heading(getString(R.string.features)), // Heading item
-//            SettingsModel.FeaturesItem(getString(R.string.watermark), R.drawable.setting_watermark_ic),
+            SettingsModel.FeaturesItem(getString(R.string.watermark), R.drawable.setting_watermark_ic),
 //            SettingsModel.FeaturesItem(getString(R.string.save_original_photos), R.drawable.setting_save_original_ic),
             SettingsModel.FeaturesItem(getString(R.string.qr_detection), R.drawable.setting_qr_ic),
 //            SettingsModel.FeaturesItem(getString(R.string.location_share_mode), R.drawable.setting_location_share_ic),
@@ -182,9 +182,8 @@ class SettingsActivity : BaseActivity() {
 
 
             getString(R.string.rate_us) -> {
-//                RateUsDialog(this@SettingsActivity).show()
-                FeedbackDialog(this@SettingsActivity).show()
-
+                RateUsDialog(this@SettingsActivity).show()
+//                FeedbackDialog(this@SettingsActivity).show()
             }
 
 

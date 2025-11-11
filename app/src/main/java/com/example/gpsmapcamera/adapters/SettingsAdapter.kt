@@ -29,6 +29,7 @@ import com.example.gpsmapcamera.utils.launchActivity
 import com.example.gpsmapcamera.utils.setCompoundDrawableTintAndTextColor
 import com.example.gpsmapcamera.utils.setDrawable
 import com.example.gpsmapcamera.models.SettingsModel
+import com.example.gpsmapcamera.utils.PrefManager.KEY_WATERMARK_SETTING
 
 class SettingsAdapter(
     val userList: MutableList<SettingsModel>,
@@ -176,6 +177,7 @@ class SettingsAdapter(
                 switchBtn.isChecked= when(item.title)
                 {
                     context.getString(R.string.qr_detection)-> getBoolean(binding.root.context, KEY_QR_DETECT_SETTING)
+                    context.getString(R.string.watermark)-> getBoolean(binding.root.context, KEY_WATERMARK_SETTING)
                     else -> false
                 }
 
@@ -186,6 +188,9 @@ class SettingsAdapter(
                         context.getString(R.string.qr_detection) -> {
                             saveBoolean(context, KEY_QR_DETECT_SETTING, isChecked)
                             CameraSettingsNotifier.notifyQRDetectionChanged(isChecked)
+                        }
+                        context.getString(R.string.watermark) -> {
+                            saveBoolean(context, KEY_WATERMARK_SETTING, isChecked)
                         }
                     }
                 }

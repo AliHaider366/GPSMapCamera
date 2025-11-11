@@ -335,6 +335,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
         return currentLocation
     }
 
+    fun updateLocation(location : Location)  {
+        Log.d("TAG", "updateLocation: longitude ${location.longitude} latitude 9${location.latitude}")
+        currentLocation = location
+    }
+
     private var locationCallback: ((Location) -> Unit)? = null
 
 
@@ -509,8 +514,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application), Se
         }
     }
 
-
-    private fun fetchWeatherData(latitude: Double, longitude: Double) {
+    fun fetchWeatherData(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             try {
                 currentWeather = weatherApiService.getCurrentWeather(latitude, longitude, apiKey)

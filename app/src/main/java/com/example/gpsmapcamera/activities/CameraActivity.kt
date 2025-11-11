@@ -41,6 +41,12 @@ import com.example.gpsmapcamera.databinding.ActivityCameraBinding
 import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampReportingTemplateLayoutBinding
+import com.example.gpsmapcamera.databinding.StampTopTemplate1Binding
+import com.example.gpsmapcamera.databinding.StampTopTemplate2Binding
+import com.example.gpsmapcamera.databinding.StampTopTemplate3Binding
+import com.example.gpsmapcamera.databinding.StampTopTemplate4Binding
+import com.example.gpsmapcamera.databinding.StampTopTemplate5Binding
+import com.example.gpsmapcamera.databinding.StampTopTemplate6Binding
 import com.example.gpsmapcamera.databinding.ViewDraggableTextOverlayBinding
 import com.example.gpsmapcamera.enums.ImageQuality
 import com.example.gpsmapcamera.interfaces.CameraSettingsListener
@@ -66,6 +72,7 @@ import com.example.gpsmapcamera.utils.PrefManager.KEY_QR_DETECT_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_SHARE_IMAGE
 import com.example.gpsmapcamera.utils.PrefManager.KEY_TOUCH_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_VOLUME_BTN_SETTING
+import com.example.gpsmapcamera.utils.PrefManager.KEY_WATERMARK_SETTING
 import com.example.gpsmapcamera.utils.PrefManager.KEY_WHITE_BALANCE
 import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.PrefManager.getInt
@@ -77,6 +84,8 @@ import com.example.gpsmapcamera.utils.applyTextStyle
 import com.example.gpsmapcamera.utils.checkAndRequestGps
 import com.example.gpsmapcamera.utils.disableClicks
 import com.example.gpsmapcamera.utils.enableClicks
+import com.example.gpsmapcamera.utils.formatDate
+import com.example.gpsmapcamera.utils.formatTimeZone
 import com.example.gpsmapcamera.utils.getFontSizeFactor
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.hideSystemBars
@@ -96,6 +105,7 @@ import com.example.gpsmapcamera.utils.setDrawable
 import com.example.gpsmapcamera.utils.setImage
 import com.example.gpsmapcamera.utils.setOverlayTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setStampPosition
+import com.example.gpsmapcamera.utils.setStampPositionForTopTemplate
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setTextColorRes
 import com.example.gpsmapcamera.utils.setTintColor
@@ -105,6 +115,10 @@ import com.example.gpsmapcamera.utils.setUpMapPositionForReportingTemplate
 import com.example.gpsmapcamera.utils.shareImage
 import com.example.gpsmapcamera.utils.showToast
 import com.example.gpsmapcamera.utils.stampFontList
+import com.example.gpsmapcamera.utils.toPressure
+import com.example.gpsmapcamera.utils.toTemperature
+import com.example.gpsmapcamera.utils.toWindSpeed
+import com.example.gpsmapcamera.utils.updateAddressWithVisibility
 import com.example.gpsmapcamera.utils.visible
 import java.util.concurrent.TimeUnit
 import kotlin.math.atan2
@@ -129,6 +143,30 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     }
     private val reportingTemplateBinding by lazy {
         StampReportingTemplateLayoutBinding.inflate(layoutInflater)
+    }
+
+    private val topTemplateBinding1 by lazy {
+        StampTopTemplate1Binding.inflate(layoutInflater)
+    }
+
+    private val topTemplateBinding2 by lazy {
+        StampTopTemplate2Binding.inflate(layoutInflater)
+    }
+
+    private val topTemplateBinding3 by lazy {
+        StampTopTemplate3Binding.inflate(layoutInflater)
+    }
+
+    private val topTemplateBinding4 by lazy {
+        StampTopTemplate4Binding.inflate(layoutInflater)
+    }
+
+    private val topTemplateBinding5 by lazy {
+        StampTopTemplate5Binding.inflate(layoutInflater)
+    }
+
+    private val topTemplateBinding6 by lazy {
+        StampTopTemplate6Binding.inflate(layoutInflater)
     }
 
 
@@ -310,22 +348,27 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
     private fun setInitialStates() = binding.apply {
 
-        scanedQRTv.setOnClickListener{          /// to copy scanned QR
+        scanedQRTv.setOnClickListener {          /// to copy scanned QR
             val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             cm.setPrimaryClip(ClipData.newPlainText("hex", scanedQRTv.text?.toString() ?: ""))
         }
 
-        cameraManager.setQRCodeDetectionEnabled(getBoolean(binding.root.context, KEY_QR_DETECT_SETTING)){
+        cameraManager.setQRCodeDetectionEnabled(
+            getBoolean(
+                binding.root.context,
+                KEY_QR_DETECT_SETTING
+            )
+        ) {
             qrScanedView.visible()
-            scanedQRTv.text=it
-            qrScanCancleBtn.setOnClickListener{
+            scanedQRTv.text = it
+            qrScanCancleBtn.setOnClickListener {
                 cameraManager.resetDetectedQR()
                 qrScanedView.gone()
             }
         }
 
         if (getBoolean(this@CameraActivity, KEY_SHARE_IMAGE)) {
-            switchMode(R.id.share_btn,false)
+            switchMode(R.id.share_btn, false)
         }
         if (getBoolean(this@CameraActivity, KEY_CAMERA_LEVEL)) {
             camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
@@ -413,7 +456,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             }
 
-            3 ->{
+            3 -> {
                 flashBtn.setImage(R.drawable.flash_torch_ic)
                 flashBtn.setTintColor(R.color.blue)
                 cameraManager.toggleFlash(3)    /*flash torch*/
@@ -462,7 +505,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             volumeBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
             cameraManager.captureSound(true)
             volumeBtn.text = getString(R.string.volume_on)
-        }else{
+        } else {
             volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
             cameraManager.captureSound(false)
             volumeBtn.text = getString(R.string.volume_off)
@@ -485,6 +528,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         ivStampCross.setOnClickListener {
             ivStampCross.gone()
             watermarkContainer.gone()
+            saveBoolean(this@CameraActivity, KEY_WATERMARK_SETTING, false)
         }
 
         galleyGotoBtn.setOnClickListener {
@@ -504,13 +548,22 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         locationBtn.setOnClickListener {
-            launchActivity<LocationActivity> {  }
+            launchActivity<LocationActivity> { }
         }
 
         textBtn.setOnClickListener {
             val dialog = TextEditorDialog(this@CameraActivity)
-            dialog.setOnTextSavedListener { text,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity ->
-                addDraggableTextOverlay(text,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity)
+            dialog.setOnTextSavedListener { text, textColor, bgColor, typeface, isBold, isItalic, isUnderline, gravity ->
+                addDraggableTextOverlay(
+                    text,
+                    textColor,
+                    bgColor,
+                    typeface,
+                    isBold,
+                    isItalic,
+                    isUnderline,
+                    gravity
+                )
             }
             dialog.show()
         }
@@ -702,7 +755,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 cameraManager.takePhotoWithTimer(
                     getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
                     binding.timmerTV,
-                    stampContainer,// pass your overlay container
+                    overlayRootContainer,// pass your overlay container
                     selectedStampPosition
                 ) { uri ->
                     uri?.let {
@@ -714,7 +767,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                     }
                 }
             } else {
-                cameraManager.takePhotoWithStamp(stampContainer, selectedStampPosition) { uri ->
+                cameraManager.takePhotoWithStamp(overlayRootContainer, selectedStampPosition) { uri ->
                     if (uri != null) {
                         val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
                         intent.putExtra("image_uri", uri.toString())
@@ -734,10 +787,21 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             videoTimmerTV.visible()
             videoRecordBtn.gone()
 
-            disableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
+            disableClicks(
+                shareBtn,
+                photoBtn,
+                videoBtn,
+                galleyGotoBtn,
+                templateBtn,
+                moreBtn,
+                flashBtn,
+                pickGalleyBtn,
+                fileNameBtn,
+                settingBtn
+            )
             defaultTopMenuView.gone()
             cameraManager.startVideoRecordingWithStamp(
-                stampContainer = stampContainer,
+                stampContainer = overlayRootContainer,
                 stampPosition = selectedStampPosition,
                 onStarted = {
                     Log.d("TAG", "setClickListeners: onStarted")
@@ -757,7 +821,18 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         videoStopBtn.setOnClickListener {
             defaultTopMenuView.visible()
-            enableClicks(shareBtn, photoBtn, videoBtn, galleyGotoBtn, templateBtn, moreBtn, flashBtn, pickGalleyBtn, fileNameBtn, settingBtn)
+            enableClicks(
+                shareBtn,
+                photoBtn,
+                videoBtn,
+                galleyGotoBtn,
+                templateBtn,
+                moreBtn,
+                flashBtn,
+                pickGalleyBtn,
+                fileNameBtn,
+                settingBtn
+            )
             cameraManager.stopVideoRecordingWithStamp()
             recordingTimer.stop()
 
@@ -844,22 +919,25 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
-    private fun addDraggableTextOverlay(text: String,textColor:Int,
-                                        bgColor:Int, typeface: Typeface?,
-                                        isBold: Boolean,
-                                        isItalic: Boolean,
-                                        isUnderline: Boolean,
-                                        gravity: Int) {
+    private fun addDraggableTextOverlay(
+        text: String, textColor: Int,
+        bgColor: Int, typeface: Typeface?,
+        isBold: Boolean,
+        isItalic: Boolean,
+        isUnderline: Boolean,
+        gravity: Int
+    ) {
         val container = binding.overlayContainer
-        val overlayBinding = ViewDraggableTextOverlayBinding.inflate(layoutInflater, container, false)
+        val overlayBinding =
+            ViewDraggableTextOverlayBinding.inflate(layoutInflater, container, false)
         val view = overlayBinding.root
 
 
         overlayBinding.apply {
-            val tv=overlayText
+            val tv = overlayText
 
             tv.text = text
-            tv.setOverlayTextColorAndBackgroundTint(textColor,bgColor)
+            tv.setOverlayTextColorAndBackgroundTint(textColor, bgColor)
             tv.applyTextStyle(typeface, isBold, isItalic, isUnderline, gravity)
 
 //
@@ -923,17 +1001,27 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 // Extract current style information
                 val currentGravity = tv.gravity
-                val hasUnderline = (tv.paintFlags and android.graphics.Paint.UNDERLINE_TEXT_FLAG) != 0
+                val hasUnderline =
+                    (tv.paintFlags and android.graphics.Paint.UNDERLINE_TEXT_FLAG) != 0
                 val typefaceStyle = currentTypeface?.style ?: Typeface.NORMAL
                 val isBold = (typefaceStyle and Typeface.BOLD) != 0
                 val isItalic = (typefaceStyle and Typeface.ITALIC) != 0
                 val BaseTypeface = currentTypeface?.let { Typeface.create(it, Typeface.NORMAL) }
 
-                val editDialog = TextEditorDialog(this@CameraActivity, currentText, currentTextColor, currentBgColor, BaseTypeface,
-                    isBold, isItalic, hasUnderline, currentGravity)
-                editDialog.setOnTextSavedListener { newText,textColor,bgColor,typeface,isBold,isItalic,isUnderline,gravity ->
+                val editDialog = TextEditorDialog(
+                    this@CameraActivity,
+                    currentText,
+                    currentTextColor,
+                    currentBgColor,
+                    BaseTypeface,
+                    isBold,
+                    isItalic,
+                    hasUnderline,
+                    currentGravity
+                )
+                editDialog.setOnTextSavedListener { newText, textColor, bgColor, typeface, isBold, isItalic, isUnderline, gravity ->
                     tv.text = newText
-                    tv.setOverlayTextColorAndBackgroundTint(textColor,bgColor)
+                    tv.setOverlayTextColorAndBackgroundTint(textColor, bgColor)
                     tv.applyTextStyle(typeface, isBold, isItalic, isUnderline, gravity)
 
                 }
@@ -1010,20 +1098,20 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         when (getInt(this@CameraActivity, KEY_CAMERA_FLASH, 0)) {
             0 -> {
-                 if (activeMode == R.id.video_btn) {
-                     flashBtn.setImage(R.drawable.flash_torch_ic)
-                     flashBtn.setTintColor(R.color.blue)
-                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
-                     cameraManager.toggleFlash(3)
-                     return
-            }
+                if (activeMode == R.id.video_btn) {
+                    flashBtn.setImage(R.drawable.flash_torch_ic)
+                    flashBtn.setTintColor(R.color.blue)
+                    saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
+                    cameraManager.toggleFlash(3)
+                    return
+                }
                 flashBtn.setImage(R.drawable.flash_on_ic)
                 flashBtn.setTintColor(R.color.blue)
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 1)
                 cameraManager.toggleFlash(1)  /*flash on*/
-               /* if (activeMode == R.id.video_btn) {
-                    cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
-                }*/
+                /* if (activeMode == R.id.video_btn) {
+                     cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
+                 }*/
             }
 
             1 -> {
@@ -1032,9 +1120,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 flashBtn.setTintColor(R.color.blue)
                 saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 2)
                 cameraManager.toggleFlash(2) /*flash auto*/
-               /* if (activeMode == R.id.video_btn) {
-                    cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
-                }*/
+                /* if (activeMode == R.id.video_btn) {
+                     cameraManager.camera?.cameraControl?.enableTorch(true) // Enable torch for video
+                 }*/
 
             }
 
@@ -1047,7 +1135,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
             }
 
-            3 ->{
+            3 -> {
 
                 flashBtn.setImage(R.drawable.flash_off_ic)
                 flashBtn.setTintColor(R.color.white)
@@ -1076,17 +1164,21 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         return when (keyCode) {
             KeyEvent.KEYCODE_VOLUME_UP -> {
 
-                when(getString(this@CameraActivity, KEY_VOLUME_BTN_SETTING,getString(R.string.volume)))
-                {
-                    getString(R.string.capture_photo)->{
+                when (getString(
+                    this@CameraActivity,
+                    KEY_VOLUME_BTN_SETTING,
+                    getString(R.string.volume)
+                )) {
+                    getString(R.string.capture_photo) -> {
 
                         capturePhoto()
                     }
-                    getString(R.string.volume)->{
+
+                    getString(R.string.volume) -> {
 
                     }
-                    getString(R.string.zoom)->
-                    {
+
+                    getString(R.string.zoom) -> {
                         cameraManager.zoomIn()
                     }
                 }
@@ -1094,23 +1186,27 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             }
 
             KeyEvent.KEYCODE_VOLUME_DOWN -> {
-               /* if (volumeButtonForCapture) {
-                    cameraManager.takePhoto {
-                        Toast.makeText(this, "Saved: $it", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    cameraManager.zoomOut()
-                }*/
-                when(getString(this@CameraActivity, KEY_VOLUME_BTN_SETTING,getString(R.string.volume)))
-                {
-                    getString(R.string.capture_photo)->{
+                /* if (volumeButtonForCapture) {
+                     cameraManager.takePhoto {
+                         Toast.makeText(this, "Saved: $it", Toast.LENGTH_SHORT).show()
+                     }
+                 } else {
+                     cameraManager.zoomOut()
+                 }*/
+                when (getString(
+                    this@CameraActivity,
+                    KEY_VOLUME_BTN_SETTING,
+                    getString(R.string.volume)
+                )) {
+                    getString(R.string.capture_photo) -> {
                         capturePhoto()
                     }
-                    getString(R.string.volume)->{
+
+                    getString(R.string.volume) -> {
 
                     }
-                    getString(R.string.zoom)->
-                    {
+
+                    getString(R.string.zoom) -> {
                         cameraManager.zoomOut()
 
                     }
@@ -1122,7 +1218,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
-    private fun switchMode(newMode: Int,resetFlash:Boolean=true) {
+    private fun switchMode(newMode: Int, resetFlash: Boolean = true) {
         if (activeMode == newMode) return // already active → do nothing
         activeMode = newMode
 
@@ -1144,8 +1240,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
                 cameraManager.stopVideoRecording()/// stop recording if started
                 binding.videoStopBtn.gone()
-                if (resetFlash)
-                {
+                if (resetFlash) {
                     saveInt(this@CameraActivity, KEY_CAMERA_FLASH, 3)
                     updateFlash()
                 }
@@ -1194,7 +1289,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         setZoom()
     }
 
-    private fun capturePhoto()=binding.apply {
+    private fun capturePhoto() = binding.apply {
         if (videoRecordBtn.isGone && videoStopBtn.isGone) {
             /// only allow touch capture when in photo mode not in record
 
@@ -1203,7 +1298,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 cameraManager.takePhotoWithTimer(
                     getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
                     timmerTV,
-                    stampContainer,// pass your overlay container
+                    overlayRootContainer,// pass your overlay container
                     selectedStampPosition
                 ) { uri ->
                     uri?.let {
@@ -1219,7 +1314,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
             } else {
                 cameraManager.takePhotoWithStamp(
-                    stampContainer,
+                    overlayRootContainer,
                     selectedStampPosition
                 ) { uri ->
                     if (uri != null) {
@@ -1277,7 +1372,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                                 cameraManager.takePhotoWithTimer(
                                     getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
                                     binding.timmerTV,
-                                    stampContainer,// pass your overlay container
+                                    overlayRootContainer,// pass your overlay container
                                     selectedStampPosition
                                 ) { uri ->
                                     uri?.let {
@@ -1293,7 +1388,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                                 }
                             } else {
                                 cameraManager.takePhotoWithStamp(
-                                    stampContainer,
+                                    overlayRootContainer,
                                     selectedStampPosition
                                 ) { uri ->
                                     if (uri != null) {
@@ -1317,74 +1412,332 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     }
 
     private fun setUpTemplate() {
-        selectedTemplate = getString(
-            this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
-            Constants.CLASSIC_TEMPLATE
-        )
 
-        selectedStampPosition = if (PrefManager.getInt(
+        if (!PrefManager.getBoolean(
                 this@CameraActivity,
-                Constants.SELECTED_STAMP_POSITION + selectedTemplate,
-                0
-            ) == 0
-        ) StampCameraPosition.BOTTOM else StampCameraPosition.TOP
+                Constants.IS_TOP_TEMPLATE_SELECTED,
+                false
+            )
+        ) {
 
-        // Observe the appropriate LiveData based on the selected template
-        val stampConfigs = when (selectedTemplate) {
-            Constants.CLASSIC_TEMPLATE -> appViewModel.classicStampConfigs
-            Constants.ADVANCE_TEMPLATE -> appViewModel.advanceStampConfigs
-            Constants.REPORTING_TEMPLATE -> appViewModel.reportingStampConfigs
-            else -> appViewModel.classicStampConfigs // Fallback to classic
-        }
-
-        stampConfigs.observe(this) { allConfigs ->
-            val bottomItems =
-                allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
-            val centerItems =
-                allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
-            val rightItems =
-                allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
-
-            Log.d("TAG", "setUpTemplate: $centerItems")
-
-            templateAdapterBottom.submitList(bottomItems as ArrayList)
-            templateAdapterCenter.submitList(centerItems as ArrayList)
-            templateAdapterRight.submitList(rightItems as ArrayList)
-
-
-            val templateType = getString(
+            selectedTemplate = getString(
                 this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
                 Constants.CLASSIC_TEMPLATE
             )
 
+            selectedStampPosition = if (PrefManager.getInt(
+                    this@CameraActivity,
+                    Constants.SELECTED_STAMP_POSITION + selectedTemplate,
+                    0
+                ) == 0
+            ) StampCameraPosition.BOTTOM else StampCameraPosition.TOP
 
-            // Inflate selected layout into FrameLayout
-            when (templateType) {
-                Constants.CLASSIC_TEMPLATE -> {
-                    setupClassicUI(allConfigs)
+            // Observe the appropriate LiveData based on the selected template
+            val stampConfigs = when (selectedTemplate) {
+                Constants.CLASSIC_TEMPLATE -> appViewModel.classicStampConfigs
+                Constants.ADVANCE_TEMPLATE -> appViewModel.advanceStampConfigs
+                Constants.REPORTING_TEMPLATE -> appViewModel.reportingStampConfigs
+                else -> appViewModel.classicStampConfigs // Fallback to classic
+            }
+
+            stampConfigs.observe(this) { allConfigs ->
+                val bottomItems =
+                    allConfigs.filter { it.position == StampPosition.BOTTOM && it.visibility }
+                val centerItems =
+                    allConfigs.filter { it.position == StampPosition.CENTER && it.visibility }
+                val rightItems =
+                    allConfigs.filter { it.position == StampPosition.RIGHT && it.visibility }
+
+                Log.d("TAG", "setUpTemplate: $centerItems")
+
+                templateAdapterBottom.submitList(bottomItems as ArrayList)
+                templateAdapterCenter.submitList(centerItems as ArrayList)
+                templateAdapterRight.submitList(rightItems as ArrayList)
+
+
+                val templateType = getString(
+                    this@CameraActivity, Constants.SELECTED_STAMP_TEMPLATE,
+                    Constants.CLASSIC_TEMPLATE
+                )
+
+
+                // Inflate selected layout into FrameLayout
+                when (templateType) {
+                    Constants.CLASSIC_TEMPLATE -> {
+                        setupClassicUI(allConfigs)
+                    }
+
+                    Constants.ADVANCE_TEMPLATE -> {
+                        setupAdvanceUI(allConfigs)
+                    }
+
+                    Constants.REPORTING_TEMPLATE -> {
+                        setupReportingUI(allConfigs)
+                    }
                 }
 
-                Constants.ADVANCE_TEMPLATE -> {
-                    setupAdvanceUI(allConfigs)
-                }
 
-                Constants.REPORTING_TEMPLATE -> {
-                    setupReportingUI(allConfigs)
+            }
+
+            appViewModel.dynamicValues.observe(this) { newDynamics ->
+                Log.d("TAG", "setUpTemplate: newDynamics $newDynamics")
+                templateAdapterBottom.updateDynamics(newDynamics, selectedTemplate)
+                templateAdapterCenter.updateDynamics(newDynamics, selectedTemplate)
+                templateAdapterRight.updateDynamics(newDynamics, selectedTemplate)
+
+                reportingTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
+                advanceTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
+                classicTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
+            }
+        } else {
+
+            val selectedTopTemplateIndex = getInt(
+                this@CameraActivity,
+                Constants.TOP_TEMPLATE_SELECTED_NUMBER, 0
+            )
+            binding.stampContainer.removeAllViews()
+
+
+            appViewModel.dynamicValues.observe(this) { currentDynamics ->
+                when (selectedTopTemplateIndex) {
+                    0 -> topTemplateBinding1.apply {
+                        tvCenterTitle.text = currentDynamics.shortAddress
+                        val time = currentDynamics.dateTime
+                        tvTimeDate.text = buildString {
+                            append(time?.formatDate(root.context, Constants.CLASSIC_TEMPLATE))
+                            append(" ")
+                            append(time?.formatTimeZone(root.context, Constants.CLASSIC_TEMPLATE))
+                        }
+                        tvTemperature.text = currentDynamics.weather.toTemperature(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                    }
+
+                    1 -> topTemplateBinding2.apply {
+
+                        tvCenterTitle.text = currentDynamics.shortAddress
+                        val time = currentDynamics.dateTime
+                        tvTimeDate.text = buildString {
+                            append(time?.formatDate(root.context, Constants.CLASSIC_TEMPLATE))
+                            append(" ")
+                            append(time?.formatTimeZone(root.context, Constants.CLASSIC_TEMPLATE))
+                        }
+                        tvTemperature.text = currentDynamics.weather.toTemperature(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        tvLatitude.text = buildString {
+                            append("Latitude : ")
+                            append(currentDynamics.latLong?.lat)
+                        }
+                        tvLongitude.text = buildString {
+                            append("Longitude : ")
+                            append(currentDynamics.latLong?.lon)
+                        }
+                    }
+
+                    2 -> topTemplateBinding3.apply {
+
+                        tvCenterTitle.text = currentDynamics.shortAddress
+                        tvCity.text = currentDynamics.shortAddress
+                        val formattedAddress =
+                            currentDynamics.fullAddress.updateAddressWithVisibility(
+                                binding.root.context,
+                                Constants.CLASSIC_TEMPLATE
+                            )
+
+                        tvFullAddress.text = formattedAddress
+                        tvTemperature.text = currentDynamics.weather.toTemperature(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        val time = currentDynamics.dateTime
+                        tvDateTime.text = buildString {
+                            append(time?.formatDate(root.context, Constants.CLASSIC_TEMPLATE))
+                            append(" ")
+                            append(time?.formatTimeZone(root.context, Constants.CLASSIC_TEMPLATE))
+                        }
+
+                        tvCompass.text = currentDynamics.compass
+                        tvMagnetic.text = currentDynamics.magneticField
+                        tvPressure.text = currentDynamics.pressure.toPressure(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        tvWind.text = currentDynamics.wind.toWindSpeed(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        tvHumidity.text = currentDynamics.humidity.toString()
+                    }
+
+                    3 -> topTemplateBinding4.apply {
+
+
+                        tvCenterTitle.text = currentDynamics.shortAddress
+                        val formattedAddress =
+                            currentDynamics.fullAddress.updateAddressWithVisibility(
+                                binding.root.context,
+                                Constants.CLASSIC_TEMPLATE
+                            )
+
+                        tvFullAddress.text = formattedAddress
+                        tvTemperature.text = currentDynamics.weather.toTemperature(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        val time = currentDynamics.dateTime
+                        tvDateTime.text = buildString {
+                            append(time?.formatDate(root.context, Constants.CLASSIC_TEMPLATE))
+                            append(" ")
+                            append(time?.formatTimeZone(root.context, Constants.CLASSIC_TEMPLATE))
+                        }
+
+                        tvPressure.text = currentDynamics.pressure.toPressure(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        tvWind.text = currentDynamics.wind.toWindSpeed(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        tvHumidity.text = currentDynamics.humidity.toString()
+
+                    }
+
+                    4 -> topTemplateBinding5.apply {
+
+                        tvCenterTitle.text = currentDynamics.shortAddress
+                        tvLatLong.text = buildString {
+                            append("Lat : ")
+                            append(currentDynamics.latLong?.lat)
+                            append("Lon : ")
+                            append(currentDynamics.latLong?.lon)
+                        }
+
+                        tvTemperature.text = currentDynamics.weather.toTemperature(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        val time = currentDynamics.dateTime
+                        tvDateTime.text = buildString {
+                            append(time?.formatDate(root.context, Constants.CLASSIC_TEMPLATE))
+                            append(" ")
+                            append(time?.formatTimeZone(root.context, Constants.CLASSIC_TEMPLATE))
+                        }
+
+                        tvCompass.text = currentDynamics.compass
+                        tvMagnetic.text = currentDynamics.magneticField
+                        tvPressure.text = currentDynamics.pressure.toPressure(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        tvWind.text = currentDynamics.wind.toWindSpeed(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                    }
+
+                    5 -> topTemplateBinding6.apply {
+                        tvCenterTitle.text = currentDynamics.shortAddress
+                        tvLatLong.text = buildString {
+                            append("Lat : ")
+                            append(currentDynamics.latLong?.lat)
+                            append("Lon : ")
+                            append(currentDynamics.latLong?.lon)
+                        }
+
+                        val time = currentDynamics.dateTime
+                        tvDateTime.text = buildString {
+                            append(time?.formatDate(root.context, Constants.CLASSIC_TEMPLATE))
+                            append(" ")
+                            append(time?.formatTimeZone(root.context, Constants.CLASSIC_TEMPLATE))
+                        }
+
+                        tvPressure.text = currentDynamics.pressure.toPressure(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                        tvWind.text = currentDynamics.wind.toWindSpeed(
+                            root.context,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+
+                    }
                 }
             }
 
+            when (selectedTopTemplateIndex) {
+                0 -> {
+                    binding.stampContainer.addView(topTemplateBinding1.root)
+                    (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+                        topTemplateBinding1.map.loadStaticMap(
+                            context = this,
+                            location = location!!,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                    }
+                }
 
-        }
+                1 -> {
+                    binding.stampContainer.addView(topTemplateBinding2.root)
 
-        appViewModel.dynamicValues.observe(this) { newDynamics ->
-            Log.d("TAG", "setUpTemplate: newDynamics $newDynamics")
-            templateAdapterBottom.updateDynamics(newDynamics, selectedTemplate)
-            templateAdapterCenter.updateDynamics(newDynamics, selectedTemplate)
-            templateAdapterRight.updateDynamics(newDynamics, selectedTemplate)
+                    (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+                        topTemplateBinding2.map.loadStaticMap(
+                            context = this,
+                            location = location!!,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                    }
+                }
 
-            reportingTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
-            advanceTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
-            classicTemplateBinding.tvCenterTitle.text = newDynamics.shortAddress
+                2 -> {
+                    binding.stampContainer.addView(topTemplateBinding3.root)
+
+                    (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+                        topTemplateBinding3.map.loadStaticMap(
+                            context = this,
+                            location = location!!,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                    }
+                }
+
+                3 -> {
+                    binding.stampContainer.addView(topTemplateBinding4.root)
+                }
+
+                4 -> {
+                    binding.stampContainer.addView(topTemplateBinding5.root)
+
+                    (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+                        topTemplateBinding5.map.loadStaticMap(
+                            context = this,
+                            location = location!!,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                    }
+                }
+
+                5 -> {
+                    binding.stampContainer.addView(topTemplateBinding6.root)
+
+                    (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
+                        topTemplateBinding6.map.loadStaticMap(
+                            context = this,
+                            location = location!!,
+                            Constants.CLASSIC_TEMPLATE
+                        )
+                    }
+                }
+
+
+            }
+
+            binding.watermarkContainer.gone()
+            binding.main.setStampPositionForTopTemplate()
+
 
         }
     }
@@ -1702,10 +2055,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
     }
 
     override fun onQRDetectChanged(enabled: Boolean) {
-        cameraManager.setQRCodeDetectionEnabled(enabled){
+        cameraManager.setQRCodeDetectionEnabled(enabled) {
             binding.qrScanedView.visible()
-            binding.scanedQRTv.text=it
-            binding.qrScanCancleBtn.setOnClickListener{
+            binding.scanedQRTv.text = it
+            binding.qrScanCancleBtn.setOnClickListener {
                 cameraManager.resetDetectedQR()
                 binding.qrScanedView.gone()
             }
@@ -1719,4 +2072,22 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (getBoolean(this@CameraActivity, KEY_WATERMARK_SETTING, false) && !getBoolean(
+                this@CameraActivity,
+                Constants.IS_TOP_TEMPLATE_SELECTED, false
+            )
+        ) {
+            binding.watermarkContainer.visible()
+            binding.ivStampCross.visible()
+        } else {
+            binding.watermarkContainer.gone()
+            binding.ivStampCross.gone()
+        }
+    }
+
+    companion object {
+        var isCurrentSelected = true
+    }
 }

@@ -47,6 +47,7 @@ import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
 import androidx.camera.view.PreviewView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.example.gpsmapcamera.BuildConfig
@@ -698,7 +699,7 @@ class CameraManager(
 
 
     fun takePhotoWithStamp(
-        stampContainer: FrameLayout,
+        stampContainer: ConstraintLayout,
         stampPosition : StampCameraPosition = StampCameraPosition.TOP,
         onSaved: (Uri?) -> Unit
     ) {
@@ -825,7 +826,7 @@ class CameraManager(
     fun takePhotoWithTimer(
         seconds: Int,
         countdownText: TextView,
-        stampContainer: FrameLayout,
+        stampContainer: ConstraintLayout,
         stampPosition : StampCameraPosition = StampCameraPosition.TOP,
         onSaved: (Uri?) -> Unit
     ) {
@@ -853,7 +854,7 @@ class CameraManager(
 
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun startVideoRecordingWithStamp(
-        stampContainer: FrameLayout,
+        stampContainer: ConstraintLayout,
         stampPosition: StampCameraPosition = StampCameraPosition.TOP,
         onStarted: () -> Unit,
         onSaved: (Uri) -> Unit,

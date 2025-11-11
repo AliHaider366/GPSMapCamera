@@ -1,7 +1,7 @@
 package com.example.gpsmapcamera.adapters
 
 import android.app.Application
-import android.content.Context
+import android.location.Location
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -56,6 +56,19 @@ class ManualLocationAdapter(
                 selectedPosition--
             }
         }
+    }
+
+
+    fun updateSelection(location: Location) {
+        val selectedItemIndex = findLocationIndex(location.latitude, location.longitude)
+        if (selectedItemIndex>=0){
+            selectedPosition = selectedItemIndex
+            notifyDataSetChanged()
+        }
+    }
+
+    fun findLocationIndex(lat: Double, lon: Double): Int {
+        return locations.indexOfFirst { it.latitude == lat && it.longitude == lon }
     }
 
     inner class ManualLocationViewHolder(

@@ -1068,48 +1068,79 @@ fun Context.getFontSizeFactor(passedTemplate: String): Float {
 fun ConstraintLayout.setStampPosition(stampPosition: StampCameraPosition) {
     val constraintSet = ConstraintSet()
     constraintSet.clone(this)
+    constraintSet.clear(R.id.stampContainer, ConstraintSet.BOTTOM)
 
     if (stampPosition == StampCameraPosition.TOP) {
-        constraintSet.clear(R.id.watermarkContainer, ConstraintSet.BOTTOM)
-        constraintSet.clear(R.id.stampContainer, ConstraintSet.BOTTOM)
+        constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.BOTTOM)
         constraintSet.connect(
-            R.id.watermarkContainer,
+            R.id.overlayRootContainer,
             ConstraintSet.TOP,
             R.id.previewContainer,
             ConstraintSet.TOP
         )
-        constraintSet.connect(
-            R.id.stampContainer,
-            ConstraintSet.TOP,
-            R.id.watermarkContainer,
-            ConstraintSet.BOTTOM
-        )
         constraintSet.setGoneMargin(
-            R.id.stampContainer,
+            R.id.overlayRootContainer,
             ConstraintSet.TOP,
             context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._10sdp)
         )
     } else {
-        constraintSet.clear(R.id.watermarkContainer, ConstraintSet.TOP)
-        constraintSet.clear(R.id.stampContainer, ConstraintSet.TOP)
+        constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.TOP)
         constraintSet.connect(
-            R.id.stampContainer,
+            R.id.overlayRootContainer,
             ConstraintSet.BOTTOM,
             R.id.previewContainer,
             ConstraintSet.BOTTOM
         )
-        constraintSet.connect(
-            R.id.watermarkContainer,
-            ConstraintSet.BOTTOM,
-            R.id.stampContainer,
-            ConstraintSet.TOP
-        )
         // remove top margin
         constraintSet.setMargin(
-            R.id.stampContainer, ConstraintSet.BOTTOM,
+            R.id.overlayRootContainer, ConstraintSet.BOTTOM,
             context.resources.getDimensionPixelSize(com.intuit.sdp.R.dimen._10sdp)
         )
     }
+
+    val overlayRootContainer = findViewById<ConstraintLayout>(R.id.overlayRootContainer)
+    val params = overlayRootContainer.layoutParams as ConstraintLayout.LayoutParams
+    params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT
+    overlayRootContainer.layoutParams = params
+
+
+    constraintSet.applyTo(this)
+}
+
+fun ConstraintLayout.setStampPositionForTopTemplate() {
+    val constraintSet = ConstraintSet()
+    constraintSet.clone(this)
+
+    constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.BOTTOM)
+    constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.TOP)
+    constraintSet.clear(R.id.stampContainer, ConstraintSet.BOTTOM)
+    constraintSet.connect(
+        R.id.overlayRootContainer,
+        ConstraintSet.TOP,
+        R.id.previewContainer,
+        ConstraintSet.TOP
+    )
+    constraintSet.connect(
+        R.id.overlayRootContainer,
+        ConstraintSet.BOTTOM,
+        R.id.previewContainer,
+        ConstraintSet.BOTTOM
+    )
+    constraintSet.connect(
+        R.id.stampContainer,
+        ConstraintSet.BOTTOM,
+        ConstraintSet.PARENT_ID,
+        ConstraintSet.BOTTOM
+    )
+
+    val overlayRootContainer = findViewById<ConstraintLayout>(R.id.overlayRootContainer)
+
+    val params = overlayRootContainer.layoutParams as ConstraintLayout.LayoutParams
+
+    params.height = 0
+
+    overlayRootContainer.layoutParams = params
+
 
     constraintSet.applyTo(this)
 }

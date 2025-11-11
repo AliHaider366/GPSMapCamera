@@ -36,6 +36,7 @@ object PrefManager {
     const val KEY_TOUCH_SETTING  = "touch_setting"
     const val KEY_VOLUME_BTN_SETTING  = "volume_btn_setting"
     const val KEY_QR_DETECT_SETTING  = "qr_detection_setting"
+    const val KEY_WATERMARK_SETTING  = "KEY_WATERMARK_SETTING"
     const val KEY_TYPE_COLOR  = "type_color"
     const val KEY_TYPE_BG_COLOR  = "type_bg_color"
     const val KEY_TYPE_FONT  = "type_font"

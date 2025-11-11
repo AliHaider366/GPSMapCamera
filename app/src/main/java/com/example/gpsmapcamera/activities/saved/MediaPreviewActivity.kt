@@ -59,6 +59,10 @@ class MediaPreviewActivity : BaseActivity() {
         imagePreview.gone()
         videoContainer.visible()
 
+        backBtn.setOnClickListener {
+            finish()
+        }
+
         videoView.setVideoURI(mediaUri)
         videoView.setOnPreparedListener { mp ->
             duration = mp.duration

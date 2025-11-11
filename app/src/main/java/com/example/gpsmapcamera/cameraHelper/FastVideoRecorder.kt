@@ -16,6 +16,7 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.RequiresPermission
 import androidx.camera.view.PreviewView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.gpsmapcamera.BuildConfig
 import com.example.gpsmapcamera.models.StampCameraPosition
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FOLDER_NAME
@@ -24,7 +25,7 @@ import java.io.File
 
 class FastVideoRecorder(
     private val previewView: PreviewView,
-    private val stampContainer: FrameLayout,
+    private val stampContainer: ConstraintLayout,
     private val stampPosition: StampCameraPosition,
     private val width: Int,
     private val height: Int,
