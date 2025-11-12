@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">กล้อง GPS - แผนที่ &amp; การแท็กตำแหน่ง</string>
+    <string name="gps_camera_non_translatable" translatable="false">GPS Camera</string>
+    <string name="add_note">เพิ่มโน้ต</string>
+    <string name="add_custom_name">เพิ่มชื่อกำหนดเอง</string>
+    <string name="date_and_time">วันที่และเวลา</string>
+    <string name="day">วัน</string>
+    <string name="hour_minute_second">ชั่วโมง นาที วินาที</string>
+    <string name="_24_hours">24 ชั่วโมง</string>
+    <string name="decimal">ทศนิยม</string>
+    <string name="dms">DMS</string>
+    <string name="line_1">บรรทัด 1</string>
+    <string name="line_2">บรรทัด 2</string>
+    <string name="line_3">บรรทัด 3</string>
+    <string name="line_4">บรรทัด 4</string>
+    <string name="file_name">ชื่อไฟล์</string>
+    <string name="select_folder">เลือกโฟลเดอร์</string>
+    <string name="save_original_photos">บันทึกภาพถ่ายต้นฉบับ</string>
+    <string name="default_">ค่าเริ่มต้น</string>
+    <string name="site_1">ไซต์ 1</string>
+    <string name="site_2">ไซต์ 2</string>
+    <string name="template">เทมเพลต</string>
+    <string name="environment">สภาพแวดล้อม</string>
+    <string name="camera_level">ระดับกล้อง</string>
+    <string name="focus">โฟกัส</string>
+    <string name="templates">เทมเพลต</string>
+    <string name="gallery">แกลเลอรี</string>
+    <string name="video">วิดีโอ</string>
+    <string name="photo">ภาพถ่าย</string>
+    <string name="quick_share">แชร์ด่วน</string>
+    <string name="_2x" translatable="false">2x</string>
+    <string name="_1x" translatable="false">1x</string>
+    <string name="white">ขาว</string>
+    <string name="volume">ระดับเสียง</string>
+    <string name="mirror">กระจก</string>
+    <string name="timer_off">ปิดตัวจับเวลา</string>
+    <string name="grid">ตาราง</string>
+    <string name="ratio">อัตราส่วน</string>
+    <string name="enter_folder_name">กรุณากรอกชื่อโฟลเดอร์</string>
+    <string name="add">เพิ่ม</string>
+
+    <string name="custom_name_1">ชื่อกำหนดเอง 1</string>
+    <string name="custom_name_2">ชื่อกำหนดเอง 2</string>
+    <string name="custom_name_3">ชื่อกำหนดเอง 3</string>
+    <string name="full_address">ที่อยู่แบบเต็ม</string>
+    <string name="latitude_longitude">ละติจูด/ลองจิจูด</string>
+    <string name="plus_code">รหัสพลัส</string>
+    <string name="time_zone">เขตเวลา</string>
+    <string name="to_provide_you_with_the_best_learning_experience_we_need_access_to_the_following_features">เพื่อมอบประสบการณ์การเรียนรู้ที่ดีที่สุด เราต้องการการเข้าถึงคุณสมบัติต่อไปนี้:</string>
+    <string name="permissions">การอนุญาต</string>
+    <string name="take_photos_for_visual_translations_and_practice">ถ่ายภาพเพื่อการแปลภาพและการฝึกฝน</string>
+    <string name="camera">กล้อง</string>
+    <string name="allow">อนุญาต</string>
+    <string name="location">ตำแหน่ง</string>
+    <string name="learn_location_specific_phrases_and_vocabulary">เรียนรู้วลีและคำศัพท์เฉพาะสถานที่</string>
+    <string name="photo_gallery">แกลเลอรีภาพถ่าย</string>
+    <string name="upload_images_for_translations_and_customization">อัปโหลดภาพเพื่อการแปลและการปรับแต่ง</string>
+    <string name="continue_">ดำเนินการต่อ</string>
+    <string name="you_can_change_these_permissions_later_in_your_device_settings">คุณสามารถเปลี่ยนการอนุญาตเหล่านี้ได้ในภายหลังในการตั้งค่าอุปกรณ์ของคุณ</string>
+    <string name="permission_granted">ได้รับอนุญาต</string>
+    <string name="permission_denied">ปฏิเสธการอนุญาต</string>
+    <string name="please_enter_folder_name">กรุณากรอกชื่อโฟลเดอร์</string>
+    <string name="failed_to_create_folder">ไม่สามารถสร้างโฟลเดอร์ได้!</string>
+    <string name="please_enter_sequence_number">กรุณากรอกหมายเลขลำดับ</string>
+    <string name="please_enter_custom_name">กรุณากรอกชื่อกำหนดเอง</string>
+    <string name="allowed">ได้รับอนุญาต</string>
+
+    <string-array name="aspect_ratios" translatable="false">
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+    <string-array name="grid_options" translatable="false">
+        <item>Off</item>
+        <item>2x2</item>
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
+
+    <string name="basic">พื้นฐาน</string>
+    <string name="stamp">ตราประทับ</string>
+    <string name="weather">สภาพอากาศ</string>
+    <string name="technical">เทคนิค</string>
+    <string name="advance_template">เทมเพลตขั้นสูง</string>
+    <string name="classic_template">เทมเพลตคลาสสิก</string>
+    <string name="reporting_template">เทมเพลตรายงาน</string>
+
+    <string name="next">ถัดไป</string>
+    <string name="previous">ก่อนหน้า</string>
+
+    <string name="reporting_tag">แท็กรายงาน</string>
+    <string name="date_time"><![CDATA[วันที่ & เวลา]]></string>
+    <string name="map_type">ประเภทแผนที่</string>
+    <string name="short_address">ที่อยู่อย่างย่อ</string>
+
+    <string name="lat_long">ละติจูด/ลองจิจูด</string>
+
+    <string name="person_name">ชื่อบุคคล</string>
+    <string name="contact_number">หมายเลขติดต่อ</string>
+    <string name="wind">ลม</string>
+    <string name="humidity">ความชื้น</string>
+    <string name="pressure">ความกดอากาศ</string>
+    <string name="compass">เข็มทิศ</string>
+    <string name="magnetic_field">สนามแม่เหล็ก</string>
+    <string name="altitude">ระดับความสูง</string>
+    <string name="accuracy">ความแม่นยำ</string>
+    <string name="sound_level">ระดับเสียง</string>
+    <string name="numbering">การนับเลข</string>
+    <string name="logo">โลโก้</string>
+    <string name="note">โน้ต</string>
+    <string name="stamp_settings">การตั้งค่าตราประทับ</string>
+    <string name="font_style">สไตล์ฟอนต์</string>
+    <string name="stamp_color">สีตราประทับ</string>
+    <string name="stamp_size">ขนาดตราประทับ</string>
+    <string name="stamp_position">ตำแหน่งตราประทับ</string>
+    <string name="map_position">ตำแหน่งแผนที่</string>
+    <string name="map_scale">สเกลแผนที่</string>
+    <string name="weather_information">ข้อมูลสภาพอากาศ</string>
+    <string name="technical_details">รายละเอียดทางเทคนิค</string>
+    <string name="basic_information">ข้อมูลพื้นฐาน</string>
+    <string name="additional_details">รายละเอียดเพิ่มเติม</string>
+    <string name="title">ชื่อเรื่อง</string>
+    <string name="enter_here">กรอกที่นี่</string>
+    <string name="recent_added_reporting_tag">แท็กรายงานที่เพิ่มล่าสุด</string>
+    <string name="please_enter_tag">กรุณากรอกแท็ก</string>
+    <string name="city">เมือง</string>
+    <string name="state">รัฐ</string>
+    <string name="country">ประเทศ</string>
+    <string name="pincode">รหัสไปรษณีย์</string>
+    <string name="add_number">เพิ่มหมายเลข</string>
+    <string name="this_number_will_be_used_for_verification_and_communication">หมายเลขนี้จะใช้สำหรับการยืนยันและการสื่อสาร</string>
+    <string name="enter_contact_number">กรอกหมายเลขติดต่อ</string>
+    <string name="please_enter_a_phone_number_including_country_code">กรุณากรอกหมายเลขโทรศัพท์พร้อมรหัสประเทศ</string>
+    <string name="please_enter_valid_number">กรุณากรอกหมายเลขที่ถูกต้อง</string>
+    <string name="please_add_number_first">กรุณาเพิ่มหมายเลขก่อน</string>
+    <string name="show_note_options_on_capture">แสดงตัวเลือกโน้ตเมื่อถ่ายภาพ</string>
+    <string name="recent_added_note">โน้ตที่เพิ่มล่าสุด</string>
+    <string name="prefix">คำนำหน้า</string>
+    <string name="enter_prefix">กรอกคำนำหน้า</string>
+    <string name="suffix">คำต่อท้าย</string>
+    <string name="enter_suffix">กรอกคำต่อท้าย</string>
+    <string name="sequence_number">หมายเลขลำดับ</string>
+    <string name="sequence_type">ประเภทลำดับ</string>
+    <string name="reset">รีเซ็ต</string>
+    <string name="normal">ปกติ</string>
+    <string name="satellite">ดาวเทียม</string>
+    <string name="terrain">ภูมิประเทศ</string>
+    <string name="hybrid">ผสม</string>
+    <string name="left">ซ้าย</string>
+    <string name="right">ขวา</string>
+    <string name="top">ด้านบน</string>
+    <string name="bottom">ด้านล่าง</string>
+    <string name="large">ใหญ่</string>
+    <string name="medium">กลาง</string>
+    <string name="small">เล็ก</string>
+    <string name="extra_small">เล็กพิเศษ</string>
+    <string name="capture_beyond_photos">จับภาพเกินกว่าภาพถ่าย</string>
+    <string name="stamp_it_save_it_share_it">ประทับตรา บันทึก แชร์</string>
+    <string name="your_camera_your_way">กล้องของคุณ สไตล์ของคุณ</string>
+    <string name="shoot_like_a_pro">ถ่ายภาพเหมือนมืออาชีพ</string>
+    <string name="select_your_language">เลือกภาษาของคุณ</string>
+    <string name="apply">นำไปใช้</string>
+    <string name="settings">การตั้งค่า</string>
+    <string name="general">ทั่วไป</string>
+    <string name="app_language">ภาษาของแอป</string>
+    <string name="image_quality">คุณภาพภาพ</string>
+    <string name="volume_button">ปุ่มระดับเสียง</string>
+    <string name="touch_settings">การตั้งค่าการสัมผัส</string>
+    <string name="features">คุณสมบัติ</string>
+    <string name="watermark">ลายน้ำ</string>
+    <string name="qr_detection">การตรวจจับ QR</string>
+    <string name="location_share_mode">โหมดแชร์ตำแหน่ง</string>
+    <string name="front_rear_camera_stamp">ตราประทับกล้องหน้า/หลัง</string>
+    <string name="about">เกี่ยวกับ</string>
+    <string name="rate_us">ให้คะแนนเรา</string>
+    <string name="share">แชร์</string>
+    <string name="privacy_policy">นโยบายความเป็นส่วนตัว</string>
+    <string name="which_camera_mode_do_you_use_the_most">คุณใช้โหมดกล้องไหนบ่อยที่สุด?</string>
+    <string name="high_quality_still_images">ภาพนิ่งคุณภาพสูง</string>
+    <string name="hd_and_4k_video_recording">การบันทึกวิดีโอ HD และ 4K</string>
+    <string name="instant_capture_and_share">ถ่ายและแชร์ทันที</string>
+    <string name="choose_your_default_photo_ratio">เลือกอัตราส่วนภาพถ่ายเริ่มต้นของคุณ</string>
+    <string name="_16_9_wide">16:9 (กว้าง)</string>
+    <string name="perfect_for_videos_and_cinematic_photos">เหมาะสำหรับวิดีโอและภาพถ่ายแบบภาพยนตร์</string>
+    <string name="_16_9_preview">ตัวอย่าง 16:9</string>
+    <string name="_4_3_preview">ตัวอย่าง 4:3</string>
+    <string name="_4_3_standard">4:3 (มาตรฐาน)</string>
+    <string name="classic_photo_format_for_most_cameras">รูปแบบภาพถ่ายคลาสสิกสำหรับกล้องส่วนใหญ่</string>
+    <string name="how_do_you_prefer_to_tag_your_location">คุณต้องการแท็กตำแหน่งของคุณอย่างไร?</string>
+    <string name="gps_automatic">GPS (อัตโนมัติ)</string>
+    <string name="use_your_device_s_location_to_automatically_tag_photos">ใช้ตำแหน่งของอุปกรณ์เพื่อแท็กภาพถ่ายโดยอัตโนมัติ</string>
+    <string name="manual_entry">ป้อนด้วยตนเอง</string>
+    <string name="type_in_your_location_when_saving_photos">พิมพ์ตำแหน่งของคุณเมื่อบันทึกภาพถ่าย</string>
+    <string name="do_not_tag">ไม่แท็ก</string>
+    <string name="no_location_information_will_be_added_to_photos">จะไม่มีการเพิ่มข้อมูลตำแหน่งในภาพถ่าย</string>
+    <string name="classic">คลาสสิก</string>
+    <string name="modern">ทันสมัย</string>
+    <string name="minimal">มินิมอล</string>
+    <string name="vintage">วินเทจ</string>
+    <string name="bold">ตัวหนา</string>
+    <string name="select_your_preferred_stamp_template">เลือกเทมเพลตตราประทับที่คุณต้องการ</string>
+    <string name="timer_3sec">ตัวจับเวลา 3 วินาที</string>
+    <string name="timer_5sec">ตัวจับเวลา 5 วินาที</string>
+    <string name="version">รุ่น</string>
+    <string name="low">ต่ำ</string>
+    <string name="high">สูง</string>
+    <string name="photo_capture">การถ่ายภาพ</string>
+    <string name="grid_3_3" translatable="false">Grid 3*3</string>
+    <string name="grid_4_4" translatable="false">Grid 4*4</string>
+    <string name="grid_phi" translatable="false">Grid PHI</string>
+
+    <string name="tap_again_to_exit">แตะอีกครั้งเพื่อออก</string>
+    <string name="volume_on">เปิดเสียง</string>
+    <string name="volume_off">ปิดเสียง</string>
+    <string name="please_enter_note">กรุณากรอกโน้ต</string>
+    <string name="please_enter_text_first">กรุณากรอกข้อความก่อน</string>
+    <string name="capture_photo">ถ่ายภาพ</string>
+    <string name="zoom">ซูม</string>
+    <string name="r">แดง</string>
+    <string name="g">เขียว</string>
+    <string name="b">น้ำเงิน</string>
+    <string name="saturation">ความอิ่มตัว</string>
+    <string name="hue">เฉดสี</string>
+    <string name="copy">คัดลอก</string>
+    <string name="hex">HEX</string>
+    <string name="color">สี</string>
+    <string name="bg_color">สีพื้นหลัง</string>
+    <string name="fonts">ฟอนต์</string>
+    <string name="style">สไตล์</string>
+    <string name="alignment">การจัดตำแหน่ง</string>
+    <string name="add_manual_location">เพิ่มตำแหน่งด้วยตนเอง</string>
+    <string name="latitude">ละติจูด</string>
+    <string name="longitude">ลองจิจูด</string>
+    <string name="range_in_meters">ระยะ (เมตร)</string>
+    <string name="address">ที่อยู่</string>
+    <string name="current_location">ตำแหน่งปัจจุบัน</string>
+    <string name="manual_location">ตำแหน่งด้วยตนเอง</string>
+    <string name="gps_camera">กล้อง GPS</string>
+    <string name="home_camera_desc">ถ่ายภาพด้วยข้อมูล GPS</string>
+    <string name="share_media_instantly">แชร์สื่อทันที</string>
+    <string name="record_with_gps_watermark">บันทึกด้วยลายน้ำ GPS</string>
+    <string name="gps_watermark_templates">เทมเพลตลายน้ำ GPS</string>
+    <string name="captured_photos_videos">ภาพถ่ายและวิดีโอที่ถ่าย</string>
+    <string name="saved_data">ข้อมูลที่บันทึก</string>
+    <string name="do_you_really_want_to_exit">คุณต้องการออกจริงหรือ?</string>
+    <string name="before_you_go_explore_these_amazing_features">ก่อนที่คุณจะไป สำรวจคุณสมบัติที่น่าทึ่งเหล่านี้!</string>
+    <string name="continue_using_app">ใช้แอปต่อ</string>
+    <string name="exit_app">ออกจากแอป</string>
+    <string name="enjoying_the_app">สนุกกับแอปนี้หรือไม่?</string>
+    <string name="your_feedback_helps_us_improve">ความคิดเห็นของคุณช่วยให้เราปรับปรุง!</string>
+    <string name="rate_on_play_store">ให้คะแนนใน Play Store</string>
+    <string name="maybe_later">ไว้ทีหลัง</string>
+    <string name="add_quick_tags_to_your_images">เพิ่มแท็กด่วนให้กับภาพของคุณ</string>
+    <string name="stamp_your_photo_with_location_and_time_zone">ประทับตราภาพถ่ายของคุณด้วยตำแหน่งและเขตเวลา</string>
+    <string name="we_d_love_to_know_how_we_can_improve">เราอยากรู้ว่าเราจะปรับปรุงอะไรได้บ้าง</string>
+    <string name="your_feedback_is_valuable_to_us">ความคิดเห็นของคุณมีค่าสำหรับเรา</string>
+    <string name="tell_us_what_we_can_do_better">บอกเราว่าเราจะทำอะไรให้ดีขึ้นได้บ้าง...</string>
+    <string name="submit">ส่ง</string>
+    <string name="cancel">ยกเลิก</string>
+    <string name="terrible">แย่มาก</string>
+    <string name="bad">ไม่ดี</string>
+    <string name="good">ดี</string>
+    <string name="okay">ใช้ได้</string>
+    <string name="excellent">ยอดเยี่ยม</string>
+    <string name="something_went_wrong">เกิดข้อผิดพลาด</string>
+    <string name="choose_an_email_client">เลือกไคลเอนต์อีเมล</string>
+    <string name="please_enter_feedback">กรุณากรอกความคิดเห็น</string>
+    <string name="done">เสร็จสิ้น</string>
+    <string name="saved_media">สื่อที่บันทึก</string>
+    <string name="no_saved_media_yet">ยังไม่มีสื่อที่บันทึก</string>
+    <string name="your_saved_media_will_appear_here">สื่อที่คุณบันทึกจะปรากฏที่นี่</string>
+    <string name="delete_saved_media">ลบสื่อที่บันทึก</string>
+    <string name="are_you_sure_you_want_to_delete">คุณแน่ใจหรือว่าต้องการลบ?</string>
+    <string name="delete">ลบ</string>
+    <string name="preview">ตัวอย่าง</string>
+    <string name="saved">บันทึกแล้ว</string>
+    <string name="location_permission_not_granted">ไม่ได้ให้อนุญาตตำแหน่ง</string>
+    <string name="unable_to_get_current_location">ไม่สามารถรับตำแหน่งปัจจุบันได้</string>
+    <string name="top_templates">เทมเพลตยอดนิยม</string>
+    <string name="basic_templates">เทมเพลตพื้นฐาน</string>
+</resources>

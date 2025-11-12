@@ -1104,49 +1104,54 @@ fun ConstraintLayout.setStampPosition(stampPosition: StampCameraPosition) {
     overlayRootContainer.layoutParams = params
 
 
+    // Set layout params for stampContainer
+    val stampContainer = findViewById<FrameLayout>(R.id.stampContainer)
+    val stampParams = stampContainer.layoutParams as ConstraintLayout.LayoutParams
+    stampParams.height = ConstraintLayout.LayoutParams.WRAP_CONTENT // Ensure full height
+    stampContainer.layoutParams = stampParams
+
+
+
     constraintSet.applyTo(this)
 }
+
 
 fun ConstraintLayout.setStampPositionForTopTemplate() {
     val constraintSet = ConstraintSet()
     constraintSet.clone(this)
 
-    constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.BOTTOM)
-    constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.TOP)
+    // Clear existing constraints for stampContainer
+    constraintSet.clear(R.id.stampContainer, ConstraintSet.TOP)
     constraintSet.clear(R.id.stampContainer, ConstraintSet.BOTTOM)
+
+    // Constrain stampContainer to match overlayRootContainer height
     constraintSet.connect(
-        R.id.overlayRootContainer,
+        R.id.stampContainer,
         ConstraintSet.TOP,
-        R.id.previewContainer,
+        ConstraintSet.PARENT_ID,
         ConstraintSet.TOP
-    )
-    constraintSet.connect(
-        R.id.overlayRootContainer,
-        ConstraintSet.BOTTOM,
-        R.id.previewContainer,
-        ConstraintSet.BOTTOM
     )
     constraintSet.connect(
         R.id.stampContainer,
         ConstraintSet.BOTTOM,
-        ConstraintSet.PARENT_ID,
+        R.id.overlayRootContainer,
         ConstraintSet.BOTTOM
     )
 
-    val overlayRootContainer = findViewById<ConstraintLayout>(R.id.overlayRootContainer)
+    // Set layout params for overlayRootContainer
+    val params = layoutParams as ConstraintLayout.LayoutParams
+    params.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT // Ensure full height
+    layoutParams = params
 
-    val params = overlayRootContainer.layoutParams as ConstraintLayout.LayoutParams
+    // Set layout params for stampContainer
+    val stampContainer = findViewById<FrameLayout>(R.id.stampContainer)
+    val stampParams = stampContainer.layoutParams as ConstraintLayout.LayoutParams
+    stampParams.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT // Ensure full height
+    stampContainer.layoutParams = stampParams
 
-    params.height = 0
-
-    overlayRootContainer.layoutParams = params
-
-
+    // Apply the constraints
     constraintSet.applyTo(this)
 }
-
-
-
 
 
 

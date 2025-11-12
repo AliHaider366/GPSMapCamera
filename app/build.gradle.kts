@@ -15,8 +15,8 @@ android {
         applicationId = "com.we.map.geotag.location.video.photo.gpscamera.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "2.0.3"
+        versionCode = 4
+        versionName = "2.0.4"
 
 
         applicationVariants.all {
@@ -35,6 +35,9 @@ android {
         release {
             isShrinkResources = true
             isMinifyEnabled = true
+
+//            isShrinkResources = false
+//            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

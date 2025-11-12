@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">دوربین GPS - نقشه &amp; برچسب‌گذاری جغرافیایی</string>
+    <string name="gps_camera_non_translatable" translatable="false">GPS Camera</string>
+    <string name="add_note">افزودن یادداشت</string>
+    <string name="add_custom_name">افزودن نام سفارشی</string>
+    <string name="date_and_time">تاریخ و زمان</string>
+    <string name="day">روز</string>
+    <string name="hour_minute_second">ساعت دقیقه ثانیه</string>
+    <string name="_24_hours">24 ساعت</string>
+    <string name="decimal">اعشاری</string>
+    <string name="dms">DMS</string>
+    <string name="line_1">خط 1</string>
+    <string name="line_2">خط 2</string>
+    <string name="line_3">خط 3</string>
+    <string name="line_4">خط 4</string>
+    <string name="file_name">نام فایل</string>
+    <string name="select_folder">انتخاب پوشه</string>
+    <string name="save_original_photos">ذخیره عکس‌های اصلی</string>
+    <string name="default_">پیش‌فرض</string>
+    <string name="site_1">سایت 1</string>
+    <string name="site_2">سایت 2</string>
+    <string name="template">الگو</string>
+    <string name="environment">محیط</string>
+    <string name="camera_level">سطح دوربین</string>
+    <string name="focus">فوکوس</string>
+    <string name="templates">الگوها</string>
+    <string name="gallery">گالری</string>
+    <string name="video">ویدیو</string>
+    <string name="photo">عکس</string>
+    <string name="quick_share">اشتراک‌گذاری سریع</string>
+    <string name="_2x" translatable="false">2x</string>
+    <string name="_1x" translatable="false">1x</string>
+    <string name="white">سفید</string>
+    <string name="volume">حجم صدا</string>
+    <string name="mirror">آینه</string>
+    <string name="timer_off">تایمر خاموش</string>
+    <string name="grid">شبکه</string>
+    <string name="ratio">نسبت</string>
+    <string name="enter_folder_name">نام پوشه را وارد کنید</string>
+    <string name="add">افزودن</string>
+
+    <string name="custom_name_1">نام سفارشی 1</string>
+    <string name="custom_name_2">نام سفارشی 2</string>
+    <string name="custom_name_3">نام سفارشی 3</string>
+    <string name="full_address">آدرس کامل</string>
+    <string name="latitude_longitude">عرض جغرافیایی/طول جغرافیایی</string>
+    <string name="plus_code">کد پلاس</string>
+    <string name="time_zone">منطقه زمانی</string>
+    <string name="to_provide_you_with_the_best_learning_experience_we_need_access_to_the_following_features">برای ارائه بهترین تجربه یادگیری، نیاز به دسترسی به ویژگی‌های زیر داریم:</string>
+    <string name="permissions">مجوزها</string>
+    <string name="take_photos_for_visual_translations_and_practice">گرفتن عکس برای ترجمه‌های بصری و تمرین</string>
+    <string name="camera">دوربین</string>
+    <string name="allow">اجازه دادن</string>
+    <string name="location">موقعیت</string>
+    <string name="learn_location_specific_phrases_and_vocabulary">یادگیری عبارات و واژگان خاص موقعیت</string>
+    <string name="photo_gallery">گالری عکس</string>
+    <string name="upload_images_for_translations_and_customization">بارگذاری تصاویر برای ترجمه و سفارشی‌سازی</string>
+    <string name="continue_">ادامه</string>
+    <string name="you_can_change_these_permissions_later_in_your_device_settings">می‌توانید این مجوزها را بعداً در تنظیمات دستگاه خود تغییر دهید</string>
+    <string name="permission_granted">مجوز اعطا شد</string>
+    <string name="permission_denied">مجوز رد شد</string>
+    <string name="please_enter_folder_name">لطفاً نام پوشه را وارد کنید</string>
+    <string name="failed_to_create_folder">ایجاد پوشه ناموفق بود!</string>
+    <string name="please_enter_sequence_number">لطفاً شماره ترتیب را وارد کنید</string>
+    <string name="please_enter_custom_name">لطفاً نام سفارشی را وارد کنید</string>
+    <string name="allowed">مجاز</string>
+
+    <string-array name="aspect_ratios" translatable="false">
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+    <string-array name="grid_options" translatable="false">
+        <item>Off</item>
+        <item>2x2</item>
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
+
+    <string name="basic">پایه</string>
+    <string name="stamp">مهر</string>
+    <string name="weather">هواشناسی</string>
+    <string name="technical">فنی</string>
+    <string name="advance_template">الگوی پیشرفته</string>
+    <string name="classic_template">الگوی کلاسیک</string>
+    <string name="reporting_template">الگوی گزارش‌دهی</string>
+
+    <string name="next">بعدی</string>
+    <string name="previous">قبلی</string>
+
+    <string name="reporting_tag">برچسب گزارش‌دهی</string>
+    <string name="date_time"><![CDATA[تاریخ & زمان]]></string>
+    <string name="map_type">نوع نقشه</string>
+    <string name="short_address">آدرس کوتاه</string>
+
+    <string name="lat_long">عرض/طول</string>
+
+    <string name="person_name">نام شخص</string>
+    <string name="contact_number">شماره تماس</string>
+    <string name="wind">باد</string>
+    <string name="humidity">رطوبت</string>
+    <string name="pressure">فشار</string>
+    <string name="compass">قطب‌نما</string>
+    <string name="magnetic_field">میدان مغناطیسی</string>
+    <string name="altitude">ارتفاع</string>
+    <string name="accuracy">دقت</string>
+    <string name="sound_level">سطح صدا</string>
+    <string name="numbering">شماره‌گذاری</string>
+    <string name="logo">لوگو</string>
+    <string name="note">یادداشت</string>
+    <string name="stamp_settings">تنظیمات مهر</string>
+    <string name="font_style">سبک قلم</string>
+    <string name="stamp_color">رنگ مهر</string>
+    <string name="stamp_size">اندازه مهر</string>
+    <string name="stamp_position">موقعیت مهر</string>
+    <string name="map_position">موقعیت نقشه</string>
+    <string name="map_scale">مقیاس نقشه</string>
+    <string name="weather_information">اطلاعات هواشناسی</string>
+    <string name="technical_details">جزئیات فنی</string>
+    <string name="basic_information">اطلاعات پایه</string>
+    <string name="additional_details">جزئیات اضافی</string>
+    <string name="title">عنوان</string>
+    <string name="enter_here">اینجا وارد کنید</string>
+    <string name="recent_added_reporting_tag">برچسب گزارش‌دهی اخیراً اضافه شده</string>
+    <string name="please_enter_tag">لطفاً برچسب را وارد کنید</string>
+    <string name="city">شهر</string>
+    <string name="state">استان</string>
+    <string name="country">کشور</string>
+    <string name="pincode">کد پستی</string>
+    <string name="add_number">افزودن شماره</string>
+    <string name="this_number_will_be_used_for_verification_and_communication">این شماره برای تأیید و ارتباط استفاده خواهد شد</string>
+    <string name="enter_contact_number">شماره تماس را وارد کنید</string>
+    <string name="please_enter_a_phone_number_including_country_code">لطفاً شماره تلفن را همراه با کد کشور وارد کنید</string>
+    <string name="please_enter_valid_number">لطفاً شماره معتبر وارد کنید</string>
+    <string name="please_add_number_first">لطفاً ابتدا شماره را اضافه کنید</string>
+    <string name="show_note_options_on_capture">نمایش گزینه‌های یادداشت هنگام ثبت</string>
+    <string name="recent_added_note">یادداشت اخیراً اضافه شده</string>
+    <string name="prefix">پیشوند</string>
+    <string name="enter_prefix">پیشوند را وارد کنید</string>
+    <string name="suffix">پسوند</string>
+    <string name="enter_suffix">پسوند را وارد کنید</string>
+    <string name="sequence_number">شماره ترتیب</string>
+    <string name="sequence_type">نوع ترتیب</string>
+    <string name="reset">بازنشانی</string>
+    <string name="normal">عادی</string>
+    <string name="satellite">ماهواره‌ای</string>
+    <string name="terrain">زمین</string>
+    <string name="hybrid">ترکیبی</string>
+    <string name="left">چپ</string>
+    <string name="right">راست</string>
+    <string name="top">بالا</string>
+    <string name="bottom">پایین</string>
+    <string name="large">بزرگ</string>
+    <string name="medium">متوسط</string>
+    <string name="small">کوچک</string>
+    <string name="extra_small">خیلی کوچک</string>
+    <string name="capture_beyond_photos">ثبت فراتر از عکس‌ها</string>
+    <string name="stamp_it_save_it_share_it">مهر بزن، ذخیره کن، به اشتراک بگذار</string>
+    <string name="your_camera_your_way">دوربین شما، به روش شما</string>
+    <string name="shoot_like_a_pro">عکاسی مثل حرفه‌ای‌ها</string>
+    <string name="select_your_language">زبان خود را انتخاب کنید</string>
+    <string name="apply">اعمال</string>
+    <string name="settings">تنظیمات</string>
+    <string name="general">عمومی</string>
+    <string name="app_language">زبان برنامه</string>
+    <string name="image_quality">کیفیت تصویر</string>
+    <string name="volume_button">دکمه صدا</string>
+    <string name="touch_settings">تنظیمات لمسی</string>
+    <string name="features">ویژگی‌ها</string>
+    <string name="watermark">واترمارک</string>
+    <string name="qr_detection">تشخیص QR</string>
+    <string name="location_share_mode">حالت اشتراک‌گذاری موقعیت</string>
+    <string name="front_rear_camera_stamp">مهر دوربین جلو/عقب</string>
+    <string name="about">درباره</string>
+    <string name="rate_us">به ما امتیاز دهید</string>
+    <string name="share">اشتراک‌گذاری</string>
+    <string name="privacy_policy">سیاست حفظ حریم خصوصی</string>
+    <string name="which_camera_mode_do_you_use_the_most">بیشتر از کدام حالت دوربین استفاده می‌کنید؟</string>
+    <string name="high_quality_still_images">تصاویر ثابت با کیفیت بالا</string>
+    <string name="hd_and_4k_video_recording">ضبط ویدیو HD و 4K</string>
+    <string name="instant_capture_and_share">ثبت و اشتراک‌گذاری فوری</string>
+    <string name="choose_your_default_photo_ratio">نسبت عکس پیش‌فرض خود را انتخاب کنید</string>
+    <string name="_16_9_wide">16:9 (عریض)</string>
+    <string name="perfect_for_videos_and_cinematic_photos">ایده‌آل برای ویدیوها و عکس‌های سینمایی</string>
+    <string name="_16_9_preview">پیش‌نمایش 16:9</string>
+    <string name="_4_3_preview">پیش‌نمایش 4:3</string>
+    <string name="_4_3_standard">4:3 (استاندارد)</string>
+    <string name="classic_photo_format_for_most_cameras">فرمت عکس کلاسیک برای اکثر دوربین‌ها</string>
+    <string name="how_do_you_prefer_to_tag_your_location">چگونه ترجیح می‌دهید موقعیت خود را برچسب‌گذاری کنید؟</string>
+    <string name="gps_automatic">GPS (خودکار)</string>
+    <string name="use_your_device_s_location_to_automatically_tag_photos">استفاده از موقعیت دستگاه برای برچسب‌گذاری خودکار عکس‌ها</string>
+    <string name="manual_entry">ورود دستی</string>
+    <string name="type_in_your_location_when_saving_photos">موقعیت خود را هنگام ذخیره عکس‌ها وارد کنید</string>
+    <string name="do_not_tag">بدون برچسب</string>
+    <string name="no_location_information_will_be_added_to_photos">هیچ اطلاعات موقعیتی به عکس‌ها اضافه نخواهد شد</string>
+    <string name="classic">کلاسیک</string>
+    <string name="modern">مدرن</string>
+    <string name="minimal">مینیمال</string>
+    <string name="vintage">وینتیج</string>
+    <string name="bold">پررنگ</string>
+    <string name="select_your_preferred_stamp_template">الگوی مهر مورد نظر خود را انتخاب کنید</string>
+    <string name="timer_3sec">تایمر 3 ثانیه</string>
+    <string name="timer_5sec">تایمر 5 ثانیه</string>
+    <string name="version">نسخه</string>
+    <string name="low">پایین</string>
+    <string name="high">بالا</string>
+    <string name="photo_capture">ثبت عکس</string>
+    <string name="grid_3_3" translatable="false">Grid 3*3</string>
+    <string name="grid_4_4" translatable="false">Grid 4*4</string>
+    <string name="grid_phi" translatable="false">Grid PHI</string>
+
+    <string name="tap_again_to_exit">برای خروج دوباره ضربه بزنید</string>
+    <string name="volume_on">صدا روشن</string>
+    <string name="volume_off">صدا خاموش</string>
+    <string name="please_enter_note">لطفاً یادداشت را وارد کنید</string>
+    <string name="please_enter_text_first">لطفاً ابتدا متن را وارد کنید</string>
+    <string name="capture_photo">گرفتن عکس</string>
+    <string name="zoom">زوم</string>
+    <string name="r">قرمز</string>
+    <string name="g">سبز</string>
+    <string name="b">آبی</string>
+    <string name="saturation">اشباع</string>
+    <string name="hue">رنگ</string>
+    <string name="copy">کپی</string>
+    <string name="hex">HEX</string>
+    <string name="color">رنگ</string>
+    <string name="bg_color">رنگ پس‌زمینه</string>
+    <string name="fonts">فونت‌ها</string>
+    <string name="style">سبک</string>
+    <string name="alignment">تراز</string>
+    <string name="add_manual_location">افزودن موقعیت دستی</string>
+    <string name="latitude">عرض جغرافیایی</string>
+    <string name="longitude">طول جغرافیایی</string>
+    <string name="range_in_meters">محدوده (به متر)</string>
+    <string name="address">آدرس</string>
+    <string name="current_location">موقعیت فعلی</string>
+    <string name="manual_location">موقعیت دستی</string>
+    <string name="gps_camera">دوربین GPS</string>
+    <string name="home_camera_desc">ثبت با داده‌های GPS</string>
+    <string name="share_media_instantly">اشتراک‌گذاری فوری رسانه</string>
+    <string name="record_with_gps_watermark">ضبط با واترمارک GPS</string>
+    <string name="gps_watermark_templates">الگوهای واترمارک GPS</string>
+    <string name="captured_photos_videos">عکس‌ها و ویدیوهای ثبت‌شده</string>
+    <string name="saved_data">داده‌های ذخیره‌شده</string>
+    <string name="do_you_really_want_to_exit">آیا واقعاً می‌خواهید خارج شوید؟</string>
+    <string name="before_you_go_explore_these_amazing_features">قبل از خروج، این ویژگی‌های شگفت‌انگیز را کاوش کنید!</string>
+    <string name="continue_using_app">ادامه استفاده از برنامه</string>
+    <string name="exit_app">خروج از برنامه</string>
+    <string name="enjoying_the_app">از برنامه لذت می‌برید؟</string>
+    <string name="your_feedback_helps_us_improve">بازخورد شما به ما کمک می‌کند تا بهبود یابیم!</string>
+    <string name="rate_on_play_store">امتیاز دهید در Play Store</string>
+    <string name="maybe_later">شاید بعداً</string>
+    <string name="add_quick_tags_to_your_images">افزودن برچسب‌های سریع به تصاویر شما</string>
+    <string name="stamp_your_photo_with_location_and_time_zone">مهر زدن عکس شما با موقعیت و منطقه زمانی</string>
+    <string name="we_d_love_to_know_how_we_can_improve">دوست داریم بدانیم چگونه می‌توانیم بهبود یابیم</string>
+    <string name="your_feedback_is_valuable_to_us">بازخورد شما برای ما ارزشمند است</string>
+    <string name="tell_us_what_we_can_do_better">به ما بگویید چه چیزی را می‌توانیم بهتر کنیم...</string>
+    <string name="submit">ارسال</string>
+    <string name="cancel">لغو</string>
+    <string name="terrible">افتضاح</string>
+    <string name="bad">بد</string>
+    <string name="good">خوب</string>
+    <string name="okay">متوسط</string>
+    <string name="excellent">عالی</string>
+    <string name="something_went_wrong">مشکلی پیش آمد</string>
+    <string name="choose_an_email_client">یک کلاینت ایمیل انتخاب کنید</string>
+    <string name="please_enter_feedback">لطفاً بازخورد را   را وارد کنید</string>
+    <string name="done">انجام شد</string>
+    <string name="saved_media">رسانه‌های ذخیره‌شده</string>
+    <string name="no_saved_media_yet">هنوز هیچ رسانه‌ای ذخیره نشده است</string>
+    <string name="your_saved_media_will_appear_here">رسانه‌های ذخیره‌شده شما اینجا ظاهر خواهند شد</string>
+    <string name="delete_saved_media">حذف رسانه‌های ذخیره‌شده</string>
+    <string name="are_you_sure_you_want_to_delete">آیا مطمئن هستید که می‌خواهید حذف کنید؟</string>
+    <string name="delete">حذف</string>
+    <string name="preview">پیش‌نمایش</string>
+    <string name="saved">ذخیره شد</string>
+    <string name="location_permission_not_granted">مجوز موقعیت اعطا نشده است</string>
+    <string name="unable_to_get_current_location">ناتوان در دریافت موقعیت فعلی</string>
+    <string name="top_templates">الگوهای برتر</string>
+    <string name="basic_templates">الگوهای پایه</string>
+</resources>

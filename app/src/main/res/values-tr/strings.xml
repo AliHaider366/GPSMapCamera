@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GPS Kamera - Harita &amp; Coğrafi Etiketleme</string>
+    <string name="gps_camera_non_translatable" translatable="false">GPS Camera</string>
+    <string name="add_note">Not Ekle</string>
+    <string name="add_custom_name">Özel İsim Ekle</string>
+    <string name="date_and_time">Tarih ve saat</string>
+    <string name="day">Gün</string>
+    <string name="hour_minute_second">Saat dakika saniye</string>
+    <string name="_24_hours">24 Saat</string>
+    <string name="decimal">Ondalık</string>
+    <string name="dms">DMS</string>
+    <string name="line_1">Satır 1</string>
+    <string name="line_2">Satır 2</string>
+    <string name="line_3">Satır 3</string>
+    <string name="line_4">Satır 4</string>
+    <string name="file_name">Dosya Adı</string>
+    <string name="select_folder">Klasör Seç</string>
+    <string name="save_original_photos">Orijinal fotoğrafları kaydet</string>
+    <string name="default_">Varsayılan</string>
+    <string name="site_1">Site 1</string>
+    <string name="site_2">Site 2</string>
+    <string name="template">Şablon</string>
+    <string name="environment">Çevre</string>
+    <string name="camera_level">Kamera seviyesi</string>
+    <string name="focus">Odak</string>
+    <string name="templates">Şablonlar</string>
+    <string name="gallery">Galeri</string>
+    <string name="video">Video</string>
+    <string name="photo">Fotoğraf</string>
+    <string name="quick_share">Hızlı Paylaş</string>
+    <string name="_2x" translatable="false">2x</string>
+    <string name="_1x" translatable="false">1x</string>
+    <string name="white">Beyaz</string>
+    <string name="volume">Ses</string>
+    <string name="mirror">Ayna</string>
+    <string name="timer_off">Zamanlayıcı Kapalı</string>
+    <string name="grid">Izgara</string>
+    <string name="ratio">Oran</string>
+    <string name="enter_folder_name">Klasör adı girin</string>
+    <string name="add">Ekle</string>
+
+    <string name="custom_name_1">Özel isim 1</string>
+    <string name="custom_name_2">Özel isim 2</string>
+    <string name="custom_name_3">Özel isim 3</string>
+    <string name="full_address">Tam Adres</string>
+    <string name="latitude_longitude">Enlem/boylam</string>
+    <string name="plus_code">Artı kod</string>
+    <string name="time_zone">Saat dilimi</string>
+    <string name="to_provide_you_with_the_best_learning_experience_we_need_access_to_the_following_features">Size en iyi öğrenme deneyimini sunmak için aşağıdaki özelliklere erişim gerekiyor:</string>
+    <string name="permissions">İzinler</string>
+    <string name="take_photos_for_visual_translations_and_practice">Görsel çeviriler ve pratik için fotoğraf çek</string>
+    <string name="camera">Kamera</string>
+    <string name="allow">İzin Ver</string>
+    <string name="location">Konum</string>
+    <string name="learn_location_specific_phrases_and_vocabulary">Konuma özgü ifadeler ve kelime dağarcığı öğren</string>
+    <string name="photo_gallery">Fotoğraf Galerisi</string>
+    <string name="upload_images_for_translations_and_customization">Çeviriler ve özelleştirme için görüntü yükle</string>
+    <string name="continue_">Devam Et</string>
+    <string name="you_can_change_these_permissions_later_in_your_device_settings">Bu izinleri daha sonra cihaz ayarlarınızda değiştirebilirsiniz</string>
+    <string name="permission_granted">İzin Verildi</string>
+    <string name="permission_denied">İzin Reddedildi</string>
+    <string name="please_enter_folder_name">Lütfen klasör adı girin</string>
+    <string name="failed_to_create_folder">Klasör oluşturulamadı!</string>
+    <string name="please_enter_sequence_number">Lütfen sıra numarası girin</string>
+    <string name="please_enter_custom_name">Lütfen özel isim girin</string>
+    <string name="allowed">İzin Verildi</string>
+
+    <string-array name="aspect_ratios" translatable="false">
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+    <string-array name="grid_options" translatable="false">
+        <item>Off</item>
+        <item>2x2</item>
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
+
+    <string name="basic">Temel</string>
+    <string name="stamp">Damga</string>
+    <string name="weather">Hava Durumu</string>
+    <string name="technical">Teknik</string>
+    <string name="advance_template">Gelişmiş Şablon</string>
+    <string name="classic_template">Klasik Şablon</string>
+    <string name="reporting_template">Raporlama Şablonu</string>
+
+    <string name="next">Sonraki</string>
+    <string name="previous">Önceki</string>
+
+    <string name="reporting_tag">Raporlama Etiketi</string>
+    <string name="date_time"><![CDATA[Tarih & saat]]></string>
+    <string name="map_type">Harita türü</string>
+    <string name="short_address">Kısa adres</string>
+
+    <string name="lat_long">Enlem/boylam</string>
+
+    <string name="person_name">Kişi adı</string>
+    <string name="contact_number">İletişim numarası</string>
+    <string name="wind">Rüzgar</string>
+    <string name="humidity">Nem</string>
+    <string name="pressure">Basınç</string>
+    <string name="compass">Pusula</string>
+    <string name="magnetic_field">Manyetik Alan</string>
+    <string name="altitude">Yükseklik</string>
+    <string name="accuracy">Doğruluk</string>
+    <string name="sound_level">Ses Seviyesi</string>
+    <string name="numbering">Numaralandırma</string>
+    <string name="logo">Logo</string>
+    <string name="note">Not</string>
+    <string name="stamp_settings">Damga Ayarları</string>
+    <string name="font_style">Yazı Tipi Stili</string>
+    <string name="stamp_color">Damga Rengi</string>
+    <string name="stamp_size">Damga Boyutu</string>
+    <string name="stamp_position">Damga Konumu</string>
+    <string name="map_position">Harita Konumu</string>
+    <string name="map_scale">Harita Ölçeği</string>
+    <string name="weather_information">Hava Durumu Bilgileri</string>
+    <string name="technical_details">Teknik Detaylar</string>
+    <string name="basic_information">Temel Bilgiler</string>
+    <string name="additional_details">Ek Detaylar</string>
+    <string name="title">Başlık</string>
+    <string name="enter_here">Buraya Girin</string>
+    <string name="recent_added_reporting_tag">Son eklenen raporlama etiketi</string>
+    <string name="please_enter_tag">Lütfen etiket girin</string>
+    <string name="city">Şehir</string>
+    <string name="state">Eyalet</string>
+    <string name="country">Ülke</string>
+    <string name="pincode">Posta kodu</string>
+    <string name="add_number">Numara Ekle</string>
+    <string name="this_number_will_be_used_for_verification_and_communication">Bu numara doğrulama ve iletişim için kullanılacak.</string>
+    <string name="enter_contact_number">İletişim numarası girin</string>
+    <string name="please_enter_a_phone_number_including_country_code">Lütfen ülke kodu dahil bir telefon numarası girin</string>
+    <string name="please_enter_valid_number">Lütfen geçerli bir numara girin</string>
+    <string name="please_add_number_first">Lütfen önce numara ekleyin</string>
+    <string name="show_note_options_on_capture">Çekimde not seçeneklerini göster</string>
+    <string name="recent_added_note">Son eklenen not</string>
+    <string name="prefix">Ön ek</string>
+    <string name="enter_prefix">Ön ek girin</string>
+    <string name="suffix">Son ek</string>
+    <string name="enter_suffix">Son ek girin</string>
+    <string name="sequence_number">Sıra Numarası</string>
+    <string name="sequence_type">Sıra Türü</string>
+    <string name="reset">Sıfırla</string>
+    <string name="normal">Normal</string>
+    <string name="satellite">Uydu</string>
+    <string name="terrain">Arazi</string>
+    <string name="hybrid">Hibrit</string>
+    <string name="left">Sol</string>
+    <string name="right">Sağ</string>
+    <string name="top">Üst</string>
+    <string name="bottom">Alt</string>
+    <string name="large">Büyük</string>
+    <string name="medium">Orta</string>
+    <string name="small">Küçük</string>
+    <string name="extra_small">Ekstra Küçük</string>
+    <string name="capture_beyond_photos">Fotoğrafların Ötesini Yakala</string>
+    <string name="stamp_it_save_it_share_it">Damgala, Kaydet, Paylaş</string>
+    <string name="your_camera_your_way">Kameran, Senin Tarzın</string>
+    <string name="shoot_like_a_pro">Profesyonel Gibi Çek</string>
+    <string name="select_your_language">Dil Seçin</string>
+    <string name="apply">Uygula</string>
+    <string name="settings">Ayarlar</string>
+    <string name="general">Genel</string>
+    <string name="app_language">Uygulama Dili</string>
+    <string name="image_quality">Görüntü Kalitesi</string>
+    <string name="volume_button">Ses Düğmesi</string>
+    <string name="touch_settings">Dokunmatik Ayarlar</string>
+    <string name="features">Özellikler</string>
+    <string name="watermark">Filigran</string>
+    <string name="qr_detection">QR Algılama</string>
+    <string name="location_share_mode">Konum Paylaşım Modu</string>
+    <string name="front_rear_camera_stamp">Ön/arka kamera damgası</string>
+    <string name="about">Hakkında</string>
+    <string name="rate_us">Bizi Değerlendir</string>
+    <string name="share">Paylaş</string>
+    <string name="privacy_policy">Gizlilik Politikası</string>
+    <string name="which_camera_mode_do_you_use_the_most">En çok hangi kamera modunu kullanıyorsunuz?</string>
+    <string name="high_quality_still_images">Yüksek kaliteli sabit görüntüler</string>
+    <string name="hd_and_4k_video_recording">HD ve 4K video kaydı</string>
+    <string name="instant_capture_and_share">Anında çekim ve paylaşım</string>
+    <string name="choose_your_default_photo_ratio">Varsayılan fotoğraf oranınızı seçin</string>
+    <string name="_16_9_wide">16:9 (Geniş)</string>
+    <string name="perfect_for_videos_and_cinematic_photos">Videolar ve sinematik fotoğraflar için mükemmel</string>
+    <string name="_16_9_preview">16:9 Önizleme</string>
+    <string name="_4_3_preview">4:3 Önizleme</string>
+    <string name="_4_3_standard">4:3 (Standart)</string>
+    <string name="classic_photo_format_for_most_cameras">Çoğu kamera için klasik fotoğraf formatı</string>
+    <string name="how_do_you_prefer_to_tag_your_location">Konumunuzu nasıl etiketlemeyi tercih edersiniz?</string>
+    <string name="gps_automatic">GPS (otomatik)</string>
+    <string name="use_your_device_s_location_to_automatically_tag_photos">Fotoğrafları otomatik olarak etiketlemek için cihazınızın konumunu kullan</string>
+    <string name="manual_entry">Manuel giriş</string>
+    <string name="type_in_your_location_when_saving_photos">Fotoğrafları kaydederken konumunuzu yazın</string>
+    <string name="do_not_tag">Etiketleme</string>
+    <string name="no_location_information_will_be_added_to_photos">Fotoğraflara konum bilgisi eklenmeyecek</string>
+    <string name="classic">Klasik</string>
+    <string name="modern">Modern</string>
+    <string name="minimal">Minimal</string>
+    <string name="vintage">Vintage</string>
+    <string name="bold">Kalın</string>
+    <string name="select_your_preferred_stamp_template">Tercih ettiğiniz damga şablonunu seçin</string>
+    <string name="timer_3sec">Zamanlayıcı 3sn</string>
+    <string name="timer_5sec">Zamanlayıcı 5sn</string>
+    <string name="version">Sürüm</string>
+    <string name="low">Düşük</string>
+    <string name="high">Yüksek</string>
+    <string name="photo_capture">Fotoğraf Çekimi</string>
+    <string name="grid_3_3" translatable="false">Grid 3*3</string>
+    <string name="grid_4_4" translatable="false">Grid 4*4</string>
+    <string name="grid_phi" translatable="false">Grid PHI</string>
+
+    <string name="tap_again_to_exit">Çıkmak için tekrar dokunun</string>
+    <string name="volume_on">Ses Açık</string>
+    <string name="volume_off">Ses Kapalı</string>
+    <string name="please_enter_note">Lütfen not girin</string>
+    <string name="please_enter_text_first">Lütfen önce metin girin</string>
+    <string name="capture_photo">Fotoğraf çek</string>
+    <string name="zoom">Yakınlaştır</string>
+    <string name="r">K</string>
+    <string name="g">Y</string>
+    <string name="b">M</string>
+    <string name="saturation">Doygunluk</string>
+    <string name="hue">Renk Tonu</string>
+    <string name="copy">Kopyala</string>
+    <string name="hex">HEX</string>
+    <string name="color">Renk</string>
+    <string name="bg_color">Arka Plan Rengi</string>
+    <string name="fonts">Yazı Tipleri</string>
+    <string name="style">Stil</string>
+    <string name="alignment">Hizalama</string>
+    <string name="add_manual_location">Manuel konum ekle</string>
+    <string name="latitude">Enlem</string>
+    <string name="longitude">Boylam</string>
+    <string name="range_in_meters">Menzil (metre cinsinden)</string>
+    <string name="address">Adres</string>
+    <string name="current_location">Geçerli Konum</string>
+    <string name="manual_location">Manuel Konum</string>
+    <string name="gps_camera">GPS Kamera</string>
+    <string name="home_camera_desc">GPS verileriyle çekim yap</string>
+    <string name="share_media_instantly">Medyayı anında paylaş</string>
+    <string name="record_with_gps_watermark">GPS filigranıyla kaydet</string>
+    <string name="gps_watermark_templates">GPS filigran şablonları</string>
+    <string name="captured_photos_videos">Çekilen fotoğraflar &amp; videolar</string>
+    <string name="saved_data">Kaydedilen Veriler</string>
+    <string name="do_you_really_want_to_exit">Gerçekten çıkmak istiyor musunuz?</string>
+    <string name="before_you_go_explore_these_amazing_features">Ayrılmadan önce bu harika özellikleri keşfedin!</string>
+    <string name="continue_using_app">Uygulamayı Kullanmaya Devam Et</string>
+    <string name="exit_app">Uygulamadan Çık</string>
+    <string name="enjoying_the_app">Uygulamadan memnun musunuz?</string>
+    <string name="your_feedback_helps_us_improve">Geri bildiriminiz bize yardımcı olur!</string>
+    <string name="rate_on_play_store">Play Store’da Değerlendir</string>
+    <string name="maybe_later">Belki Sonra</string>
+    <string name="add_quick_tags_to_your_images">Görüntülerinize hızlı etiketler ekleyin</string>
+    <string name="stamp_your_photo_with_location_and_time_zone">Fotoğrafınızı konum ve saat dilimi ile damgalayın</string>
+    <string name="we_d_love_to_know_how_we_can_improve">Neleri geliştirebileceğimizi öğrenmek isteriz</string>
+    <string name="your_feedback_is_valuable_to_us">Geri bildiriminiz bizim için değerli</string>
+    <string name="tell_us_what_we_can_do_better">Bize neyi daha iyi yapabileceğimizi söyleyin...</string>
+    <string name="submit">Gönder</string>
+    <string name="cancel">İptal</string>
+    <string name="terrible">Berbat</string>
+    <string name="bad">Kötü</string>
+    <string name="good">İyi</string>
+    <string name="okay">Tamam</string>
+    <string name="excellent">Mükemmel</string>
+    <string name="something_went_wrong">Bir şeyler ters gitti</string>
+    <string name="choose_an_email_client">Bir e-posta istemcisi seçin</string>
+    <string name="please_enter_feedback">Lütfen geri bildirim girin</string>
+    <string name="done">Tamamlandı</string>
+    <string name="saved_media">Kaydedilen Medya</string>
+    <string name="no_saved_media_yet">Henüz kaydedilmiş medya yok</string>
+    <string name="your_saved_media_will_appear_here">Kaydedilen medyanız burada görünecek</string>
+    <string name="delete_saved_media">Kaydedilen Medyayı Sil</string>
+    <string name="are_you_sure_you_want_to_delete">Silmek istediğinizden emin misiniz?</string>
+    <string name="delete">Sil</string>
+    <string name="preview">Önizleme</string>
+    <string name="saved">Kaydedildi</string>
+    <string name="location_permission_not_granted">Konum izni verilmedi</string>
+    <string name="unable_to_get_current_location">Geçerli konum alınamıyor</string>
+    <string name="top_templates">En İyi Şablonlar</string>
+    <string name="basic_templates">Temel Şablonlar</string>
+</resources>

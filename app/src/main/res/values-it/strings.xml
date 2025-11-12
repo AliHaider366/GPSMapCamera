@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fotocamera GPS - Mappa &amp; Geotagging</string>
+    <string name="gps_camera_non_translatable" translatable="false">GPS Camera</string>
+    <string name="add_note">Aggiungi nota</string>
+    <string name="add_custom_name">Aggiungi nome personalizzato</string>
+    <string name="date_and_time">Data e ora</string>
+    <string name="day">Giorno</string>
+    <string name="hour_minute_second">Ora minuto secondo</string>
+    <string name="_24_hours">24 ore</string>
+    <string name="decimal">Decimale</string>
+    <string name="dms">DMS</string>
+    <string name="line_1">Riga 1</string>
+    <string name="line_2">Riga 2</string>
+    <string name="line_3">Riga 3</string>
+    <string name="line_4">Riga 4</string>
+    <string name="file_name">Nome file</string>
+    <string name="select_folder">Seleziona cartella</string>
+    <string name="save_original_photos">Salva foto originali</string>
+    <string name="default_">Predefinito</string>
+    <string name="site_1">Sito 1</string>
+    <string name="site_2">Sito 2</string>
+    <string name="template">Modello</string>
+    <string name="environment">Ambiente</string>
+    <string name="camera_level">Livello fotocamera</string>
+    <string name="focus">Messa a fuoco</string>
+    <string name="templates">Modelli</string>
+    <string name="gallery">Galleria</string>
+    <string name="video">Video</string>
+    <string name="photo">Foto</string>
+    <string name="quick_share">Condivisione rapida</string>
+    <string name="_2x" translatable="false">2x</string>
+    <string name="_1x" translatable="false">1x</string>
+    <string name="white">Bianco</string>
+    <string name="volume">Volume</string>
+    <string name="mirror">Specchio</string>
+    <string name="timer_off">Timer disattivato</string>
+    <string name="grid">Griglia</string>
+    <string name="ratio">Proporzioni</string>
+    <string name="enter_folder_name">Inserisci nome cartella</string>
+    <string name="add">Aggiungi</string>
+
+    <string name="custom_name_1">Nome personalizzato 1</string>
+    <string name="custom_name_2">Nome personalizzato 2</string>
+    <string name="custom_name_3">Nome personalizzato 3</string>
+    <string name="full_address">Indirizzo completo</string>
+    <string name="latitude_longitude">Latitudine/longitudine</string>
+    <string name="plus_code">Codice Plus</string>
+    <string name="time_zone">Fuso orario</string>
+    <string name="to_provide_you_with_the_best_learning_experience_we_need_access_to_the_following_features">Per offrirti la migliore esperienza di apprendimento, abbiamo bisogno dell’accesso alle seguenti funzionalità:</string>
+    <string name="permissions">Permessi</string>
+    <string name="take_photos_for_visual_translations_and_practice">Scatta foto per traduzioni visive e pratica</string>
+    <string name="camera">Fotocamera</string>
+    <string name="allow">Consenti</string>
+    <string name="location">Posizione</string>
+    <string name="learn_location_specific_phrases_and_vocabulary">Impara frasi e vocabolario specifici per la posizione</string>
+    <string name="photo_gallery">Galleria foto</string>
+    <string name="upload_images_for_translations_and_customization">Carica immagini per traduzioni e personalizzazioni</string>
+    <string name="continue_">Continua</string>
+    <string name="you_can_change_these_permissions_later_in_your_device_settings">Puoi modificare questi permessi in seguito nelle impostazioni del dispositivo</string>
+    <string name="permission_granted">Permesso concesso</string>
+    <string name="permission_denied">Permesso negato</string>
+    <string name="please_enter_folder_name">Inserisci il nome della cartella</string>
+    <string name="failed_to_create_folder">Impossibile creare la cartella!</string>
+    <string name="please_enter_sequence_number">Inserisci il numero di sequenza</string>
+    <string name="please_enter_custom_name">Inserisci il nome personalizzato</string>
+    <string name="allowed">Consentito</string>
+
+    <string-array name="aspect_ratios" translatable="false">
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+    <string-array name="grid_options" translatable="false">
+        <item>Off</item>
+        <item>2x2</item>
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
+
+    <string name="basic">Base</string>
+    <string name="stamp">Timbro</string>
+    <string name="weather">Meteo</string>
+    <string name="technical">Tecnico</string>
+    <string name="advance_template">Modello avanzato</string>
+    <string name="classic_template">Modello classico</string>
+    <string name="reporting_template">Modello di reporting</string>
+
+    <string name="next">Successivo</string>
+    <string name="previous">Precedente</string>
+
+    <string name="reporting_tag">Tag di reporting</string>
+    <string name="date_time"><![CDATA[Data & ora]]></string>
+    <string name="map_type">Tipo di mappa</string>
+    <string name="short_address">Indirizzo breve</string>
+
+    <string name="lat_long">Lat/long</string>
+
+    <string name="person_name">Nome persona</string>
+    <string name="contact_number">Numero di contatto</string>
+    <string name="wind">Vento</string>
+    <string name="humidity">Umidità</string>
+    <string name="pressure">Pressione</string>
+    <string name="compass">Bussola</string>
+    <string name="magnetic_field">Campo magnetico</string>
+    <string name="altitude">Altitudine</string>
+    <string name="accuracy">Precisione</string>
+    <string name="sound_level">Livello sonoro</string>
+    <string name="numbering">Numerazione</string>
+    <string name="logo">Logo</string>
+    <string name="note">Nota</string>
+    <string name="stamp_settings">Impostazioni timbro</string>
+    <string name="font_style">Stile del carattere</string>
+    <string name="stamp_color">Colore timbro</string>
+    <string name="stamp_size">Dimensione timbro</string>
+    <string name="stamp_position">Posizione timbro</string>
+    <string name="map_position">Posizione mappa</string>
+    <string name="map_scale">Scala mappa</string>
+    <string name="weather_information">Informazioni meteo</string>
+    <string name="technical_details">Dettagli tecnici</string>
+    <string name="basic_information">Informazioni di base</string>
+    <string name="additional_details">Dettagli aggiuntivi</string>
+    <string name="title">Titolo</string>
+    <string name="enter_here">Inserisci qui</string>
+    <string name="recent_added_reporting_tag">Tag di reporting aggiunto di recente</string>
+    <string name="please_enter_tag">Inserisci il tag</string>
+    <string name="city">Città</string>
+    <string name="state">Stato</string>
+    <string name="country">Paese</string>
+    <string name="pincode">Codice postale</string>
+    <string name="add_number">Aggiungi numero</string>
+    <string name="this_number_will_be_used_for_verification_and_communication">Questo numero sarà utilizzato per verifica e comunicazione</string>
+    <string name="enter_contact_number">Inserisci numero di contatto</string>
+    <string name="please_enter_a_phone_number_including_country_code">Inserisci un numero di telefono con il prefisso internazionale</string>
+    <string name="please_enter_valid_number">Inserisci un numero valido</string>
+    <string name="please_add_number_first">Aggiungi prima il numero</string>
+    <string name="show_note_options_on_capture">Mostra opzioni nota durante la cattura</string>
+    <string name="recent_added_note">Nota aggiunta di recente</string>
+    <string name="prefix">Prefisso</string>
+    <string name="enter_prefix">Inserisci prefisso</string>
+    <string name="suffix">Suffisso</string>
+    <string name="enter_suffix">Inserisci suffisso</string>
+    <string name="sequence_number">Numero di sequenza</string>
+    <string name="sequence_type">Tipo di sequenza</string>
+    <string name="reset">Ripristina</string>
+    <string name="normal">Normale</string>
+    <string name="satellite">Satellite</string>
+    <string name="terrain">Terreno</string>
+    <string name="hybrid">Ibrido</string>
+    <string name="left">Sinistra</string>
+    <string name="right">Destra</string>
+    <string name="top">Alto</string>
+    <string name="bottom">Basso</string>
+    <string name="large">Grande</string>
+    <string name="medium">Medio</string>
+    <string name="small">Piccolo</string>
+    <string name="extra_small">Extra piccolo</string>
+    <string name="capture_beyond_photos">Cattura oltre le foto</string>
+    <string name="stamp_it_save_it_share_it">Timbra, salva, condividi</string>
+    <string name="your_camera_your_way">La tua fotocamera, a modo tuo</string>
+    <string name="shoot_like_a_pro">Scatta come un professionista</string>
+    <string name="select_your_language">Seleziona la tua lingua</string>
+    <string name="apply">Applica</string>
+    <string name="settings">Impostazioni</string>
+    <string name="general">Generale</string>
+    <string name="app_language">Lingua dell’app</string>
+    <string name="image_quality">Qualità immagine</string>
+    <string name="volume_button">Pulsante volume</string>
+    <string name="touch_settings">Impostazioni touch</string>
+    <string name="features">Funzionalità</string>
+    <string name="watermark">Filigrana</string>
+    <string name="qr_detection">Rilevamento QR</string>
+    <string name="location_share_mode">Modalità condivisione posizione</string>
+    <string name="front_rear_camera_stamp">Timbro fotocamera anteriore/posteriore</string>
+    <string name="about">Informazioni</string>
+    <string name="rate_us">Valutaci</string>
+    <string name="share">Condividi</string>
+    <string name="privacy_policy">Informativa sulla privacy</string>
+    <string name="which_camera_mode_do_you_use_the_most">Quale modalità della fotocamera usi di più?</string>
+    <string name="high_quality_still_images">Immagini fisse di alta qualità</string>
+    <string name="hd_and_4k_video_recording">Registrazione video HD e 4K</string>
+    <string name="instant_capture_and_share">Cattura e condivisione istantanea</string>
+    <string name="choose_your_default_photo_ratio">Scegli il rapporto foto predefinito</string>
+    <string name="_16_9_wide">16:9 (Largo)</string>
+    <string name="perfect_for_videos_and_cinematic_photos">Perfetto per video e foto cinematografiche</string>
+    <string name="_16_9_preview">Anteprima 16:9</string>
+    <string name="_4_3_preview">Anteprima 4:3</string>
+    <string name="_4_3_standard">4:3 (Standard)</string>
+    <string name="classic_photo_format_for_most_cameras">Formato foto classico per la maggior parte delle fotocamere</string>
+    <string name="how_do_you_prefer_to_tag_your_location">Come preferisci taggare la tua posizione?</string>
+    <string name="gps_automatic">GPS (automatico)</string>
+    <string name="use_your_device_s_location_to_automatically_tag_photos">Usa la posizione del dispositivo per taggare automaticamente le foto</string>
+    <string name="manual_entry">Inserimento manuale</string>
+    <string name="type_in_your_location_when_saving_photos">Digita la tua posizione quando salvi le foto</string>
+    <string name="do_not_tag">Non taggare</string>
+    <string name="no_location_information_will_be_added_to_photos">Nessuna informazione sulla posizione verrà aggiunta alle foto</string>
+    <string name="classic">Classico</string>
+    <string name="modern">Moderno</string>
+    <string name="minimal">Minimal</string>
+    <string name="vintage">Vintage</string>
+    <string name="bold">Grassetto</string>
+    <string name="select_your_preferred_stamp_template">Seleziona il modello di timbro preferito</string>
+    <string name="timer_3sec">Timer 3 secondi</string>
+    <string name="timer_5sec">Timer 5 secondi</string>
+    <string name="version">Versione</string>
+    <string name="low">Basso</string>
+    <string name="high">Alto</string>
+    <string name="photo_capture">Cattura foto</string>
+    <string name="grid_3_3" translatable="false">Grid 3*3</string>
+    <string name="grid_4_4" translatable="false">Grid 4*4</string>
+    <string name="grid_phi" translatable="false">Grid PHI</string>
+
+    <string name="tap_again_to_exit">Tocca di nuovo per uscire</string>
+    <string name="volume_on">Volume attivo</string>
+    <string name="volume_off">Volume disattivato</string>
+    <string name="please_enter_note">Inserisci la nota</string>
+    <string name="please_enter_text_first">Inserisci prima il testo</string>
+    <string name="capture_photo">Scatta foto</string>
+    <string name="zoom">Zoom</string>
+    <string name="r">R</string>
+    <string name="g">G</string>
+    <string name="b">B</string>
+    <string name="saturation">Saturazione</string>
+    <string name="hue">Tonalità</string>
+    <string name="copy">Copia</string>
+    <string name="hex">HEX</string>
+    <string name="color">Colore</string>
+    <string name="bg_color">Colore di sfondo</string>
+    <string name="fonts">Caratteri</string>
+    <string name="style">Stile</string>
+    <string name="alignment">Allineamento</string>
+    <string name="add_manual_location">Aggiungi posizione manuale</string>
+    <string name="latitude">Latitudine</string>
+    <string name="longitude">Longitudine</string>
+    <string name="range_in_meters">Portata (in metri)</string>
+    <string name="address">Indirizzo</string>
+    <string name="current_location">Posizione attuale</string>
+    <string name="manual_location">Posizione manuale</string>
+    <string name="gps_camera">Fotocamera GPS</string>
+    <string name="home_camera_desc">Scatta con dati GPS</string>
+    <string name="share_media_instantly">Condividi media istantaneamente</string>
+    <string name="record_with_gps_watermark">Registra con filigrana GPS</string>
+    <string name="gps_watermark_templates">Modelli filigrana GPS</string>
+    <string name="captured_photos_videos">Foto e video catturati</string>
+    <string name="saved_data">Dati salvati</string>
+    <string name="do_you_really_want_to_exit">Vuoi davvero uscire?</string>
+    <string name="before_you_go_explore_these_amazing_features">Prima di andare, esplora queste fantastiche funzionalità!</string>
+    <string name="continue_using_app">Continua a usare l’app</string>
+    <string name="exit_app">Esci dall’app</string>
+    <string name="enjoying_the_app">Ti piace l’app?</string>
+    <string name="your_feedback_helps_us_improve">Il tuo feedback ci aiuta a migliorare!</string>
+    <string name="rate_on_play_store">Valuta su Play Store</string>
+    <string name="maybe_later">Forse dopo</string>
+    <string name="add_quick_tags_to_your_images">Aggiungi tag rapidi alle tue immagini</string>
+    <string name="stamp_your_photo_with_location_and_time_zone">Timbra la tua foto con posizione e fuso orario</string>
+    <string name="we_d_love_to_know_how_we_can_improve">Ci piacerebbe sapere come possiamo migliorare</string>
+    <string name="your_feedback_is_valuable_to_us">Il tuo feedback è prezioso per noi</string>
+    <string name="tell_us_what_we_can_do_better">Dicci cosa possiamo fare meglio...</string>
+    <string name="submit">Invia</string>
+    <string name="cancel">Annulla</string>
+    <string name="terrible">Terribile</string>
+    <string name="bad">Cattivo</string>
+    <string name="good">Buono</string>
+    <string name="okay">Ok</string>
+    <string name="excellent">Eccellente</string>
+    <string name="something_went_wrong">Qualcosa è andato storto</string>
+    <string name="choose_an_email_client">Scegli un client email</string>
+    <string name="please_enter_feedback">Inserisci il feedback</string>
+    <string name="done">Fatto</string>
+    <string name="saved_media">Media salvati</string>
+    <string name="no_saved_media_yet">Nessun media salvato ancora</string>
+    <string name="your_saved_media_will_appear_here">I tuoi media salvati appariranno qui</string>
+    <string name="delete_saved_media">Elimina media salvati</string>
+    <string name="are_you_sure_you_want_to_delete">Sei sicuro di voler eliminare?</string>
+    <string name="delete">Elimina</string>
+    <string name="preview">Anteprima</string>
+    <string name="saved">Salvato</string>
+    <string name="location_permission_not_granted">Permesso posizione non concesso</string>
+    <string name="unable_to_get_current_location">Impossibile ottenere la posizione attuale</string>
+    <string name="top_templates">Modelli principali</string>
+    <string name="basic_templates">Modelli di base</string>
+</resources>

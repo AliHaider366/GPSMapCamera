@@ -700,6 +700,7 @@ class CameraManager(
 
     fun takePhotoWithStamp(
         stampContainer: ConstraintLayout,
+        textContainer : FrameLayout,
         stampPosition : StampCameraPosition = StampCameraPosition.TOP,
         onSaved: (Uri?) -> Unit
     ) {
@@ -733,9 +734,10 @@ class CameraManager(
 
                         // --- render stamp container ---
                         val stampBitmap = getViewBitmap(stampContainer)
+                        val textBitmap = getViewBitmap(textContainer)
 
                         // --- merge both bitmaps ---
-                        val mergedBitmap = mergeBitmaps(cameraBitmap, stampBitmap,stampPosition)
+                        val mergedBitmap = mergeBitmaps(cameraBitmap, stampBitmap,stampPosition, textBitmap)
 
                         // save
                         val filename = appViewModel.fileNameFromPattern()
@@ -767,6 +769,7 @@ class CameraManager(
         camera: Bitmap,
         overlay: Bitmap,
         position: StampCameraPosition = StampCameraPosition.TOP,
+        thirdBitmap: Bitmap? = null
     ): Bitmap {
         val result = camera.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = android.graphics.Canvas(result)
@@ -778,21 +781,36 @@ class CameraManager(
             context.resources.displayMetrics
         ).toInt()
 
-        // Scale overlay to match width of camera
+        val x = marginPx.toFloat()
+
+        // --- Draw third bitmap first (behind the overlay) ---
+        thirdBitmap?.let { third ->
+            val scaledThird = Bitmap.createScaledBitmap(
+                third,
+                camera.width - (marginPx * 2),
+                third.height * (camera.width - marginPx * 2) / third.width,
+                true
+            )
+
+            val thirdY = (camera.height - scaledThird.height - marginPx).toFloat()
+            canvas.drawBitmap(scaledThird, x, thirdY, null)
+        }
+
+        // --- Then draw overlay bitmap (in front) ---
         val scaledOverlay = Bitmap.createScaledBitmap(
             overlay,
-            camera.width - (marginPx * 2), // subtract horizontal margins
-            overlay.height * (camera.width - marginPx * 2) / overlay.width, // keep ratio
+            camera.width - (marginPx * 2),
+            overlay.height * (camera.width - marginPx * 2) / overlay.width,
             true
         )
 
-        val x = marginPx.toFloat()
         val y = when (position) {
             StampCameraPosition.TOP -> marginPx.toFloat()
             StampCameraPosition.BOTTOM -> (camera.height - scaledOverlay.height - marginPx).toFloat()
         }
 
         canvas.drawBitmap(scaledOverlay, x, y, null)
+
         return result
     }
 
@@ -827,6 +845,7 @@ class CameraManager(
         seconds: Int,
         countdownText: TextView,
         stampContainer: ConstraintLayout,
+        textContainer: FrameLayout,
         stampPosition : StampCameraPosition = StampCameraPosition.TOP,
         onSaved: (Uri?) -> Unit
     ) {
@@ -845,7 +864,7 @@ class CameraManager(
                     countdownText.text = ""
 
                     // 🚀 Capture with stamp
-                    takePhotoWithStamp(stampContainer, stampPosition,onSaved)
+                    takePhotoWithStamp(stampContainer,textContainer, stampPosition,onSaved)
                 }
             }
         }
@@ -855,6 +874,7 @@ class CameraManager(
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun startVideoRecordingWithStamp(
         stampContainer: ConstraintLayout,
+        textContainer: FrameLayout,
         stampPosition: StampCameraPosition = StampCameraPosition.TOP,
         onStarted: () -> Unit,
         onSaved: (Uri) -> Unit,
@@ -890,6 +910,7 @@ class CameraManager(
             videoRecorder = FastVideoRecorder(
                 previewView = previewView,
                 stampContainer = stampContainer,
+                textContainer = textContainer,
                 stampPosition = stampPosition,
                 width = width,
                 height = height,

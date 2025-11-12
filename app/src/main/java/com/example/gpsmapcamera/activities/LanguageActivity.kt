@@ -53,7 +53,7 @@ class LanguageActivity : BaseActivity() {
             add(Language("nl", "Nederlands", "Dutch", "NL"))
 
             // New additions
-            add(Language("ja", "日本語", "Japanese", "JP"))
+                add(Language("ja", "日本語", "Japanese", "JP"))
             add(Language("tr", "Türkçe", "Turkish", "TR"))
             add(Language("th", "ไทย", "Thai", "TH"))
             add(Language("vi", "Tiếng Việt", "Vietnamese", "VN"))

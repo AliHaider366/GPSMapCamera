@@ -26,6 +26,7 @@ import java.io.File
 class FastVideoRecorder(
     private val previewView: PreviewView,
     private val stampContainer: ConstraintLayout,
+    private val textContainer: FrameLayout,
     private val stampPosition: StampCameraPosition,
     private val width: Int,
     private val height: Int,
@@ -40,6 +41,7 @@ class FastVideoRecorder(
     private var drawingHandler: Handler? = null
     private var drawingRunnable: Runnable? = null
     private var stampBitmap: Bitmap? = null
+    private var textBitmap: Bitmap? = null
 
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     fun startRecording() {
@@ -70,6 +72,17 @@ class FastVideoRecorder(
                 true
             )
         }
+        textBitmap = getViewBitmap(textContainer)?.let { original ->
+            Log.e(TAG, "initializeStampBitmap")
+
+            Bitmap.createScaledBitmap(
+                original,
+                width,
+                original.height * width / original.width,
+                true
+            )
+
+        }
     }
 
     private fun startDrawingLoop() {
@@ -90,6 +103,11 @@ class FastVideoRecorder(
                     }
 
                     // Draw stamp overlay (reuse pre-scaled bitmap)
+                    textBitmap?.let {
+                        val y = (height - it.height).toFloat() // bottom
+                        canvas.drawBitmap(it, 0f, y, null)
+                    }
+
                     stampBitmap?.let {
                         val y = when (stampPosition) {
                             StampCameraPosition.TOP -> 0f
@@ -212,32 +230,6 @@ class FastVideoRecorder(
         }
     }
 
-    private fun drawStampOverlay(canvas: Canvas) {
-        try {
-            // Create a bitmap from the stamp container
-            val stampBitmap = getViewBitmap(stampContainer)
-
-            if (stampBitmap != null) {
-                // Scale the stamp to fit the video width
-                val scaledStamp = Bitmap.createScaledBitmap(
-                    stampBitmap,
-                    width,
-                    stampBitmap.height * width / stampBitmap.width,
-                    true
-                )
-
-                // Calculate position based on stamp position
-                val y = when (stampPosition) {
-                    StampCameraPosition.TOP -> 0f
-                    StampCameraPosition.BOTTOM -> (height - scaledStamp.height).toFloat()
-                }
-
-                canvas.drawBitmap(scaledStamp, 0f, y, null)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error drawing stamp overlay", e)
-        }
-    }
 
     private fun getViewBitmap(view: View): Bitmap? {
         return try {
@@ -246,6 +238,7 @@ class FastVideoRecorder(
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bitmap)
             view.draw(canvas)
+            Log.e(TAG, "getViewBitmap")
             bitmap
         } catch (e: Exception) {
             Log.e(TAG, "Error creating view bitmap", e)

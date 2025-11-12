@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Máy ảnh GPS - Bản đồ &amp; Gắn thẻ địa lý</string>
+    <string name="gps_camera_non_translatable" translatable="false">GPS Camera</string>
+    <string name="add_note">Thêm ghi chú</string>
+    <string name="add_custom_name">Thêm tên tùy chỉnh</string>
+    <string name="date_and_time">Ngày và giờ</string>
+    <string name="day">Ngày</string>
+    <string name="hour_minute_second">Giờ phút giây</string>
+    <string name="_24_hours">24 Giờ</string>
+    <string name="decimal">Thập phân</string>
+    <string name="dms">DMS</string>
+    <string name="line_1">Dòng 1</string>
+    <string name="line_2">Dòng 2</string>
+    <string name="line_3">Dòng 3</string>
+    <string name="line_4">Dòng 4</string>
+    <string name="file_name">Tên tệp</string>
+    <string name="select_folder">Chọn thư mục</string>
+    <string name="save_original_photos">Lưu ảnh gốc</string>
+    <string name="default_">Mặc định</string>
+    <string name="site_1">Địa điểm 1</string>
+    <string name="site_2">Địa điểm 2</string>
+    <string name="template">Mẫu</string>
+    <string name="environment">Môi trường</string>
+    <string name="camera_level">Mức máy ảnh</string>
+    <string name="focus">Lấy nét</string>
+    <string name="templates">Mẫu</string>
+    <string name="gallery">Thư viện</string>
+    <string name="video">Video</string>
+    <string name="photo">Ảnh</string>
+    <string name="quick_share">Chia sẻ nhanh</string>
+    <string name="_2x" translatable="false">2x</string>
+    <string name="_1x" translatable="false">1x</string>
+    <string name="white">Trắng</string>
+    <string name="volume">Âm lượng</string>
+    <string name="mirror">Gương</string>
+    <string name="timer_off">Tắt hẹn giờ</string>
+    <string name="grid">Lưới</string>
+    <string name="ratio">Tỷ lệ</string>
+    <string name="enter_folder_name">Nhập tên thư mục</string>
+    <string name="add">Thêm</string>
+
+    <string name="custom_name_1">Tên tùy chỉnh 1</string>
+    <string name="custom_name_2">Tên tùy chỉnh 2</string>
+    <string name="custom_name_3">Tên tùy chỉnh 3</string>
+    <string name="full_address">Địa chỉ đầy đủ</string>
+    <string name="latitude_longitude">Vĩ độ/Kinh độ</string>
+    <string name="plus_code">Mã Plus</string>
+    <string name="time_zone">Múi giờ</string>
+    <string name="to_provide_you_with_the_best_learning_experience_we_need_access_to_the_following_features">Để mang đến trải nghiệm học tập tốt nhất, chúng tôi cần quyền truy cập vào các tính năng sau:</string>
+    <string name="permissions">Quyền</string>
+    <string name="take_photos_for_visual_translations_and_practice">Chụp ảnh để dịch hình ảnh và luyện tập</string>
+    <string name="camera">Máy ảnh</string>
+    <string name="allow">Cho phép</string>
+    <string name="location">Vị trí</string>
+    <string name="learn_location_specific_phrases_and_vocabulary">Học các cụm từ và từ vựng đặc thù theo vị trí</string>
+    <string name="photo_gallery">Thư viện ảnh</string>
+    <string name="upload_images_for_translations_and_customization">Tải ảnh lên để dịch và tùy chỉnh</string>
+    <string name="continue_">Tiếp tục</string>
+    <string name="you_can_change_these_permissions_later_in_your_device_settings">Bạn có thể thay đổi các quyền này sau trong cài đặt thiết bị</string>
+    <string name="permission_granted">Quyền được cấp</string>
+    <string name="permission_denied">Quyền bị từ chối</string>
+    <string name="please_enter_folder_name">Vui lòng nhập tên thư mục</string>
+    <string name="failed_to_create_folder">Không thể tạo thư mục!</string>
+    <string name="please_enter_sequence_number">Vui lòng nhập số thứ tự</string>
+    <string name="please_enter_custom_name">Vui lòng nhập tên tùy chỉnh</string>
+    <string name="allowed">Được phép</string>
+
+    <string-array name="aspect_ratios" translatable="false">
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+    <string-array name="grid_options" translatable="false">
+        <item>Off</item>
+        <item>2x2</item>
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
+
+    <string name="basic">Cơ bản</string>
+    <string name="stamp">Dấu</string>
+    <string name="weather">Thời tiết</string>
+    <string name="technical">Kỹ thuật</string>
+    <string name="advance_template">Mẫu nâng cao</string>
+    <string name="classic_template">Mẫu cổ điển</string>
+    <string name="reporting_template">Mẫu báo cáo</string>
+
+    <string name="next">Tiếp theo</string>
+    <string name="previous">Trước đó</string>
+
+    <string name="reporting_tag">Thẻ báo cáo</string>
+    <string name="date_time"><![CDATA[Ngày & giờ]]></string>
+    <string name="map_type">Loại bản đồ</string>
+    <string name="short_address">Địa chỉ ngắn</string>
+
+    <string name="lat_long">Vĩ độ/Kinh độ</string>
+
+    <string name="person_name">Tên người</string>
+    <string name="contact_number">Số liên hệ</string>
+    <string name="wind">Gió</string>
+    <string name="humidity">Độ ẩm</string>
+    <string name="pressure">Áp suất</string>
+    <string name="compass">La bàn</string>
+    <string name="magnetic_field">Từ trường</string>
+    <string name="altitude">Độ cao</string>
+    <string name="accuracy">Độ chính xác</string>
+    <string name="sound_level">Mức âm thanh</string>
+    <string name="numbering">Đánh số</string>
+    <string name="logo">Logo</string>
+    <string name="note">Ghi chú</string>
+    <string name="stamp_settings">Cài đặt dấu</string>
+    <string name="font_style">Kiểu phông chữ</string>
+    <string name="stamp_color">Màu dấu</string>
+    <string name="stamp_size">Kích thước dấu</string>
+    <string name="stamp_position">Vị trí dấu</string>
+    <string name="map_position">Vị trí bản đồ</string>
+    <string name="map_scale">Tỷ lệ bản đồ</string>
+    <string name="weather_information">Thông tin thời tiết</string>
+    <string name="technical_details">Chi tiết kỹ thuật</string>
+    <string name="basic_information">Thông tin cơ bản</string>
+    <string name="additional_details">Chi tiết bổ sung</string>
+    <string name="title">Tiêu đề</string>
+    <string name="enter_here">Nhập tại đây</string>
+    <string name="recent_added_reporting_tag">Thẻ báo cáo vừa thêm</string>
+    <string name="please_enter_tag">Vui lòng nhập thẻ</string>
+    <string name="city">Thành phố</string>
+    <string name="state">Bang</string>
+    <string name="country">Quốc gia</string>
+    <string name="pincode">Mã bưu điện</string>
+    <string name="add_number">Thêm số</string>
+    <string name="this_number_will_be_used_for_verification_and_communication">Số này sẽ được sử dụng để xác minh và liên lạc</string>
+    <string name="enter_contact_number">Nhập số liên hệ</string>
+    <string name="please_enter_a_phone_number_including_country_code">Vui lòng nhập số điện thoại bao gồm mã quốc gia</string>
+    <string name="please_enter_valid_number">Vui lòng nhập số hợp lệ</string>
+    <string name="please_add_number_first">Vui lòng thêm số trước</string>
+    <string name="show_note_options_on_capture">Hiển thị tùy chọn ghi chú khi chụp</string>
+    <string name="recent_added_note">Ghi chú vừa thêm</string>
+    <string name="prefix">Tiền tố</string>
+    <string name="enter_prefix">Nhập tiền tố</string>
+    <string name="suffix">Hậu tố</string>
+    <string name="enter_suffix">Nhập hậu tố</string>
+    <string name="sequence_number">Số thứ tự</string>
+    <string name="sequence_type">Loại thứ tự</string>
+    <string name="reset">Đặt lại</string>
+    <string name="normal">Bình thường</string>
+    <string name="satellite">Vệ tinh</string>
+    <string name="terrain">Địa hình</string>
+    <string name="hybrid">Kết hợp</string>
+    <string name="left">Trái</string>
+    <string name="right">Phải</string>
+    <string name="top">Trên</string>
+    <string name="bottom">Dưới</string>
+    <string name="large">Lớn</string>
+    <string name="medium">Trung bình</string>
+    <string name="small">Nhỏ</string>
+    <string name="extra_small">Cực nhỏ</string>
+    <string name="capture_beyond_photos">Chụp vượt xa ảnh</string>
+    <string name="stamp_it_save_it_share_it">Đóng dấu, Lưu, Chia sẻ</string>
+    <string name="your_camera_your_way">Máy ảnh của bạn, phong cách của bạn</string>
+    <string name="shoot_like_a_pro">Chụp như chuyên gia</string>
+    <string name="select_your_language">Chọn ngôn ngữ của bạn</string>
+    <string name="apply">Áp dụng</string>
+    <string name="settings">Cài đặt</string>
+    <string name="general">Chung</string>
+    <string name="app_language">Ngôn ngữ ứng dụng</string>
+    <string name="image_quality">Chất lượng hình ảnh</string>
+    <string name="volume_button">Nút âm lượng</string>
+    <string name="touch_settings">Cài đặt cảm ứng</string>
+    <string name="features">Tính năng</string>
+    <string name="watermark">Hình mờ</string>
+    <string name="qr_detection">Phát hiện QR</string>
+    <string name="location_share_mode">Chế độ chia sẻ vị trí</string>
+    <string name="front_rear_camera_stamp">Dấu máy ảnh trước/sau</string>
+    <string name="about">Giới thiệu</string>
+    <string name="rate_us">Đánh giá chúng tôi</string>
+    <string name="share">Chia sẻ</string>
+    <string name="privacy_policy">Chính sách quyền riêng tư</string>
+    <string name="which_camera_mode_do_you_use_the_most">Bạn sử dụng chế độ máy ảnh nào nhiều nhất?</string>
+    <string name="high_quality_still_images">Hình ảnh tĩnh chất lượng cao</string>
+    <string name="hd_and_4k_video_recording">Ghi video HD và 4K</string>
+    <string name="instant_capture_and_share">Chụp và chia sẻ ngay lập tức</string>
+    <string name="choose_your_default_photo_ratio">Chọn tỷ lệ ảnh mặc định của bạn</string>
+    <string name="_16_9_wide">16:9 (Rộng)</string>
+    <string name="perfect_for_videos_and_cinematic_photos">Hoàn hảo cho video và ảnh điện ảnh</string>
+    <string name="_16_9_preview">Xem trước 16:9</string>
+    <string name="_4_3_preview">Xem trước 4:3</string>
+    <string name="_4_3_standard">4:3 (Tiêu chuẩn)</string>
+    <string name="classic_photo_format_for_most_cameras">Định dạng ảnh cổ điển cho hầu hết các máy ảnh</string>
+    <string name="how_do_you_prefer_to_tag_your_location">Bạn muốn gắn thẻ vị trí của mình như thế nào?</string>
+    <string name="gps_automatic">GPS (tự động)</string>
+    <string name="use_your_device_s_location_to_automatically_tag_photos">Sử dụng vị trí thiết bị để tự động gắn thẻ ảnh</string>
+    <string name="manual_entry">Nhập thủ công</string>
+    <string name="type_in_your_location_when_saving_photos">Nhập vị trí của bạn khi lưu ảnh</string>
+    <string name="do_not_tag">Không gắn thẻ</string>
+    <string name="no_location_information_will_be_added_to_photos">Không thêm thông tin vị trí vào ảnh</string>
+    <string name="classic">Cổ điển</string>
+    <string name="modern">Hiện đại</string>
+    <string name="minimal">Tối giản</string>
+    <string name="vintage">Cổ điển</string>
+    <string name="bold">Đậm</string>
+    <string name="select_your_preferred_stamp_template">Chọn mẫu dấu ưa thích của bạn</string>
+    <string name="timer_3sec">Hẹn giờ 3 giây</string>
+    <string name="timer_5sec">Hẹn giờ 5 giây</string>
+    <string name="version">Phiên bản</string>
+    <string name="low">Thấp</string>
+    <string name="high">Cao</string>
+    <string name="photo_capture">Chụp ảnh</string>
+    <string name="grid_3_3" translatable="false">Grid 3*3</string>
+    <string name="grid_4_4" translatable="false">Grid 4*4</string>
+    <string name="grid_phi" translatable="false">Grid PHI</string>
+
+    <string name="tap_again_to_exit">Nhấn lại để thoát</string>
+    <string name="volume_on">Bật âm lượng</string>
+    <string name="volume_off">Tắt âm lượng</string>
+    <string name="please_enter_note">Vui lòng nhập ghi chú</string>
+    <string name="please_enter_text_first">Vui lòng nhập văn bản trước</string>
+    <string name="capture_photo">Chụp ảnh</string>
+    <string name="zoom">Thu phóng</string>
+    <string name="r">Đỏ</string>
+    <string name="g">Xanh lá</string>
+    <string name="b">Xanh dương</string>
+    <string name="saturation">Độ bão hòa</string>
+    <string name="hue">Sắc độ</string>
+    <string name="copy">Sao chép</string>
+    <string name="hex">HEX</string>
+    <string name="color">Màu sắc</string>
+    <string name="bg_color">Màu nền</string>
+    <string name="fonts">Phông chữ</string>
+    <string name="style">Kiểu</string>
+    <string name="alignment">Căn chỉnh</string>
+    <string name="add_manual_location">Thêm vị trí thủ công</string>
+    <string name="latitude">Vĩ độ</string>
+    <string name="longitude">Kinh độ</string>
+    <string name="range_in_meters">Phạm vi (mét)</string>
+    <string name="address">Địa chỉ</string>
+    <string name="current_location">Vị trí hiện tại</string>
+    <string name="manual_location">Vị trí thủ công</string>
+    <string name="gps_camera">Máy ảnh GPS</string>
+    <string name="home_camera_desc">Chụp với dữ liệu GPS</string>
+    <string name="share_media_instantly">Chia sẻ phương tiện ngay lập tức</string>
+    <string name="record_with_gps_watermark">Ghi với hình mờ GPS</string>
+    <string name="gps_watermark_templates">Mẫu hình mờ GPS</string>
+    <string name="captured_photos_videos">Ảnh &amp; video đã chụp</string>
+    <string name="saved_data">Dữ liệu đã lưu</string>
+    <string name="do_you_really_want_to_exit">Bạn có thực sự muốn thoát không?</string>
+    <string name="before_you_go_explore_these_amazing_features">Trước khi rời đi, hãy khám phá những tính năng tuyệt vời này!</string>
+    <string name="continue_using_app">Tiếp tục sử dụng ứng dụng</string>
+    <string name="exit_app">Thoát ứng dụng</string>
+    <string name="enjoying_the_app">Bạn có thích ứng dụng này không?</string>
+    <string name="your_feedback_helps_us_improve">Phản hồi của bạn giúp chúng tôi cải thiện!</string>
+    <string name="rate_on_play_store">Đánh giá trên Play Store</string>
+    <string name="maybe_later">Có lẽ sau</string>
+    <string name="add_quick_tags_to_your_images">Thêm thẻ nhanh vào hình ảnh của bạn</string>
+    <string name="stamp_your_photo_with_location_and_time_zone">Đóng dấu ảnh của bạn với vị trí và múi giờ</string>
+    <string name="we_d_love_to_know_how_we_can_improve">Chúng tôi muốn biết làm thế nào để cải thiện</string>
+    <string name="your_feedback_is_valuable_to_us">Phản hồi của bạn rất quý giá đối với chúng tôi</string>
+    <string name="tell_us_what_we_can_do_better">Hãy cho chúng tôi biết chúng tôi có thể làm gì tốt hơn...</string>
+    <string name="submit">Gửi</string>
+    <string name="cancel">Hủy</string>
+    <string name="terrible">Tệ</string>
+    <string name="bad">Xấu</string>
+    <string name="good">Tốt</string>
+    <string name="okay">Ổn</string>
+    <string name="excellent">Tuyệt vời</string>
+    <string name="something_went_wrong">Có lỗi xảy ra</string>
+    <string name="choose_an_email_client">Chọn ứng dụng email</string>
+    <string name="please_enter_feedback">Vui lòng nhập phản hồi</string>
+    <string name="done">Xong</string>
+    <string name="saved_media">Phương tiện đã lưu</string>
+    <string name="no_saved_media_yet">Chưa có phương tiện nào được lưu</string>
+    <string name="your_saved_media_will_appear_here">Phương tiện đã lưu của bạn sẽ xuất hiện tại đây</string>
+    <string name="delete_saved_media">Xóa phương tiện đã lưu</string>
+    <string name="are_you_sure_you_want_to_delete">Bạn có chắc chắn muốn xóa không?</string>
+    <string name="delete">Xóa</string>
+    <string name="preview">Xem trước</string>
+    <string name="saved">Đã lưu</string>
+    <string name="location_permission_not_granted">Quyền vị trí chưa được cấp</string>
+    <string name="unable_to_get_current_location">Không thể lấy vị trí hiện tại</string>
+    <string name="top_templates">Mẫu hàng đầu</string>
+    <string name="basic_templates">Mẫu cơ bản</string>
+</resources>

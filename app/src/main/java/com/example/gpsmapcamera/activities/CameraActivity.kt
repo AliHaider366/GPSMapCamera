@@ -756,6 +756,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                     getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
                     binding.timmerTV,
                     overlayRootContainer,// pass your overlay container
+                    overlayContainer,
                     selectedStampPosition
                 ) { uri ->
                     uri?.let {
@@ -767,7 +768,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                     }
                 }
             } else {
-                cameraManager.takePhotoWithStamp(overlayRootContainer, selectedStampPosition) { uri ->
+                cameraManager.takePhotoWithStamp(
+                    overlayRootContainer,
+                    overlayContainer,
+                    selectedStampPosition
+                ) { uri ->
                     if (uri != null) {
                         val intent = Intent(this@CameraActivity, PreviewImageActivity::class.java)
                         intent.putExtra("image_uri", uri.toString())
@@ -802,6 +807,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             defaultTopMenuView.gone()
             cameraManager.startVideoRecordingWithStamp(
                 stampContainer = overlayRootContainer,
+                textContainer = overlayContainer,
                 stampPosition = selectedStampPosition,
                 onStarted = {
                     Log.d("TAG", "setClickListeners: onStarted")
@@ -981,7 +987,9 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             }
 
             // Delete
-            btnDelete.setOnClickListener { container.removeView(view) }
+            btnDelete.setOnClickListener {
+                container.removeView(view)
+            }
 
             // Flip (mirror horizontally)
             var flipped = false
@@ -1299,6 +1307,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                     getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
                     timmerTV,
                     overlayRootContainer,// pass your overlay container
+                    overlayContainer,
                     selectedStampPosition
                 ) { uri ->
                     uri?.let {
@@ -1315,6 +1324,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             } else {
                 cameraManager.takePhotoWithStamp(
                     overlayRootContainer,
+                    overlayContainer,
                     selectedStampPosition
                 ) { uri ->
                     if (uri != null) {
@@ -1373,6 +1383,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                                     getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE),
                                     binding.timmerTV,
                                     overlayRootContainer,// pass your overlay container
+                                    overlayContainer,
                                     selectedStampPosition
                                 ) { uri ->
                                     uri?.let {
@@ -1389,6 +1400,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                             } else {
                                 cameraManager.takePhotoWithStamp(
                                     overlayRootContainer,
+                                    overlayContainer,
                                     selectedStampPosition
                                 ) { uri ->
                                     if (uri != null) {
@@ -1496,7 +1508,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 Constants.TOP_TEMPLATE_SELECTED_NUMBER, 0
             )
             binding.stampContainer.removeAllViews()
+            binding.watermarkContainer.gone()
+            binding.ivStampCross.gone()
 
+            binding.overlayRootContainer.setStampPositionForTopTemplate()
 
             appViewModel.dynamicValues.observe(this) { currentDynamics ->
                 when (selectedTopTemplateIndex) {
@@ -1734,10 +1749,6 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
 
             }
-
-            binding.watermarkContainer.gone()
-            binding.main.setStampPositionForTopTemplate()
-
 
         }
     }
@@ -2072,20 +2083,20 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (getBoolean(this@CameraActivity, KEY_WATERMARK_SETTING, false) && !getBoolean(
-                this@CameraActivity,
-                Constants.IS_TOP_TEMPLATE_SELECTED, false
-            )
-        ) {
-            binding.watermarkContainer.visible()
-            binding.ivStampCross.visible()
-        } else {
-            binding.watermarkContainer.gone()
-            binding.ivStampCross.gone()
-        }
-    }
+    /*    override fun onResume() {
+            super.onResume()
+            if (getBoolean(this@CameraActivity, KEY_WATERMARK_SETTING, false) && !getBoolean(
+                    this@CameraActivity,
+                    Constants.IS_TOP_TEMPLATE_SELECTED, false
+                )
+            ) {
+                binding.watermarkContainer.visible()
+                binding.ivStampCross.visible()
+            } else {
+                binding.watermarkContainer.gone()
+                binding.ivStampCross.gone()
+            }
+        }*/
 
     companion object {
         var isCurrentSelected = true

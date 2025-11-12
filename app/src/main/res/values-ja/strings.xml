@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GPSカメラ - マップ &amp; ジオタグ</string>
+    <string name="gps_camera_non_translatable" translatable="false">GPSカメラ</string>
+    <string name="add_note">ノートを追加</string>
+    <string name="add_custom_name">カスタム名を追加</string>
+    <string name="date_and_time">日付と時間</string>
+    <string name="day">日</string>
+    <string name="hour_minute_second">時 分 秒</string>
+    <string name="_24_hours">24時間</string>
+    <string name="decimal">10進法</string>
+    <string name="dms">DMS</string>
+    <string name="line_1">行 1</string>
+    <string name="line_2">行 2</string>
+    <string name="line_3">行 3</string>
+    <string name="line_4">行 4</string>
+    <string name="file_name">ファイル名</string>
+    <string name="select_folder">フォルダを選択</string>
+    <string name="save_original_photos">オリジナル写真を保存</string>
+    <string name="default_">デフォルト</string>
+    <string name="site_1">サイト 1</string>
+    <string name="site_2">サイト 2</string>
+    <string name="template">テンプレート</string>
+    <string name="environment">環境</string>
+    <string name="camera_level">カメラレベル</string>
+    <string name="focus">フォーカス</string>
+    <string name="templates">テンプレート一覧</string>
+    <string name="gallery">ギャラリー</string>
+    <string name="video">ビデオ</string>
+    <string name="photo">写真</string>
+    <string name="quick_share">クイック共有</string>
+    <string name="_2x" translatable="false">2倍</string>
+    <string name="_1x" translatable="false">1倍</string>
+    <string name="white">白</string>
+    <string name="volume">音量</string>
+    <string name="mirror">ミラー</string>
+    <string name="timer_off">タイマーオフ</string>
+    <string name="grid">グリッド</string>
+    <string name="ratio">比率</string>
+    <string name="enter_folder_name">フォルダ名を入力</string>
+    <string name="add">追加</string>
+    <string name="custom_name_1">カスタム名 1</string>
+    <string name="custom_name_2">カスタム名 2</string>
+    <string name="custom_name_3">カスタム名 3</string>
+    <string name="full_address">フルアドレス</string>
+    <string name="latitude_longitude">緯度/経度</string>
+    <string name="plus_code">プラスコード</string>
+    <string name="time_zone">タイムゾーン</string>
+    <string name="to_provide_you_with_the_best_learning_experience_we_need_access_to_the_following_features">最高の学習体験を提供するために、次の機能へのアクセスが必要です：</string>
+    <string name="permissions">権限</string>
+    <string name="take_photos_for_visual_translations_and_practice">視覚翻訳と練習のために写真を撮影</string>
+    <string name="camera">カメラ</string>
+    <string name="allow">許可</string>
+    <string name="location">位置情報</string>
+    <string name="learn_location_specific_phrases_and_vocabulary">地域固有のフレーズと語彙を学ぶ</string>
+    <string name="photo_gallery">フォトギャラリー</string>
+    <string name="upload_images_for_translations_and_customization">翻訳やカスタマイズのために画像をアップロード</string>
+    <string name="continue_">続行</string>
+    <string name="you_can_change_these_permissions_later_in_your_device_settings">これらの権限は後でデバイス設定で変更できます</string>
+    <string name="permission_granted">権限が付与されました</string>
+    <string name="permission_denied">権限が拒否されました</string>
+    <string name="please_enter_folder_name">フォルダ名を入力してください</string>
+    <string name="failed_to_create_folder">フォルダの作成に失敗しました！</string>
+    <string name="please_enter_sequence_number">シーケンス番号を入力してください</string>
+    <string name="please_enter_custom_name">カスタム名を入力してください</string>
+    <string name="allowed">許可済み</string>
+
+    <string-array name="aspect_ratios" translatable="false">
+        <item>4:3</item>
+        <item>16:9</item>
+    </string-array>
+
+    <string-array name="grid_options" translatable="false">
+        <item>オフ</item>
+        <item>2x2</item>
+        <item>3x3</item>
+        <item>4x4</item>
+        <item>5x5</item>
+    </string-array>
+
+    <string name="basic">基本</string>
+    <string name="stamp">スタンプ</string>
+    <string name="weather">天気</string>
+    <string name="technical">技術</string>
+    <string name="advance_template">アドバンステンプレート</string>
+    <string name="classic_template">クラシックテンプレート</string>
+    <string name="reporting_template">報告テンプレート</string>
+
+    <string name="next">次へ</string>
+    <string name="previous">前へ</string>
+
+    <string name="reporting_tag">報告タグ</string>
+    <string name="date_time"><![CDATA[日付 & 時間]]></string>
+    <string name="map_type">地図の種類</string>
+    <string name="short_address">短縮アドレス</string>
+
+    <string name="lat_long">緯度/経度</string>
+
+    <string name="person_name">氏名</string>
+    <string name="contact_number">連絡先番号</string>
+    <string name="wind">風速</string>
+    <string name="humidity">湿度</string>
+    <string name="pressure">気圧</string>
+    <string name="compass">コンパス</string>
+    <string name="magnetic_field">磁場</string>
+    <string name="altitude">高度</string>
+    <string name="accuracy">精度</string>
+    <string name="sound_level">音量レベル</string>
+    <string name="numbering">番号付け</string>
+    <string name="logo">ロゴ</string>
+    <string name="note">ノート</string>
+    <string name="stamp_settings">スタンプ設定</string>
+    <string name="font_style">フォントスタイル</string>
+    <string name="stamp_color">スタンプカラー</string>
+    <string name="stamp_size">スタンプサイズ</string>
+    <string name="stamp_position">スタンプ位置</string>
+    <string name="map_position">地図位置</string>
+    <string name="map_scale">地図スケール</string>
+    <string name="weather_information">天気情報</string>
+    <string name="technical_details">技術的詳細</string>
+    <string name="basic_information">基本情報</string>
+    <string name="additional_details">追加情報</string>
+    <string name="title">タイトル</string>
+    <string name="enter_here">ここに入力</string>
+    <string name="recent_added_reporting_tag">最近追加された報告タグ</string>
+    <string name="please_enter_tag">タグを入力してください</string>
+    <string name="city">市区町村</string>
+    <string name="state">都道府県</string>
+    <string name="country">国</string>
+    <string name="pincode">郵便番号</string>
+    <string name="add_number">番号を追加</string>
+    <string name="this_number_will_be_used_for_verification_and_communication">この番号は確認および連絡に使用されます。</string>
+    <string name="enter_contact_number">連絡先番号を入力</string>
+    <string name="please_enter_a_phone_number_including_country_code">国コードを含む電話番号を入力してください</string>
+    <string name="please_enter_valid_number">有効な番号を入力してください</string>
+    <string name="please_add_number_first">まず番号を追加してください</string>
+    <string name="show_note_options_on_capture">キャプチャ時にノートオプションを表示</string>
+    <string name="recent_added_note">最近追加されたノート</string>
+    <string name="prefix">接頭辞</string>
+    <string name="enter_prefix">接頭辞を入力</string>
+    <string name="suffix">接尾辞</string>
+    <string name="enter_suffix">接尾辞を入力</string>
+    <string name="sequence_number">シーケンス番号</string>
+    <string name="sequence_type">シーケンスタイプ</string>
+    <string name="reset">リセット</string>
+    <string name="normal">通常</string>
+    <string name="satellite">衛星</string>
+    <string name="terrain">地形</string>
+    <string name="hybrid">ハイブリッド</string>
+
+    <string name="left">左</string>
+    <string name="right">右</string>
+    <string name="top">上</string>
+    <string name="bottom">下</string>
+    <string name="large">大</string>
+    <string name="medium">中</string>
+    <string name="small">小</string>
+    <string name="extra_small">極小</string>
+    <string name="capture_beyond_photos">写真以外もキャプチャ</string>
+    <string name="stamp_it_save_it_share_it">スタンプして、保存して、共有</string>
+    <string name="your_camera_your_way">あなたのカメラ、あなたのスタイル</string>
+    <string name="shoot_like_a_pro">プロのように撮影</string>
+    <string name="select_your_language">言語を選択</string>
+    <string name="apply">適用</string>
+    <string name="settings">設定</string>
+    <string name="general">一般</string>
+    <string name="app_language">アプリ言語</string>
+    <string name="image_quality">画像品質</string>
+    <string name="volume_button">音量ボタン</string>
+    <string name="touch_settings">タッチ設定</string>
+    <string name="features">機能</string>
+    <string name="watermark">ウォーターマーク</string>
+    <string name="qr_detection">QR検出</string>
+    <string name="location_share_mode">位置情報共有モード</string>
+    <string name="front_rear_camera_stamp">前/後カメラスタンプ</string>
+    <string name="about">アプリ情報</string>
+    <string name="rate_us">評価する</string>
+    <string name="share">共有</string>
+    <string name="privacy_policy">プライバシーポリシー</string>
+    <string name="which_camera_mode_do_you_use_the_most">最もよく使うカメラモードは？</string>
+    <string name="high_quality_still_images">高画質静止画</string>
+    <string name="hd_and_4k_video_recording">HDおよび4K動画録画</string>
+    <string name="instant_capture_and_share">瞬時に撮影して共有</string>
+    <string name="choose_your_default_photo_ratio">デフォルトの写真比率を選択</string>
+    <string name="_16_9_wide">16:9（ワイド）</string>
+    <string name="perfect_for_videos_and_cinematic_photos">動画やシネマティック写真に最適</string>
+    <string name="_16_9_preview">16:9プレビュー</string>
+    <string name="_4_3_preview">4:3プレビュー</string>
+    <string name="_4_3_standard">4:3（標準）</string>
+    <string name="classic_photo_format_for_most_cameras">ほとんどのカメラ向けクラシック写真フォーマット</string>
+    <string name="how_do_you_prefer_to_tag_your_location">位置情報はどのようにタグ付けしますか？</string>
+    <string name="gps_automatic">GPS（自動）</string>
+    <string name="use_your_device_s_location_to_automatically_tag_photos">デバイスの位置情報を使って写真に自動タグ付け</string>
+    <string name="manual_entry">手動入力</string>
+    <string name="type_in_your_location_when_saving_photos">写真保存時に位置情報を入力</string>
+    <string name="do_not_tag">タグを付けない</string>
+    <string name="no_location_information_will_be_added_to_photos">写真に位置情報は追加されません</string>
+    <string name="classic">クラシック</string>
+    <string name="modern">モダン</string>
+    <string name="minimal">ミニマル</string>
+    <string name="vintage">ヴィンテージ</string>
+    <string name="bold">太字</string>
+    <string name="select_your_preferred_stamp_template">好みのスタンプテンプレートを選択</string>
+    <string name="timer_3sec">タイマー 3秒</string>
+    <string name="timer_5sec">タイマー 5秒</string>
+    <string name="version">バージョン</string>
+    <string name="low">低</string>
+    <string name="high">高</string>
+    <string name="photo_capture">写真撮影</string>
+    <string name="grid_3_3" translatable="false">グリッド 3*3</string>
+    <string name="grid_4_4" translatable="false">グリッド 4*4</string>
+    <string name="grid_phi" translatable="false">グリッド PHI</string>
+
+    <string name="tap_again_to_exit">もう一度タップして終了</string>
+    <string name="volume_on">音量オン</string>
+    <string name="volume_off">音量オフ</string>
+    <string name="please_enter_note">ノートを入力してください</string>
+    <string name="please_enter_text_first">まずテキストを入力してください</string>
+    <string name="capture_photo">写真を撮影</string>
+    <string name="zoom">ズーム</string>
+    <string name="r">R</string>
+    <string name="g">G</string>
+    <string name="b">B</string>
+    <string name="saturation">彩度</string>
+    <string name="hue">色相</string>
+    <string name="copy">コピー</string>
+    <string name="hex">HEX</string>
+    <string name="color">色</string>
+    <string name="bg_color">背景色</string>
+    <string name="fonts">フォント</string>
+    <string name="style">スタイル</string>
+    <string name="alignment">配置</string>
+    <string name="add_manual_location">手動位置を追加</string>
+    <string name="latitude">緯度</string>
+    <string name="longitude">経度</string>
+    <string name="range_in_meters">範囲（メートル単位）</string>
+    <string name="address">住所</string>
+    <string name="current_location">現在地</string>
+    <string name="manual_location">手動位置</string>
+    <string name="gps_camera">GPSカメラ</string>
+    <string name="home_camera_desc">GPSデータ付きで撮影</string>
+    <string name="share_media_instantly">メディアをすぐに共有</string>
+    <string name="record_with_gps_watermark">GPSウォーターマーク付きで録画</string>
+    <string name="gps_watermark_templates">GPSウォーターマークテンプレート</string>
+    <string name="captured_photos_videos">撮影した写真＆動画</string>
+    <string name="saved_data">保存データ</string>
+    <string name="do_you_really_want_to_exit">本当に終了しますか？</string>
+    <string name="before_you_go_explore_these_amazing_features">終了前に、これらの素晴らしい機能をチェック！</string>
+    <string name="continue_using_app">アプリの使用を続ける</string>
+    <string name="exit_app">アプリを終了</string>
+    <string name="enjoying_the_app">アプリを楽しんでいますか？</string>
+    <string name="your_feedback_helps_us_improve">フィードバックが改善の助けになります</string>
+    <string name="rate_on_play_store">Playストアで評価</string>
+    <string name="maybe_later">あとで</string>
+    <string name="add_quick_tags_to_your_images">画像にクイックタグを追加</string>
+    <string name="stamp_your_photo_with_location_and_time_zone">位置情報とタイムゾーンを写真にスタンプ</string>
+    <string name="we_d_love_to_know_how_we_can_improve">改善方法についてぜひ教えてください</string>
+    <string name="your_feedback_is_valuable_to_us">あなたのフィードバックは貴重です</string>
+    <string name="tell_us_what_we_can_do_better">改善できる点を教えてください…</string>
+    <string name="submit">送信</string>
+    <string name="cancel">キャンセル</string>
+    <string name="terrible">ひどい</string>
+    <string name="bad">悪い</string>
+    <string name="good">良い</string>
+    <string name="okay">普通</string>
+    <string name="excellent">素晴らしい</string>
+    <string name="something_went_wrong">エラーが発生しました</string>
+    <string name="choose_an_email_client">メールクライアントを選択</string>
+    <string name="please_enter_feedback">フィードバックを入力してください</string>
+    <string name="done">完了</string>
+    <string name="saved_media">保存済みメディア</string>
+    <string name="no_saved_media_yet">まだ保存済みメディアはありません</string>
+    <string name="your_saved_media_will_appear_here">保存したメディアはここに表示されます</string>
+    <string name="delete_saved_media">保存済みメディアを削除</string>
+    <string name="are_you_sure_you_want_to_delete">本当に削除しますか？</string>
+    <string name="delete">削除</string>
+    <string name="preview">プレビュー</string>
+    <string name="saved">保存済み</string>
+    <string name="location_permission_not_granted">位置情報の権限が付与されていません</string>
+    <string name="unable_to_get_current_location">現在地を取得できません</string>
+
+    <string name="top_templates">トップテンプレート</string>
+    <string name="basic_templates">基本テンプレート</string>
+
+</resources>
