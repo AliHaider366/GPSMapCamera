@@ -2,20 +2,16 @@ package com.example.gpsmapcamera.activities
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import com.example.gpsmapcamera.R
-import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.databinding.ActivityPermissionBinding
+import com.example.gpsmapcamera.utils.EventConstants
+import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager.KEY_FIRST_TIME
 import com.example.gpsmapcamera.utils.PrefManager.saveBoolean
 import com.example.gpsmapcamera.utils.arePermissionsGranted
@@ -31,6 +27,10 @@ class PermissionActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityPermissionBinding.inflate(layoutInflater)
+    }
+
+    private val firebaseLogger by lazy {
+        (applicationContext as MyApp).firebaseEvents
     }
 
     private lateinit var cameraPermissionLauncher: ActivityResultLauncher<String>
@@ -90,6 +90,13 @@ class PermissionActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+
+        firebaseLogger.logEvent(
+            activityName = EventConstants.PERMISSION_SCREEN,
+            eventName =  EventConstants.EVENT_PERMISSION,
+            parameters = mapOf(EventConstants.PARAM_SCREEN to EventConstants.PARAM_VALUE_SHOWN)
+        )
 
         binding.apply {
             backBtn.setOnClickListener {
@@ -163,6 +170,14 @@ class PermissionActivity : BaseActivity() {
                 locationPermissionLauncher.launch(locationPermissions)
             }
             btnContinue.setOnClickListener {
+
+
+                firebaseLogger.logEvent(
+                    activityName = EventConstants.PERMISSION_SCREEN,
+                    eventName =  EventConstants.EVENT_PERMISSION,
+                    parameters = mapOf(EventConstants.PARAM_ALLOW to EventConstants.PARAM_ALLOW_VALUE)
+                )
+
                 saveBoolean(this@PermissionActivity,KEY_FIRST_TIME,false)
                 launchActivity<MainActivity> {  }
             }

@@ -8,6 +8,8 @@ import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.TemplatePagerAdapter
 import com.example.gpsmapcamera.databinding.ActivityAllTemplateBinding
 import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.EventConstants
+import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.disableView
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
@@ -18,6 +20,12 @@ class AllTemplateActivity : BaseActivity() {
     val binding by lazy {
         ActivityAllTemplateBinding.inflate(layoutInflater)
     }
+
+
+    internal val firebaseLogger by lazy {
+        (applicationContext as MyApp).firebaseEvents
+    }
+
 
 
     var isTemplateChanged = 0

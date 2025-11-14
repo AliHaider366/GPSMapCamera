@@ -74,7 +74,7 @@ class CameraManager(
     private var imageCapture: ImageCapture? = null
     private var videoCapture: VideoCapture<Recorder>? = null
     var camera: Camera? = null
-    private var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+    internal var cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 //    private var flashEnabled = false
     private var flashEnabled = 0
     private var aspectRatio: Int = AspectRatio.RATIO_4_3
@@ -175,8 +175,11 @@ class CameraManager(
     }
 
     fun switchCamera() {
-        cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA)
-            CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
+        cameraSelector = if (cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+            CameraSelector.DEFAULT_FRONT_CAMERA
+        } else {
+            CameraSelector.DEFAULT_BACK_CAMERA
+        }
         startCamera()
     }
 

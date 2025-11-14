@@ -10,6 +10,7 @@ import com.example.gpsmapcamera.adapters.HomeAdapter
 import com.example.gpsmapcamera.databinding.ActivityMainBinding
 import com.example.gpsmapcamera.models.HomeModel
 import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.EventConstants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.launchActivity
 
@@ -19,9 +20,21 @@ class MainActivity : BaseActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    private val firebaseLogger by lazy {
+        (applicationContext as MyApp).firebaseEvents
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        firebaseLogger.logEvent(
+            activityName = EventConstants.LANDING_SCREEN,
+            eventName =  EventConstants.EVENT_LANDING,
+            parameters = mapOf(EventConstants.PARAM_SCREEN to EventConstants.PARAM_VALUE_SHOWN)
+        )
+
+
         onBackPressedDispatcher.addCallback(this, backPressedCallback)
         setupRV()
         clickListeners()
@@ -74,6 +87,14 @@ class MainActivity : BaseActivity() {
         )
 
         val adapter = HomeAdapter(homeList) { item, position ->
+
+            firebaseLogger.logEvent(
+                activityName = EventConstants.LANDING_SCREEN,
+                eventName =  EventConstants.EVENT_LANDING,
+                parameters = mapOf(EventConstants.PARAM_ACTION_TYPE to item.title)
+            )
+
+
             when(item.title){
                 getString(R.string.camera)->{
                     launchActivity<CameraActivity>(){

@@ -7,7 +7,9 @@ import com.example.gpsmapcamera.adapters.LanguageAdapter
 import com.example.gpsmapcamera.databinding.ActivityLanguageBinding
 import com.example.gpsmapcamera.models.Language
 import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.EventConstants
 import com.example.gpsmapcamera.utils.LocaleHelper.setLocale
+import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.setBoolean
 import com.example.gpsmapcamera.utils.gone
@@ -21,6 +23,11 @@ class LanguageActivity : BaseActivity() {
     private val binding by lazy {
         ActivityLanguageBinding.inflate(layoutInflater)
     }
+
+    private val firebaseLogger by lazy {
+        (applicationContext as MyApp).firebaseEvents
+    }
+
 
 
     private var selectedLangCode = ""
@@ -68,6 +75,14 @@ class LanguageActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+
+        firebaseLogger.logEvent(
+            activityName = EventConstants.LANGUAGE_SCREEN,
+            eventName =  EventConstants.EVENT_LANGUAGE,
+            parameters = mapOf(EventConstants.PARAM_SCREEN to EventConstants.PARAM_VALUE_SHOWN)
+        )
+
+
         selectedLangCode = PrefManager.getString(this, Constants.SELECTED_LANGUAGE, "")
         init()
         clickListeners()
@@ -75,8 +90,12 @@ class LanguageActivity : BaseActivity() {
 
     private fun clickListeners() = binding.run {
         btnNext.setOnClickListener {
+            firebaseLogger.logEvent(
+                activityName = EventConstants.LANGUAGE_SCREEN,
+                eventName =  EventConstants.EVENT_LANGUAGE,
+                parameters = mapOf(EventConstants.PARAM_NEXT to EventConstants.PARAM_CLICKED)
+            )
             languageDone()
-
         }
         btnApply.setOnClickListener {
             languageDone()
@@ -133,6 +152,13 @@ class LanguageActivity : BaseActivity() {
         languageAdapter = LanguageAdapter(
             onLanguageSelected = { language ->
                 setBoolean(this@LanguageActivity, Constants.SHOW_LANGUAGE_ANIM, false)
+
+
+                firebaseLogger.logEvent(
+                    activityName = EventConstants.LANGUAGE_SCREEN,
+                    eventName =  EventConstants.EVENT_LANGUAGE,
+                    parameters = mapOf(EventConstants.PARAM_OTHER to language.name)
+                )
 
                 if (fromSplash){
 //                    if (!isAnimating) btnNext.startPulseAnimation()

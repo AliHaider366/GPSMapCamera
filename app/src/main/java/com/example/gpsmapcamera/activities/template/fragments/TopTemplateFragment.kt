@@ -12,6 +12,7 @@ import com.example.gpsmapcamera.activities.template.AllTemplateActivity
 import com.example.gpsmapcamera.adapters.TopTemplatesAdapter
 import com.example.gpsmapcamera.databinding.FragmentTopTemplateBinding
 import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.EventConstants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.enableView
@@ -36,6 +37,12 @@ class TopTemplateFragment : Fragment() {
             (requireActivity() as AllTemplateActivity).isTopSelected = true
             (requireActivity() as AllTemplateActivity).topTemplateSelectedPosition = position
             (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
+
+            (requireActivity() as AllTemplateActivity).firebaseLogger.logEvent(
+                activityName = EventConstants.TEMPLATE_SCREEN,
+                eventName =  EventConstants.EVENT_TEMPLATE,
+                parameters = mapOf(EventConstants.PARAM_SELECTED to "Advanced_Template_${position+1}")
+            )
         }
     }
 

@@ -22,6 +22,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.AspectRatio
+import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
@@ -57,6 +58,7 @@ import com.example.gpsmapcamera.models.StampItemName
 import com.example.gpsmapcamera.models.StampPosition
 import com.example.gpsmapcamera.objects.CameraSettingsNotifier
 import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.EventConstants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.PrefManager.KEY_AUTO_FOCUS
@@ -131,6 +133,10 @@ import kotlin.math.sqrt
 class CameraActivity : BaseActivity(), CameraSettingsListener {
     private val binding by lazy {
         ActivityCameraBinding.inflate(layoutInflater)
+    }
+
+    private val firebaseLogger by lazy {
+        (applicationContext as MyApp).firebaseEvents
     }
 
     private val templateAdapterBottom = StampAdapter()
@@ -545,14 +551,37 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         switchCamBtn.setOnClickListener {
+            if (cameraManager.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
+                firebaseLogger.logEvent(
+                    activityName = EventConstants.CAMERA_SCREEN,
+                    eventName =  EventConstants.EVENT_CAMERA,
+                    parameters = mapOf(EventConstants.PARAM_VIEW to EventConstants.PARAM_VALUE_FRONT)
+                )
+            }else{
+                firebaseLogger.logEvent(
+                    activityName = EventConstants.CAMERA_SCREEN,
+                    eventName =  EventConstants.EVENT_CAMERA,
+                    parameters = mapOf(EventConstants.PARAM_VIEW to EventConstants.PARAM_VALUE_BACK)
+                )
+            }
             cameraManager.switchCamera()
         }
 
         pickGalleyBtn.setOnClickListener {
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_SAVED_FOLDER)
+            )
             launchActivity<FileNameActivity> { }
         }
 
         fileNameBtn.setOnClickListener {
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_FILE_NAME)
+            )
             launchActivity<SavedPathActivity> { }
         }
 
@@ -594,6 +623,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         ratioBtn.setOnClickListener {
             when (getInt(this@CameraActivity, KEY_CAMERA_RATIO, 4)) {
                 4 -> {
+                    firebaseLogger.logEvent(
+                        activityName = EventConstants.CAMERA_SCREEN,
+                        eventName =  EventConstants.EVENT_CAMERA,
+                        parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_RATIO_4_3)
+                    )
                     saveInt(this@CameraActivity, KEY_CAMERA_RATIO, 16)
                     ratioBtn.setDrawable(top = R.drawable.ratio16_ic)
                     cameraManager.setAspectRatio(AspectRatio.RATIO_16_9)
@@ -601,6 +635,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
 
                 16 -> {
+                    firebaseLogger.logEvent(
+                        activityName = EventConstants.CAMERA_SCREEN,
+                        eventName =  EventConstants.EVENT_CAMERA,
+                        parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_RATIO_16_9)
+                    )
                     saveInt(this@CameraActivity, KEY_CAMERA_RATIO, 4)
                     ratioBtn.setDrawable(top = R.drawable.ratio4_ic)
                     cameraManager.setAspectRatio(AspectRatio.RATIO_4_3)
@@ -620,6 +659,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
              }*/
             when (getInt(this@CameraActivity, KEY_CAMERA_GRID)) {
                 0 -> {
+
+                    firebaseLogger.logEvent(
+                        activityName = EventConstants.CAMERA_SCREEN,
+                        eventName =  EventConstants.EVENT_CAMERA,
+                        parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_GRID_2)
+                    )
                     saveInt(this@CameraActivity, KEY_CAMERA_GRID, 3)
                     gridBtn.setDrawable(top = R.drawable.grid_3_ic)
                     gridBtn.text = getString(R.string.grid_3_3)
@@ -629,6 +674,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
 
                 3 -> {
+
+                    firebaseLogger.logEvent(
+                        activityName = EventConstants.CAMERA_SCREEN,
+                        eventName =  EventConstants.EVENT_CAMERA,
+                        parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_GRID_3)
+                    )
                     saveInt(this@CameraActivity, KEY_CAMERA_GRID, 4)
                     gridBtn.setDrawable(top = R.drawable.grid_4_ic)
                     gridBtn.text = getString(R.string.grid_4_4)
@@ -637,6 +688,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
 
                 4 -> {
+
+                    firebaseLogger.logEvent(
+                        activityName = EventConstants.CAMERA_SCREEN,
+                        eventName =  EventConstants.EVENT_CAMERA,
+                        parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_GRID_4)
+                    )
                     saveInt(this@CameraActivity, KEY_CAMERA_GRID, -3)
                     gridBtn.setDrawable(top = R.drawable.phi_grid_ic)
                     gridBtn.text = getString(R.string.grid_phi)
@@ -657,6 +714,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         timerBtn.setOnClickListener {
             when (getInt(this@CameraActivity, KEY_CAMERA_TIMER_VALUE)) {
                 0 -> {
+
+                    firebaseLogger.logEvent(
+                        activityName = EventConstants.CAMERA_SCREEN,
+                        eventName =  EventConstants.EVENT_CAMERA,
+                        parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_TIMER_3_SEC)
+                    )
                     timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.blue)
                     timerBtn.setDrawable(top = R.drawable.timer_3s_ic)
                     timerBtn.text = getString(R.string.timer_3sec)
@@ -667,6 +730,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 }
 
                 3 -> {
+                    firebaseLogger.logEvent(
+                        activityName = EventConstants.CAMERA_SCREEN,
+                        eventName =  EventConstants.EVENT_CAMERA,
+                        parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_TIMER_5_SEC)
+                    )
                     timerBtn.setCompoundDrawableTintAndTextColor(textColorRes = R.color.blue)
                     timerBtn.setDrawable(top = R.drawable.timer_5sec_ic)
                     timerBtn.text = getString(R.string.timer_5sec)
@@ -689,10 +757,22 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
         mirrorBtn.setOnClickListener {
             if (getBoolean(this@CameraActivity, KEY_CAMERA_MIRROR)) {
+
+                firebaseLogger.logEvent(
+                    activityName = EventConstants.CAMERA_SCREEN,
+                    eventName =  EventConstants.EVENT_CAMERA,
+                    parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_MIRROR_OFF)
+                )
                 mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
                 saveBoolean(this@CameraActivity, KEY_CAMERA_MIRROR, false)
                 cameraManager.setMirror(false)
             } else {
+
+                firebaseLogger.logEvent(
+                    activityName = EventConstants.CAMERA_SCREEN,
+                    eventName =  EventConstants.EVENT_CAMERA,
+                    parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_MIRROR_ON)
+                )
                 mirrorBtn.setCompoundDrawableTintAndTextColor(R.color.blue, R.color.blue)
                 saveBoolean(this@CameraActivity, KEY_CAMERA_MIRROR, true)
                 cameraManager.setMirror(true)
@@ -700,6 +780,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         volumeBtn.setOnClickListener {
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_VOLUME)
+            )
             if (getBoolean(this@CameraActivity, KEY_CAPTURE_SOUND)) {
                 volumeBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
                 saveBoolean(this@CameraActivity, KEY_CAPTURE_SOUND, false)
@@ -714,6 +799,11 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         focusBtn.setOnClickListener {
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_FOCUS)
+            )
             if (getBoolean(this@CameraActivity, KEY_AUTO_FOCUS)) {
                 focusBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
                 saveBoolean(this@CameraActivity, KEY_AUTO_FOCUS, false)
@@ -724,6 +814,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         camLevelBtn.setOnClickListener {
+
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_CAMERA_LEVEL)
+            )
             if (getBoolean(this@CameraActivity, KEY_CAMERA_LEVEL)) {
                 camLevelBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
                 saveBoolean(this@CameraActivity, KEY_CAMERA_LEVEL, false)
@@ -736,6 +832,13 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         brightnessBtn.setOnClickListener {
+
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_FEATURE_NAME to EventConstants.PARAM_VALUE_WHITE_BALANCE)
+            )
+
             if (brightnessBarView.isVisible) {
                 brightnessBarView.gone()
                 brightnessBtn.setCompoundDrawableTintAndTextColor(R.color.white, R.color.white)
@@ -746,6 +849,12 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         captureBtn.setOnClickListener {
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_MODE to EventConstants.PARAM_VALUE_PHOTO_CAPTURED)
+            )
+
             if (getBoolean(this@CameraActivity, KEY_CAMERA_TIMER)) {
                 /*                cameraManager.takePhotoWithTimer(
                                     getInt(
@@ -797,6 +906,14 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         videoRecordBtn.setOnClickListener {
+
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_MODE to EventConstants.PARAM_VALUE_VIDEO_CAPTURED)
+            )
+
+
             videoStopBtn.visible()
             videoTimmerTV.visible()
             videoRecordBtn.gone()
@@ -859,16 +976,35 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         }
 
         x1ZoomTv.setOnClickListener {
+
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_ZOOM to EventConstants.PARAM_VALUE_1X)
+            )
             isZoom1x = true
             setZoom()
         }
 
         x2ZoomTv.setOnClickListener {
+
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_ZOOM to EventConstants.PARAM_VALUE_2X)
+            )
             isZoom1x = false
             setZoom()
         }
 
         shareBtn.setDelayedClickListener {
+
+            firebaseLogger.logEvent(
+                activityName = EventConstants.CAMERA_SCREEN,
+                eventName =  EventConstants.EVENT_CAMERA,
+                parameters = mapOf(EventConstants.PARAM_ACTION to EventConstants.PARAM_VALUE_QUICK_SHARE_CAPTURED)
+            )
+
             switchMode(R.id.share_btn)
 
         }

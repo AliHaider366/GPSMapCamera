@@ -20,6 +20,7 @@ import com.example.gpsmapcamera.databinding.FragmentBasicTemplateBinding
 import com.example.gpsmapcamera.models.StampItemName
 import com.example.gpsmapcamera.models.StampPosition
 import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.EventConstants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.StampPreferences
@@ -132,18 +133,33 @@ class BasicTemplateFragment : Fragment() {
 
         lytClassicClick.setOnClickListener {
             selectTemplate(Constants.CLASSIC_TEMPLATE)
+            (requireActivity() as AllTemplateActivity).firebaseLogger.logEvent(
+                activityName = EventConstants.TEMPLATE_SCREEN,
+                eventName =  EventConstants.EVENT_TEMPLATE,
+                parameters = mapOf(EventConstants.PARAM_SELECTED to Constants.CLASSIC_TEMPLATE)
+            )
             (requireActivity() as AllTemplateActivity).isTopSelected = false
             (requireActivity() as AllTemplateActivity).isTemplateChanged = -1
             (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
         }
         lytAdvanceClick.setOnClickListener {
             selectTemplate(Constants.ADVANCE_TEMPLATE)
+            (requireActivity() as AllTemplateActivity).firebaseLogger.logEvent(
+                activityName = EventConstants.TEMPLATE_SCREEN,
+                eventName =  EventConstants.EVENT_TEMPLATE,
+                parameters = mapOf(EventConstants.PARAM_SELECTED to Constants.ADVANCE_TEMPLATE)
+            )
             (requireActivity() as AllTemplateActivity).isTopSelected = false
             (requireActivity() as AllTemplateActivity).isTemplateChanged = -1
             (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
         }
         lytReportingClick.setOnClickListener {
             selectTemplate(Constants.REPORTING_TEMPLATE)
+            (requireActivity() as AllTemplateActivity).firebaseLogger.logEvent(
+                activityName = EventConstants.TEMPLATE_SCREEN,
+                eventName =  EventConstants.EVENT_TEMPLATE,
+                parameters = mapOf(EventConstants.PARAM_SELECTED to Constants.CLASSIC_TEMPLATE)
+            )
             (requireActivity() as AllTemplateActivity).isTopSelected = false
             (requireActivity() as AllTemplateActivity).isTemplateChanged = -1
             (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
