@@ -5,22 +5,22 @@ import android.os.Bundle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gpsmapcamera.adapters.LanguageAdapter
 import com.example.gpsmapcamera.databinding.ActivityLanguageBinding
+import com.example.gpsmapcamera.models.Language
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.LocaleHelper.setLocale
 import com.example.gpsmapcamera.utils.PrefManager
-import com.example.gpsmapcamera.utils.PrefManager.getBoolean
 import com.example.gpsmapcamera.utils.PrefManager.setBoolean
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.launchActivity
+import com.example.gpsmapcamera.utils.onEnabledChanged
+import com.example.gpsmapcamera.utils.startPulseAnimation
 import com.example.gpsmapcamera.utils.visible
-import com.example.gpsmapcamera.models.Language
 
 class LanguageActivity : BaseActivity() {
 
     private val binding by lazy {
         ActivityLanguageBinding.inflate(layoutInflater)
     }
-
 
 
     private var selectedLangCode = ""
@@ -31,6 +31,8 @@ class LanguageActivity : BaseActivity() {
     private val fromSplash by lazy {
         intent.getBooleanExtra(Constants.FROM_SPLASH, false)
     }
+
+    private var isAnimating = false
 
     private val lanList by lazy {
         ArrayList<Language>().apply {
@@ -53,7 +55,7 @@ class LanguageActivity : BaseActivity() {
             add(Language("nl", "Nederlands", "Dutch", "NL"))
 
             // New additions
-                add(Language("ja", "日本語", "Japanese", "JP"))
+            add(Language("ja", "日本語", "Japanese", "JP"))
             add(Language("tr", "Türkçe", "Turkish", "TR"))
             add(Language("th", "ไทย", "Thai", "TH"))
             add(Language("vi", "Tiếng Việt", "Vietnamese", "VN"))
@@ -72,41 +74,77 @@ class LanguageActivity : BaseActivity() {
     }
 
     private fun clickListeners() = binding.run {
+        btnNext.setOnClickListener {
+            languageDone()
+
+        }
         btnApply.setOnClickListener {
-            PrefManager.setString(this@LanguageActivity, Constants.SELECTED_LANGUAGE, selectedLangCode)
-            setLocale(this@LanguageActivity, selectedLangCode)
-            if (fromSplash) {
-                launchActivity<OnBoardingActivity> { }
-            }else{
-                launchActivity<MainActivity> {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                }
-            }
-            finish()
+            languageDone()
         }
     }
 
-    private fun init()=binding.apply {
+    private fun languageDone(){
+        PrefManager.setString(
+            this@LanguageActivity,
+            Constants.SELECTED_LANGUAGE,
+            selectedLangCode
+        )
+        setLocale(this@LanguageActivity, selectedLangCode)
+        if (fromSplash) {
+            launchActivity<OnBoardingActivity> { }
+        } else {
+            launchActivity<MainActivity> {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+        }
+        finish()
+    }
 
-        btnApply.isEnabled=false
-        btnApply.alpha=0.5f
+    private fun init() = binding.apply {
         setupRecyclerView()
 
-
-        if (getBoolean(this@LanguageActivity, Constants.SHOW_LANGUAGE_ANIM, true)) {
-            lottieView.visible()
-        } else {
-            lottieView.gone()
+        if (fromSplash){
+            btnApply.gone()
+            binding.btnNext.onEnabledChanged { enabled ->
+                if (enabled) {
+                    binding.btnNext.startPulseAnimation()
+                }
+            }
+            btnNext.visible()
+            btnNext.isEnabled = false
+            btnNext.alpha = 0.5f
+        }else{
+            btnApply.visible()
+            btnNext.gone()
+            btnApply.isEnabled = false
+            btnApply.alpha = 0.5f
         }
+
+            lottieView.gone()
+
+//        if (getBoolean(this@LanguageActivity, Constants.SHOW_LANGUAGE_ANIM, true)) {
+//            lottieView.visible()
+//        } else {
+//            lottieView.gone()
+//        }
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecyclerView() = binding.run {
         languageAdapter = LanguageAdapter(
             onLanguageSelected = { language ->
                 setBoolean(this@LanguageActivity, Constants.SHOW_LANGUAGE_ANIM, false)
-                binding.lottieView.gone()
-                binding.btnApply.isEnabled=true
-                binding.btnApply.alpha=1f
+
+                if (fromSplash){
+//                    if (!isAnimating) btnNext.startPulseAnimation()
+                    isAnimating = true
+                    btnNext.isEnabled = true
+                    btnNext.alpha = 1f
+                    btnNext.visible()
+                }else{
+                    btnApply.isEnabled = true
+                    btnApply.alpha = 1f
+                    btnApply.visible()
+                }
                 languageAdapter.updateSelection(language)
                 selectedLangCode = language.code
             }
@@ -129,3 +167,4 @@ class LanguageActivity : BaseActivity() {
     }
 
 }
+

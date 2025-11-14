@@ -280,5 +280,6 @@
     <string name="unable_to_get_current_location">Unable to get current location</string>
     <string name="top_templates">Top Templates</string>
     <string name="basic_templates">Basic Templates</string>
+    <string name="enter_text_here">Enter text here</string>
 
 </resources>

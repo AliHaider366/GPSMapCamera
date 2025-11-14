@@ -56,10 +56,10 @@
         android:id="@+id/overlayRootContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/previewContainer"
         app:layout_constraintBottom_toBottomOf="@id/previewContainer"
         app:layout_constraintEnd_toEndOf="@id/previewContainer"
-        app:layout_constraintStart_toStartOf="@id/previewContainer"
-        app:layout_constraintTop_toTopOf="@id/previewContainer">
+        app:layout_constraintStart_toStartOf="@id/previewContainer">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/watermarkContainer"
@@ -201,6 +201,28 @@
         android:weightSum="6"
         app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/back_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_28sdp"
+            android:layout_weight="1">
+
+
+            <ImageView
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:background="@drawable/bg_radius_20"
+                android:backgroundTint="@color/white"
+                android:elevation="@dimen/_50sdp"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/back_ic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <ImageView
             android:id="@+id/more_btn"
             android:layout_width="0dp"
@@ -241,14 +263,6 @@
             android:layout_weight="1"
             android:padding="@dimen/_5sdp"
             android:src="@drawable/file_name_ic" />
-
-        <ImageView
-            android:id="@+id/setting_btn"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_28sdp"
-            android:layout_weight="1"
-            android:padding="@dimen/_5sdp"
-            android:src="@drawable/setting_ic" />
 
     </LinearLayout>
 

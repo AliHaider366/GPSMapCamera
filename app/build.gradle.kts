@@ -129,6 +129,15 @@ dependencies {
     implementation ("com.google.android.play:app-update:2.1.0")
     implementation ("com.google.android.play:review:2.0.2")
 
+    // In App Review
+    implementation ("com.google.android.play:review:2.0.2")
+
+    // App Update
+    implementation("com.google.android.play:app-update:2.1.0")
+
+    // Billing
+    implementation("com.android.billingclient:billing:8.1.0")
+
 
 }
 

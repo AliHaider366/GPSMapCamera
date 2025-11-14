@@ -26,8 +26,8 @@
         android:background="@drawable/continue_bg"
         android:drawableEnd="@drawable/next_ic"
         android:drawablePadding="@dimen/_10sdp"
-        android:paddingHorizontal="@dimen/_20sdp"
-        android:paddingVertical="@dimen/_8sdp"
+        android:paddingHorizontal="@dimen/_80sdp"
+        android:paddingVertical="@dimen/_12sdp"
         android:text="@string/continue_"
         android:textColor="@color/white"
         android:textSize="@dimen/_12sdp"
@@ -49,6 +49,7 @@
         app:layout_constraintTop_toBottomOf="@+id/viewPager"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
+        android:visibility="gone"
         app:lottie_rawRes="@raw/swipe_hand" />
 
 

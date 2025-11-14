@@ -3,6 +3,7 @@ package com.example.gpsmapcamera.utils
 import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Activity
@@ -93,6 +94,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
+import com.google.android.material.animation.AnimatorSetCompat.playTogether
 import com.google.openlocationcode.OpenLocationCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -1269,3 +1271,68 @@ fun Context.openEmailApp(finalMessage: String) {
 
 }
 
+
+
+fun TextView.startPulseAnimation() {
+    // Scale up
+    val scaleUpX = ObjectAnimator.ofFloat(this, View.SCALE_X, 1f, 0.9f)
+    val scaleUpY = ObjectAnimator.ofFloat(this, View.SCALE_Y, 1f, 0.9f)
+    val scaleUp = AnimatorSet().apply {
+        playTogether(scaleUpX, scaleUpY)
+        duration = 1000
+    }
+
+    // Scale down
+    val scaleDownX = ObjectAnimator.ofFloat(this, View.SCALE_X, 0.9f, 1f)
+    val scaleDownY = ObjectAnimator.ofFloat(this, View.SCALE_Y, 0.9f, 1f)
+    val scaleDown = AnimatorSet().apply {
+        playTogether(scaleDownX, scaleDownY)
+        duration = 1000
+    }
+
+    // One full cycle: up then down
+    val oneCycle = AnimatorSet().apply {
+        playSequentially(scaleUp, scaleDown)
+    }
+
+    // Repeat 3 cycles
+    val threeCycles = AnimatorSet().apply {
+        playSequentially(oneCycle, oneCycle.clone(), oneCycle.clone())
+    }
+
+    fun startLoop() {
+        threeCycles.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                postDelayed({ startLoop() }, 3000L)
+            }
+        })
+        threeCycles.start()
+    }
+
+    postDelayed({ startLoop() }, 3000L)
+}
+
+fun TextView.onEnabledChanged(onChange: (Boolean) -> Unit) {
+    var lastEnabled = isEnabled
+
+    val runnable = object : Runnable {
+        override fun run() {
+            if (lastEnabled != isEnabled) {
+                lastEnabled = isEnabled
+                onChange(isEnabled)
+            }
+            postDelayed(this, 50) // check frequently (50ms)
+        }
+    }
+    post(runnable)
+}
+
+fun View.enableView() {
+    isEnabled = true
+    alpha = 1f
+}
+
+fun View.disableView() {
+    isEnabled = false
+    alpha = 0.5f
+}

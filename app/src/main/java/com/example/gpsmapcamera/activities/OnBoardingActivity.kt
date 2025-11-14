@@ -7,7 +7,8 @@ import com.example.gpsmapcamera.adapters.OnBoardingAdapter
 import com.example.gpsmapcamera.databinding.ActivityOnBoardingBinding
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.launchActivity
-import com.example.gpsmapcamera.utils.visible
+import com.example.gpsmapcamera.utils.onEnabledChanged
+import com.example.gpsmapcamera.utils.startPulseAnimation
 import com.google.android.material.tabs.TabLayoutMediator
 
 
@@ -41,6 +42,11 @@ class OnBoardingActivity : BaseActivity() {
             }
         }
 
+
+
+        binding.continueBtn.startPulseAnimation()
+
+
         // Attach TabLayout and ViewPager2
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
         }.attach()
@@ -51,7 +57,7 @@ class OnBoardingActivity : BaseActivity() {
                 positionOffset: Float,
                 positionOffsetPixels: Int
             ) {
-                if (position > 2) binding.lottieView.gone() else binding.lottieView.visible()
+                if (position > 2) binding.lottieView.gone() else binding.lottieView.gone()
             }
 
             override fun onPageSelected(position: Int) {}

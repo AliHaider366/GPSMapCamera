@@ -23,6 +23,7 @@ import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
 import com.example.gpsmapcamera.utils.StampPreferences
+import com.example.gpsmapcamera.utils.enableView
 import com.example.gpsmapcamera.utils.getSelectedMapDrawable
 import com.example.gpsmapcamera.utils.gone
 import com.example.gpsmapcamera.utils.invisible
@@ -131,29 +132,30 @@ class BasicTemplateFragment : Fragment() {
 
         lytClassicClick.setOnClickListener {
             selectTemplate(Constants.CLASSIC_TEMPLATE)
-            PrefManager.setBoolean(requireActivity(), Constants.IS_TOP_TEMPLATE_SELECTED, false)
+            (requireActivity() as AllTemplateActivity).isTopSelected = false
             (requireActivity() as AllTemplateActivity).isTemplateChanged = -1
+            (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
         }
         lytAdvanceClick.setOnClickListener {
             selectTemplate(Constants.ADVANCE_TEMPLATE)
-            PrefManager.setBoolean(requireActivity(), Constants.IS_TOP_TEMPLATE_SELECTED, false)
+            (requireActivity() as AllTemplateActivity).isTopSelected = false
             (requireActivity() as AllTemplateActivity).isTemplateChanged = -1
+            (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
         }
         lytReportingClick.setOnClickListener {
             selectTemplate(Constants.REPORTING_TEMPLATE)
-            PrefManager.setBoolean(requireActivity(), Constants.IS_TOP_TEMPLATE_SELECTED, false)
+            (requireActivity() as AllTemplateActivity).isTopSelected = false
             (requireActivity() as AllTemplateActivity).isTemplateChanged = -1
+            (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
         }
 
 
     }
 
     private fun selectTemplate(selectedTemplate: String) {
-        PrefManager.setString(
-            requireActivity(),
-            Constants.SELECTED_STAMP_TEMPLATE,
-            selectedTemplate
-        )
+
+        (requireActivity() as AllTemplateActivity).stampSelectedModel = selectedTemplate
+
         when (selectedTemplate) {
             Constants.CLASSIC_TEMPLATE -> {
                 binding.ivEditClassicTemplate.visible()

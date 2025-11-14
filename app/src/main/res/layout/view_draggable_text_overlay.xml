@@ -5,17 +5,26 @@
     android:layout_height="wrap_content"
 
     >
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_stroke_white_5"
+        app:layout_constraintBottom_toBottomOf="@+id/overlayText"
+        app:layout_constraintEnd_toEndOf="@+id/overlayText"
+        app:layout_constraintStart_toStartOf="@+id/overlayText"
+        app:layout_constraintTop_toTopOf="@+id/overlayText"/>
+
 
     <TextView
         android:id="@+id/overlayText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/_10sdp"
-        app:layout_constraintWidth_percent="0.88"
+        app:layout_constraintWidth_percent="0.8"
         android:background="@drawable/bg_stroke_white_5"
         android:paddingHorizontal="@dimen/_8sdp"
         android:paddingVertical="@dimen/_8sdp"
-        android:text="Hello Friends"
+        android:text="Hello"
         android:gravity="center"
         android:textColor="@color/blue"
         android:textSize="@dimen/_14sdp"

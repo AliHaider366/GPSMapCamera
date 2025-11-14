@@ -9,7 +9,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/_10sdp">
+        android:padding="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/mapContainer"
@@ -29,8 +33,6 @@
         </LinearLayout>
 
 
-
-
         <!-- Center Title -->
         <TextView
             android:id="@+id/tvTemperature"
@@ -40,8 +42,8 @@
             android:text="23 C"
             android:textColor="@color/white"
             android:textSize="@dimen/_24sdp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
         <!-- Center Title -->
@@ -50,14 +52,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
             android:text="Rwp, Pakistan"
             android:textColor="@color/white"
             android:textSize="@dimen/_18sdp"
             android:textStyle="bold"
-            android:layout_marginBottom="@dimen/_5sdp"
             app:layout_constraintBottom_toTopOf="@+id/tvTimeDate"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"  />
+            app:layout_constraintStart_toStartOf="parent" />
 
 
         <!-- Center Title -->
@@ -66,13 +68,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
             android:text="08:22 PM Monday, 02 \nSep 2023"
             android:textColor="@color/white"
             android:textSize="@dimen/_15sdp"
-            android:layout_marginBottom="@dimen/_5sdp"
             app:layout_constraintBottom_toTopOf="@+id/tvLatitude"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"  />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <!-- Center Title -->
         <TextView
@@ -80,10 +82,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
             android:text="Latitude : 11.12"
             android:textColor="@color/white"
             android:textSize="@dimen/_14sdp"
-            android:layout_marginBottom="@dimen/_5sdp"
             app:layout_constraintBottom_toTopOf="@+id/tvLongitude"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -98,8 +100,8 @@
             android:textColor="@color/white"
             android:textSize="@dimen/_14sdp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tvCompassContainer"/>
+            app:layout_constraintEnd_toStartOf="@+id/tvCompassContainer"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <LinearLayout
             android:id="@+id/tvCompassContainer"
@@ -113,8 +115,7 @@
             <ImageView
                 android:layout_width="@dimen/_20sdp"
                 android:layout_height="@dimen/_20sdp"
-                android:src="@drawable/ic_top_template_compass"
-                />
+                android:src="@drawable/ic_top_template_compass" />
             <!-- Center Title -->
             <TextView
                 android:layout_width="wrap_content"
@@ -122,10 +123,9 @@
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:text="334 NW"
                 android:textColor="@color/white"
-                android:textSize="@dimen/_14sdp"/>
+                android:textSize="@dimen/_14sdp" />
 
         </LinearLayout>
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,31 +2,56 @@ package com.example.gpsmapcamera.activities.template
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
-import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.BaseActivity
 import com.example.gpsmapcamera.adapters.TemplatePagerAdapter
 import com.example.gpsmapcamera.databinding.ActivityAllTemplateBinding
+import com.example.gpsmapcamera.utils.Constants
+import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.disableView
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 
 
 class AllTemplateActivity : BaseActivity() {
 
-    private val binding by lazy {
+    val binding by lazy {
         ActivityAllTemplateBinding.inflate(layoutInflater)
     }
 
 
     var isTemplateChanged = 0
 
+    var isTopSelected = false
+    var topTemplateSelectedPosition = 0
+    var stampSelectedModel = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
+        initViews()
         setupViewPager()
         clickListeners()
+    }
+
+    private fun initViews() = binding.run {
+        btnDone.disableView()
+        isTopSelected = PrefManager.getBoolean(
+            this@AllTemplateActivity,
+            Constants.IS_TOP_TEMPLATE_SELECTED,
+            false
+        )
+        topTemplateSelectedPosition = PrefManager.getInt(
+            this@AllTemplateActivity,
+            Constants.TOP_TEMPLATE_SELECTED_NUMBER, 0
+        )
+        stampSelectedModel = PrefManager.getString(
+            this@AllTemplateActivity,
+            Constants.SELECTED_STAMP_TEMPLATE,
+            Constants.CLASSIC_TEMPLATE
+        )
     }
 
     private fun setupViewPager() = binding.viewPager.run {
@@ -61,6 +86,29 @@ class AllTemplateActivity : BaseActivity() {
         btnTopTemplates.setOnClickListener {
             viewPager.currentItem = 1
             setTabSelected(isBasic = false)
+        }
+
+        btnDone.setOnClickListener {
+            if (btnDone.isEnabled) {
+                PrefManager.setBoolean(
+                    this@AllTemplateActivity,
+                    Constants.IS_TOP_TEMPLATE_SELECTED,
+                    isTopSelected
+                )
+                PrefManager.setInt(
+                    this@AllTemplateActivity,
+                    Constants.TOP_TEMPLATE_SELECTED_NUMBER,
+                    topTemplateSelectedPosition
+                )
+                PrefManager.setString(
+                    this@AllTemplateActivity,
+                    Constants.SELECTED_STAMP_TEMPLATE,
+                    stampSelectedModel
+                )
+
+                setResult(RESULT_OK)
+                finish()
+            }
         }
     }
 

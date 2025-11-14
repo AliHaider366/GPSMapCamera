@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.doOnPreDraw
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.databinding.StampAdvanceTemplateLayoutBinding
 import com.example.gpsmapcamera.databinding.StampClassicTemplateLayoutBinding
@@ -1068,7 +1069,6 @@ fun Context.getFontSizeFactor(passedTemplate: String): Float {
 fun ConstraintLayout.setStampPosition(stampPosition: StampCameraPosition) {
     val constraintSet = ConstraintSet()
     constraintSet.clone(this)
-    constraintSet.clear(R.id.stampContainer, ConstraintSet.BOTTOM)
 
     if (stampPosition == StampCameraPosition.TOP) {
         constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.BOTTOM)
@@ -1107,8 +1107,45 @@ fun ConstraintLayout.setStampPosition(stampPosition: StampCameraPosition) {
     // Set layout params for stampContainer
     val stampContainer = findViewById<FrameLayout>(R.id.stampContainer)
     val stampParams = stampContainer.layoutParams as ConstraintLayout.LayoutParams
-    stampParams.height = ConstraintLayout.LayoutParams.WRAP_CONTENT // Ensure full height
+    stampParams.height = ConstraintLayout.LayoutParams.WRAP_CONTENT
     stampContainer.layoutParams = stampParams
+
+
+
+    constraintSet.applyTo(this)
+}
+
+fun ConstraintLayout.setTopTemplateForRoot() {
+    val constraintSet = ConstraintSet()
+    constraintSet.clone(this)
+
+    constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.BOTTOM)
+    constraintSet.clear(R.id.overlayRootContainer, ConstraintSet.TOP)
+    constraintSet.connect(
+        R.id.overlayRootContainer,
+        ConstraintSet.TOP,
+        R.id.previewContainer,
+        ConstraintSet.TOP
+    )
+
+    constraintSet.connect(
+        R.id.overlayRootContainer,
+        ConstraintSet.BOTTOM,
+        R.id.previewContainer,
+        ConstraintSet.BOTTOM
+    )
+
+    val overlayRootContainer = findViewById<ConstraintLayout>(R.id.overlayRootContainer)
+    val params = overlayRootContainer.layoutParams as ConstraintLayout.LayoutParams
+    params.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+    overlayRootContainer.layoutParams = params
+
+    // Set layout params for stampContainer
+    val stampContainer = findViewById<FrameLayout>(R.id.stampContainer)
+    val stampParams = stampContainer.layoutParams as ConstraintLayout.LayoutParams
+    stampParams.height = ConstraintLayout.LayoutParams.MATCH_PARENT // Ensure full height
+    stampContainer.layoutParams = stampParams
+
 
 
 
@@ -1128,7 +1165,7 @@ fun ConstraintLayout.setStampPositionForTopTemplate() {
     constraintSet.connect(
         R.id.stampContainer,
         ConstraintSet.TOP,
-        ConstraintSet.PARENT_ID,
+        R.id.overlayRootContainer,
         ConstraintSet.TOP
     )
     constraintSet.connect(
@@ -1138,6 +1175,7 @@ fun ConstraintLayout.setStampPositionForTopTemplate() {
         ConstraintSet.BOTTOM
     )
 
+
     // Set layout params for overlayRootContainer
     val params = layoutParams as ConstraintLayout.LayoutParams
     params.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT // Ensure full height
@@ -1146,12 +1184,11 @@ fun ConstraintLayout.setStampPositionForTopTemplate() {
     // Set layout params for stampContainer
     val stampContainer = findViewById<FrameLayout>(R.id.stampContainer)
     val stampParams = stampContainer.layoutParams as ConstraintLayout.LayoutParams
-    stampParams.height = ConstraintLayout.LayoutParams.MATCH_CONSTRAINT // Ensure full height
+    stampParams.height = ConstraintLayout.LayoutParams.MATCH_PARENT // Ensure full height
     stampContainer.layoutParams = stampParams
 
     // Apply the constraints
     constraintSet.applyTo(this)
 }
-
 
 

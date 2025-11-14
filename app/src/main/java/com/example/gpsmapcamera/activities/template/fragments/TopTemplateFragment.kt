@@ -14,6 +14,7 @@ import com.example.gpsmapcamera.databinding.FragmentTopTemplateBinding
 import com.example.gpsmapcamera.utils.Constants
 import com.example.gpsmapcamera.utils.MyApp
 import com.example.gpsmapcamera.utils.PrefManager
+import com.example.gpsmapcamera.utils.enableView
 import com.example.gpsmapcamera.utils.invisible
 import com.example.gpsmapcamera.utils.observeOnce
 
@@ -32,8 +33,9 @@ class TopTemplateFragment : Fragment() {
     private val topTemplateAdapter by lazy {
         TopTemplatesAdapter(getTopTemplates()) { position ->
             (requireActivity() as AllTemplateActivity).isTemplateChanged = 1
-            PrefManager.setBoolean(requireActivity(), Constants.IS_TOP_TEMPLATE_SELECTED, true)
-            PrefManager.setInt(requireActivity(), Constants.TOP_TEMPLATE_SELECTED_NUMBER, position)
+            (requireActivity() as AllTemplateActivity).isTopSelected = true
+            (requireActivity() as AllTemplateActivity).topTemplateSelectedPosition = position
+            (requireActivity() as AllTemplateActivity).binding.btnDone.enableView()
         }
     }
 

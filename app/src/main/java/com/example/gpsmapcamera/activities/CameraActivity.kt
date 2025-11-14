@@ -29,6 +29,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.example.gpsmapcamera.R
 import com.example.gpsmapcamera.activities.saved.SavedMediaActivity
 import com.example.gpsmapcamera.activities.template.AllTemplateActivity
@@ -109,6 +110,7 @@ import com.example.gpsmapcamera.utils.setStampPositionForTopTemplate
 import com.example.gpsmapcamera.utils.setTextColorAndBackgroundTint
 import com.example.gpsmapcamera.utils.setTextColorRes
 import com.example.gpsmapcamera.utils.setTintColor
+import com.example.gpsmapcamera.utils.setTopTemplateForRoot
 import com.example.gpsmapcamera.utils.setUpMapPositionForAdvancedTemplate
 import com.example.gpsmapcamera.utils.setUpMapPositionForClassicTemplate
 import com.example.gpsmapcamera.utils.setUpMapPositionForReportingTemplate
@@ -120,6 +122,8 @@ import com.example.gpsmapcamera.utils.toTemperature
 import com.example.gpsmapcamera.utils.toWindSpeed
 import com.example.gpsmapcamera.utils.updateAddressWithVisibility
 import com.example.gpsmapcamera.utils.visible
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import kotlin.math.atan2
 import kotlin.math.sqrt
@@ -265,7 +269,6 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             Manifest.permission.RECORD_AUDIO,
             onGranted = {
                 switchMode(R.id.video_btn)
-
             },
             onDenied = { permanentlyDenied ->
                 if (permanentlyDenied) {
@@ -333,14 +336,20 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
         })
 
         if (fromVideoSelected) {
+            binding.shareBtn.gone()
+            binding.photoBtn.gone()
             if (isPermissionGranted(Manifest.permission.RECORD_AUDIO)) {
                 switchMode(R.id.video_btn)
             } else {
                 micPermissionLauncher.requestPermission(Manifest.permission.RECORD_AUDIO)
             }
         } else if (fromQuickShareSelected) {
+            binding.photoBtn.gone()
+            binding.videoBtn.gone()
             switchMode(R.id.share_btn)
         } else {
+            binding.shareBtn.gone()
+            binding.videoBtn.gone()
             switchMode(R.id.photo_btn)
         }
 
@@ -802,7 +811,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 flashBtn,
                 pickGalleyBtn,
                 fileNameBtn,
-                settingBtn
+                backBtn
             )
             defaultTopMenuView.gone()
             cameraManager.startVideoRecordingWithStamp(
@@ -837,7 +846,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 flashBtn,
                 pickGalleyBtn,
                 fileNameBtn,
-                settingBtn
+                backBtn
             )
             cameraManager.stopVideoRecordingWithStamp()
             recordingTimer.stop()
@@ -886,8 +895,8 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             }
         }
 
-        settingBtn.setOnClickListener {
-            launchActivity<SettingsActivity>() {}
+        backBtn.setOnClickListener {
+            finish()
         }
 
         templateBtn.setOnClickListener {
@@ -1511,7 +1520,10 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
             binding.watermarkContainer.gone()
             binding.ivStampCross.gone()
 
+
+            binding.main.setTopTemplateForRoot()
             binding.overlayRootContainer.setStampPositionForTopTemplate()
+
 
             appViewModel.dynamicValues.observe(this) { currentDynamics ->
                 when (selectedTopTemplateIndex) {
@@ -1798,7 +1810,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
 
 
         }
-        binding.main.setStampPosition(selectedStampPosition)
+            binding.main.setStampPosition(selectedStampPosition)
 
         (applicationContext as MyApp).appViewModel.getLocationAndFetch { location ->
 
@@ -2026,7 +2038,7 @@ class CameraActivity : BaseActivity(), CameraSettingsListener {
                 flashBtn,
                 pickGalleyBtn,
                 fileNameBtn,
-                settingBtn
+                backBtn
             )
             cameraManager.stopVideoRecording()
             cameraManager.stopVideoRecordingWithStamp()
